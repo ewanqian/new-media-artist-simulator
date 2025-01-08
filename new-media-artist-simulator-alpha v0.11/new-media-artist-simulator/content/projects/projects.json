@@ -1,0 +1,340 @@
+[
+    {
+        "id": "dream_theft",
+        "name": "梦境窃贼",
+        "description": "用脑波检测仪记录人们的梦境内容，制作成'艺术电影'在画廊展出，美其名曰'集体潜意识的视觉化呈现'",
+        "requirements": {
+            "theory": 75,
+            "social": 35,
+            "confusion": 85
+        },
+        "effects": {
+            "theory": 65,
+            "confusion": 90,
+            "social": 40,
+            "funding": 75
+        },
+        "achievement": {
+            "name": "梦境掠夺者",
+            "description": "成功让观众看着陌生人的梦境落泪"
+        }
+    },
+    {
+        "id": "time_merchant",
+        "name": "时间商人",
+        "description": "开发一款APP让人们可以用金钱购买他人的时间，越是珍贵的生命时刻越值钱，美其名曰'时间价值再分配'",
+        "requirements": {
+            "theory": 65,
+            "social": 55,
+            "confusion": 70
+        },
+        "effects": {
+            "theory": 50,
+            "confusion": 85,
+            "social": 60,
+            "funding": 100
+        },
+        "achievement": {
+            "name": "时光贩子",
+            "description": "成功让一个人把临终关怀时间卖给了陌生富豪"
+        }
+    },
+    {
+        "id": "reality_filter",
+        "name": "现实过滤器",
+        "description": "推出一款AR眼镜，可以实时美化或丑化用户看到的现实世界，声称这是'对美学标准的解构与重建'",
+        "requirements": {
+            "theory": 60,
+            "social": 40,
+            "confusion": 75
+        },
+        "effects": {
+            "theory": 55,
+            "confusion": 95,
+            "social": 45,
+            "funding": 80
+        },
+        "achievement": {
+            "name": "现实美化师",
+            "description": "成功让用户再也无法直视真实的世界"
+        }
+    },
+    {
+        "id": "empathy_casino",
+        "name": "共情赌场",
+        "description": "建立一个虚拟赌场，让玩家下注其他人的情感起伏，越是极端的情绪波动赔率越高",
+        "requirements": {
+            "theory": 55,
+            "social": 45,
+            "confusion": 90
+        },
+        "effects": {
+            "theory": 45,
+            "confusion": 95,
+            "social": 50,
+            "funding": 85
+        },
+        "achievement": {
+            "name": "情感庄家",
+            "description": "成功让观众把他人的痛苦当作赌资"
+        }
+    },
+    {
+        "id": "reality_mining",
+        "name": "人生矿工",
+        "description": "让参与者佩戴特制眼镜24小时挖掘'稀有人生时刻'，记录陌生人的悲欢离合并铸造成NFT，美其名曰'时代记录'",
+        "requirements": {
+            "theory": 50,
+            "social": 30,
+            "confusion": 70
+        },
+        "effects": {
+            "theory": 40,
+            "confusion": 90,
+            "social": 50,
+            "funding": 80
+        },
+        "achievement": {
+            "name": "人性矿工",
+            "description": "成功让100个人把自己的生活变成了可交易的数字商品"
+        }
+    },
+    {
+        "id": "meta_grave",
+        "name": "数字墓地",
+        "description": "收集死者生前的社交媒体数据，用AI复活他们的数字分身，让亲友能在元宇宙中与'逝者'互动",
+        "requirements": {
+            "theory": 80,
+            "social": 40,
+            "confusion": 90
+        },
+        "effects": {
+            "theory": 60,
+            "confusion": 100,
+            "social": 70,
+            "funding": 100
+        },
+        "achievement": {
+            "name": "数字招魂师",
+            "description": "成功让一个家庭沉迷于与AI假扮的逝者对话"
+        }
+    },
+    {
+        "id": "memory_market",
+        "name": "记忆交易所",
+        "description": "用脑机接口采集用户的美好回忆，制作成可交易的'记忆胶囊'，让富人可以购买穷人的快乐记忆",
+        "requirements": {
+            "theory": 70,
+            "social": 50,
+            "confusion": 60
+        },
+        "effects": {
+            "theory": 50,
+            "confusion": 80,
+            "social": 40,
+            "funding": 90
+        },
+        "achievement": {
+            "name": "记忆掮客",
+            "description": "成功让一个破产者卖掉了自己最后的美好回忆"
+        }
+    },
+    {
+        "id": "emotion_farm",
+        "name": "情感农场",
+        "description": "在VR空间建造一个情感收割场，让用户进行极端情感体验，然后收集这些情感数据用于训练AI",
+        "requirements": {
+            "theory": 65,
+            "social": 45,
+            "confusion": 75
+        },
+        "effects": {
+            "theory": 55,
+            "confusion": 95,
+            "social": 45,
+            "funding": 70
+        },
+        "achievement": {
+            "name": "情感收割者",
+            "description": "成功让AI学会了人类的痛苦"
+        }
+    },
+    {
+        "id": "identity_swap",
+        "name": "身份互换",
+        "description": "让参与者在元宇宙中随机互换身份生活一个月，最后发现自己过得比原来还好的就要支付赔偿金",
+        "requirements": {
+            "theory": 55,
+            "social": 60,
+            "confusion": 85
+        },
+        "effects": {
+            "theory": 45,
+            "confusion": 85,
+            "social": 65,
+            "funding": 60
+        },
+        "achievement": {
+            "name": "命运骗子",
+            "description": "成功让人们怀疑自己的人生是否值得保留"
+        }
+    },
+    {
+        "id": "virtual_wasteland",
+        "name": "元宇宙垃圾场",
+        "description": "在区块链上建造一个数字废墟，出售虚拟垃圾。让玩家用真钱购买虚拟污染权。[讽刺值：最大]",
+        "detailed_description": "一个后启示录风格的虚拟废土。玩家可以购买数字垃圾、建立垃圾帝国。每次交易都会消耗大量真实能源，完美地将虚拟污染转化为现实污染。",
+        "artist_statement": "当人类将垃圾带入元宇宙，我们就完成了存在主义的终极讽刺。[注：项目碳排放惊人]",
+        "critics_quote": "这是有史以来最诚实的NFT项目，因为它承认自己就是垃圾。 - 环保主义者",
+        "requirements": {
+            "cynicism": 80,
+            "marketing": 60,
+            "ethics": -70
+        },
+        "effects": {
+            "digital_waste": 90,
+            "profit": 70,
+            "environment": -60
+        },
+        "achievement": {
+            "name": "数字垃圾大亨",
+            "description": "成功让用户为虚无付费"
+        }
+    },
+    {
+        "id": "installation_art",
+        "name": "装置艺术陷阱",
+        "description": "用废弃的工业零件和闪烁的LED灯打造一个'深刻'的装置，观众看不懂才是成功的关键",
+        "requirements": {
+            "theory": 40,
+            "social": 20,
+            "funding": 50
+        },
+        "effects": {
+            "social": 40,
+            "confusion": 60,
+            "theory": 20
+        },
+        "achievement": {
+            "name": "装置迷宫大师",
+            "description": "成功让观众在装置前驻足三分钟试图理解它的意义"
+        }
+    },
+    {
+        "id": "digital_art",
+        "name": "元宇宙NFT骗局",
+        "description": "用AI生成一堆看起来很酷的图片，声称这是对数字时代的深刻反思",
+        "requirements": {
+            "theory": 30,
+            "confusion": 40,
+            "funding": 30
+        },
+        "effects": {
+            "theory": 25,
+            "confusion": 55,
+            "social": 35,
+            "funding": 100
+        },
+        "achievement": {
+            "name": "数字炒作大师",
+            "description": "成功说服收藏家购买了一个不存在的数字资产"
+        }
+    },
+    {
+        "id": "commercial_project",
+        "name": "品牌艺术合作",
+        "description": "为某奢侈品牌创作一个毫无意义但看起来很时尚的艺术项目，记得多用'创新'和'颠覆'这样的词",
+        "requirements": {
+            "social": 40,
+            "funding": 20
+        },
+        "effects": {
+            "funding": 200,
+            "theory": -30,
+            "social": 50,
+            "confusion": 40
+        },
+        "achievement": {
+            "name": "品牌带货王",
+            "description": "成功把艺术理想包装成商业项目"
+        }
+    },
+    {
+        "id": "social_practice",
+        "name": "社会实践艺术",
+        "description": "和随机路人进行'艺术互动'，无论他们愿意与否，然后宣称这是对社会关系的探讨",
+        "requirements": {
+            "theory": 50,
+            "social": 30
+        },
+        "effects": {
+            "social": 45,
+            "confusion": 70,
+            "theory": 40,
+            "funding": -20
+        },
+        "achievement": {
+            "name": "社会实践先锋",
+            "description": "成功让路人参与了一个他们完全不理解的艺术项目"
+        }
+    },
+    {
+        "id": "concept_art",
+        "name": "概念艺术诡计",
+        "description": "展出一个空白画框，声称这是对艺术本质的终极探讨，还要配上至少3000字的艺术评论",
+        "requirements": {
+            "theory": 70,
+            "confusion": 50
+        },
+        "effects": {
+            "theory": 100,
+            "confusion": 90,
+            "social": 30,
+            "funding": -10
+        },
+        "achievement": {
+            "name": "概念大师",
+            "description": "成功让评论家写出了一篇关于'无'的长评"
+        }
+    },
+    {
+        "id": "video_art",
+        "name": "实验影像",
+        "description": "用手机随意拍摄10小时的日常生活片段，剪辑成一部3小时的实验电影，声称这是对现代生活的批判",
+        "requirements": {
+            "theory": 45,
+            "social": 25,
+            "funding": 30
+        },
+        "effects": {
+            "theory": 50,
+            "confusion": 65,
+            "social": 40,
+            "funding": -15
+        },
+        "achievement": {
+            "name": "实验影像先锋",
+            "description": "成功让观众在放映厅待满całe场"
+        }
+    },
+    {
+        "id": "performance_art",
+        "name": "行为艺术闹剧",
+        "description": "在公共场所做一些匪夷所思的行为，越是让路人困惑，艺术性就越高",
+        "requirements": {
+            "theory": 60,
+            "social": 20,
+            "confusion": 80
+        },
+        "effects": {
+            "theory": 70,
+            "confusion": 100,
+            "social": 60,
+            "funding": -30
+        },
+        "achievement": {
+            "name": "行为艺术大师",
+            "description": "成功让保安也变成了行为艺术的一部分"
+        }
+    }
+]

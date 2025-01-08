@@ -1,0 +1,132 @@
+[
+    {
+        "id": "art_critic",
+        "name": "评论家来访",
+        "description": "一位知名评论家说要来参观你的工作室，但暗示需要一些'参观费用'",
+        "choices": [
+            {
+                "text": "支付¥2000'参观费'",
+                "result": {
+                    "description": "评论家写了一篇莫名其妙但看起来很专业的评论",
+                    "effects": {
+                        "funding": -20,
+                        "social": 30,
+                        "theory": 15
+                    },
+                    "achievement": {
+                        "name": "交际达人",
+                        "description": "成功体验了艺术圈的潜规则"
+                    }
+                }
+            },
+            {
+                "text": "拒绝支付",
+                "result": {
+                    "description": "评论家表示你不懂行规，以后别想参加任何展览",
+                    "effects": {
+                        "social": -40,
+                        "confusion": 20
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": "plagiarism_accusation",
+        "name": "抄袭风波",
+        "description": "有人在网上指出你的作品与国外一个艺术家的作品极其相似",
+        "choices": [
+            {
+                "text": "声称这是'艺术对话'",
+                "result": {
+                    "description": "你写了一篇长文解释这是对后现代艺术的致敬",
+                    "effects": {
+                        "theory": 25,
+                        "confusion": 50,
+                        "social": -10
+                    },
+                    "achievement": {
+                        "name": "危机公关大师",
+                        "description": "成功把抄袭说成了艺术创新"
+                    }
+                }
+            },
+            {
+                "text": "装死不回应",
+                "result": {
+                    "description": "争议慢慢平息，但圈内都记住了这件事",
+                    "effects": {
+                        "social": -30,
+                        "theory": -15
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": "rich_collector",
+        "name": "暴发户收藏家",
+        "description": "一位房地产老板想要购买你的作品，但要求改成'更喜庆'的风格",
+        "choices": [
+            {
+                "text": "艺术是要妥协的",
+                "result": {
+                    "description": "你的作品现在挂在某售楼处大厅里",
+                    "effects": {
+                        "funding": 100,
+                        "theory": -30,
+                        "social": 20
+                    },
+                    "achievement": {
+                        "name": "市场达人",
+                        "description": "成功把艺术变成了装饰品"
+                    }
+                }
+            },
+            {
+                "text": "坚持艺术理想",
+                "result": {
+                    "description": "收藏家表示你不懂市场，转身去买了村上隆",
+                    "effects": {
+                        "theory": 20,
+                        "funding": -40,
+                        "confusion": 15
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "id": "viral_chance",
+        "name": "网红机会",
+        "description": "短视频平台的运营联系你，想请你做一些'接地气'的艺术内容",
+        "choices": [
+            {
+                "text": "成为艺术网红",
+                "result": {
+                    "description": "你现在有100万粉丝，都在评论问你用的什么滤镜",
+                    "effects": {
+                        "social": 50,
+                        "funding": 60,
+                        "theory": -40,
+                        "confusion": 30
+                    },
+                    "achievement": {
+                        "name": "流量之王",
+                        "description": "成功把艺术做成了短视频"
+                    }
+                }
+            },
+            {
+                "text": "保持高冷",
+                "result": {
+                    "description": "你错过了一个成为网红的机会，但保住了艺术家的骄傲",
+                    "effects": {
+                        "theory": 30,
+                        "social": -20
+                    }
+                }
+            }
+        ]
+    }
+]
