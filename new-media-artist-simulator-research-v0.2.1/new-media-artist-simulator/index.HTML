@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新媒体艺术家模拟器 - 专业研究版</title>
+    <style>
+        :root {
+            --bg-color: #202124;
+            --text-color: #e8eaed;
+            --card-bg: #303134;
+            --accent-color: #8ab4f8;
+            --achievement-bg: #2d2f31;
+            --positive-color: #81c995;
+            --negative-color: #f28b82;
+            --card-hover-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --highlight-color: #c58af9;
+            --theory-color: #4db6ac;
+            --research-color: #7986cb;
+            --tag-bg: rgba(255, 255, 255, 0.1);
+            --scrollbar-bg: rgba(255, 255, 255, 0.05);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .card {
+            background: var(--achievement-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: var(--card-hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .card-clicked {
+            animation: click-animation 0.2s ease;
+        }
+
+        .achievements-section {
+            background: var(--achievement-bg);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .achievements-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .achievement-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .stat-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 4px;
+            font-size: 0.9em;
+            background: var(--tag-bg);
+        }
+
+        .theory-tag { color: var(--theory-color); }
+        .social-tag { color: var(--accent-color); }
+        .confusion-tag { color: var(--negative-color); }
+        .funding-tag { color: var(--positive-color); }
+
+        .export-button {
+            background: var(--research-color);
+            color: var(--text-color);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .export-button:hover {
+            background: var(--theory-color);
+            transform: translateY(-2px);
+        }
+
+        @keyframes click-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .features-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .features-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-section li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .features-section li:before {
+            content: "??";
+            position: absolute;
+            left: 0;
+            color: var(--highlight-color);
+        }
+
+        /* 事件弹窗样式 */
+        .event-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .event-dialog {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .event-dialog.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .event-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .event-choice {
+            background: var(--tag-bg);
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .event-choice:hover {
+            background: var(--card-hover-bg);
+        }
+
+        .event-continue {
+            background: var(--accent-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: var(--text-color);
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>新媒体艺术家模拟器</h1>
+            <p>专业研究版 - Cross-Disciplinary Art Research</p>
+            <p>深度学术探索的第 <span id="days">1</span> 天</p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <h3>理论深度</h3>
+                <p id="stat-theory">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>学术资本</h3>
+                <p id="stat-social">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>范式突破</h3>
+                <p id="stat-confusion">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>研究经费</h3>
+                <p id="stat-funding">0</p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>研究场域</h2>
+                <p>探索跨学科实验室与理论研究空间</p>
+                <div id="spaces-grid"></div>
+            </div>
+            <div class="section">
+                <h2>专业准备</h2>
+                <p>进行深度理论研究与技术实验准备</p>
+                <div id="research-grid"></div>
+            </div>
+            <div class="section">
+                <h2>项目研究</h2>
+                <p>开展前沿性的跨学科艺术研究项目</p>
+                <div id="projects-grid"></div>
+            </div>
+        </div>
+
+        <div class="achievements-section">
+            <div class="achievements-header">
+                <h2>研究成果与学术突破</h2>
+                <button id="export-button" class="export-button">导出研究档案</button>
+            </div>
+            <div id="achievements-list" class="achievements-grid"></div>
+        </div>
+
+        <div class="features-section">
+            <h2>专业研究版特性：</h2>
+            <ul>
+                <li>生物艺术与合成生命研究</li>
+                <li>人工智能与认知科学实验</li>
+                <li>量子计算与艺术创作探索</li>
+                <li>神经科学与意识研究项目</li>
+                <li>后人类理论与技术哲学</li>
+                <li>跨学科实验室研究实践</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 脚本引用 -->
+    <script src="js/contentLoader.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/eventSystem.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
