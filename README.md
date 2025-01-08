@@ -15,7 +15,20 @@
 3. 首次运行时，在"系统偏好设置 > 安全性与隐私 > 通用"中点击"仍要打开"
 
 ## 项目结构
-
+**new-media-artist-simulator/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   ├── main.js          // 游戏主逻辑
+│   ├── gameState.js     // 游戏状态管理
+│   ├── eventSystem.js   // 事件系统
+│   └── contentLoader.js // 内容加载器
+└── content/
+    ├── spaces/          // 基础场景
+    ├── preparations/    // 基础研究
+    ├── projects/        // 基础项目
+    └── events/          // 基础随机事件**
 ## 游戏特性
 
 - 基础属性系统：理论水平、社交资本、迷惑指数、资金
