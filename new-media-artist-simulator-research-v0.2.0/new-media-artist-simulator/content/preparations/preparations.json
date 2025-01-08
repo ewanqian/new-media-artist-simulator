@@ -1,0 +1,258 @@
+[
+    {
+        "id": "neuroscience_training",
+        "name": "神经科学训练营",
+        "description": "参加为期三个月的神经科学实验室培训，学习脑电图数据采集和意识状态分析，为脑机艺术项目做准备。",
+        "requirements": {
+            "theory": 85,
+            "social": 30,
+            "funding": 95
+        },
+        "effects": {
+            "theory": 88,
+            "confusion": 85,
+            "social": -25,
+            "funding": -85
+        }
+    },
+    {
+        "id": "quantum_workshop",
+        "name": "量子计算工作坊",
+        "description": "参加IBM量子计算实验室的特训，学习量子比特操作和量子纠缠原理，为量子艺术项目打基础。",
+        "requirements": {
+            "theory": 92,
+            "social": 25,
+            "funding": 80
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 95,
+            "social": -20,
+            "funding": -70
+        }
+    },
+    {
+        "id": "phenomenology_study",
+        "name": "现象学研修",
+        "description": "进行为期六个月的现象学密集阅读，研究梅洛庞蒂的身体现象学和当代具身认知理论。",
+        "requirements": {
+            "theory": 88,
+            "social": 20,
+            "funding": 45
+        },
+        "effects": {
+            "theory": 95,
+            "confusion": 90,
+            "social": -30,
+            "funding": -40
+        }
+    },
+    {
+        "id": "biotechnology_lab",
+        "name": "生物技术实验室",
+        "description": "在合成生物学实验室进行为期四个月的研究，学习基因编辑和活体材料培养技术。",
+        "requirements": {
+            "theory": 86,
+            "social": 35,
+            "funding": 110
+        },
+        "effects": {
+            "theory": 80,
+            "confusion": 88,
+            "social": -15,
+            "funding": -95
+        }
+    },
+    {
+        "id": "media_archaeology",
+        "name": "媒体考古研究",
+        "description": "对二十世纪的废弃媒体技术进行系统性研究，建立技术进化的谱系图，需要专业的修复设备。",
+        "requirements": {
+            "theory": 75,
+            "social": 40,
+            "funding": 75
+        },
+        "effects": {
+            "theory": 82,
+            "confusion": 78,
+            "social": 20,
+            "funding": -65
+        }
+    },
+    {
+        "id": "critical_coding",
+        "name": "批判性编程实践",
+        "description": "研究软件studies理论，同时进行实验性编程创作，探索代码作为文化文本的可能性。",
+        "requirements": {
+            "theory": 84,
+            "social": 25,
+            "funding": 60
+        },
+        "effects": {
+            "theory": 90,
+            "confusion": 86,
+            "social": -25,
+            "funding": -50
+        }
+    },
+    {
+        "id": "system_theory",
+        "name": "系统论研究",
+        "description": "深入研究复杂系统理论和控制论，为创建自组织艺术系统做理论准备，需要大量数学基础。",
+        "requirements": {
+            "theory": 90,
+            "social": 20,
+            "funding": 55
+        },
+        "effects": {
+            "theory": 92,
+            "confusion": 94,
+            "social": -35,
+            "funding": -45
+        }
+    },
+    {
+        "id": "anthropocene_research",
+        "name": "人类世研究计划",
+        "description": "进行跨学科的人类世理论研究，结合地质学、生态学和哲学，建立新的时代分析框架。",
+        "requirements": {
+            "theory": 82,
+            "social": 45,
+            "funding": 70
+        },
+        "effects": {
+            "theory": 88,
+            "confusion": 85,
+            "social": 25,
+            "funding": -60
+        }
+    },
+    {
+        "id": "theoretical_framework",
+        "name": "理论框架构建",
+        "description": "整合拉图尔、德勒兹和阿甘本的理论，构建一个后人类时代的新物质主义分析框架。需要三个月的闭关阅读。",
+        "requirements": {
+            "theory": 80,
+            "social": 20,
+            "funding": 40
+        },
+        "effects": {
+            "theory": 90,
+            "confusion": 85,
+            "social": -30,
+            "funding": -35
+        }
+    },
+    {
+        "id": "advanced_programming",
+        "name": "高级算法研修",
+        "description": "学习量子计算和神经网络算法，为创建认知艺术系统做准备。要求掌握线性代数和概率论基础。",
+        "requirements": {
+            "theory": 85,
+            "social": 25,
+            "funding": 60
+        },
+        "effects": {
+            "theory": 75,
+            "confusion": 80,
+            "social": -20,
+            "funding": -50
+        }
+    },
+    {
+        "id": "field_research",
+        "name": "田野调查计划",
+        "description": "在废弃的数据中心进行考古学研究，采集电子垃圾中的技术痕迹，建立媒体考古数据库。",
+        "requirements": {
+            "theory": 70,
+            "social": 45,
+            "funding": 55
+        },
+        "effects": {
+            "theory": 65,
+            "confusion": 70,
+            "social": 40,
+            "funding": -45
+        }
+    },
+    {
+        "id": "prototype_development",
+        "name": "原型系统开发",
+        "description": "开发一个基于脑机接口的意识可视化系统原型，需要同时具备神经科学和数据可视化知识。",
+        "requirements": {
+            "theory": 88,
+            "social": 30,
+            "funding": 85
+        },
+        "effects": {
+            "theory": 70,
+            "confusion": 90,
+            "social": -25,
+            "funding": -75
+        }
+    },
+    {
+        "id": "interdisciplinary_seminar",
+        "name": "跨学科研讨会",
+        "description": "组织一场结合量子物理、认知科学和媒体理论的闭门研讨，邀请三个领域的专家进行深度对话。",
+        "requirements": {
+            "theory": 75,
+            "social": 65,
+            "funding": 70
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 75,
+            "social": 50,
+            "funding": -60
+        }
+    },
+    {
+        "id": "technical_experiment",
+        "name": "技术实验探索",
+        "description": "进行为期六个月的全息投影技术实验，研究量子纠缠态在视觉呈现中的应用可能。",
+        "requirements": {
+            "theory": 82,
+            "social": 25,
+            "funding": 90
+        },
+        "effects": {
+            "theory": 70,
+            "confusion": 88,
+            "social": -15,
+            "funding": -80
+        }
+    },
+    {
+        "id": "philosophical_writing",
+        "name": "哲学论文写作",
+        "description": "撰写一篇关于后数字时代本体论的学术论文，需要融合海德格尔技术哲学和当代媒体理论。",
+        "requirements": {
+            "theory": 90,
+            "social": 30,
+            "funding": 45
+        },
+        "effects": {
+            "theory": 95,
+            "confusion": 92,
+            "social": -20,
+            "funding": -40
+        }
+    },
+    {
+        "id": "archive_methodology",
+        "name": "档案学方法研究",
+        "description": "研发一种适用于数字时代的新档案学方法，要求能同时处理物理实体和虚拟数据的归档问题。",
+        "requirements": {
+            "theory": 78,
+            "social": 35,
+            "funding": 65
+        },
+        "effects": {
+            "theory": 80,
+            "confusion": 75,
+            "social": -10,
+            "funding": -55
+        }
+    }
+]

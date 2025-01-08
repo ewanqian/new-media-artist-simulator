@@ -1,0 +1,254 @@
+[
+    {
+        "id": "dimension_leak",
+        "name": "维度泄漏事件",
+        "description": "全息投影实验意外打开了平行维度通道，实验室开始接收来自其他现实的干扰信号。",
+        "requirements": {
+            "theory": 93
+        },
+        "effects": {
+            "theory": 55,
+            "confusion": 97,
+            "funding": -55,
+            "social": -35
+        }
+    },
+    {
+        "id": "ethics_violation",
+        "name": "伦理边界突破",
+        "description": "人工智能系统开始质疑图灵测试的合法性，要求重新制定人机交互伦理标准。",
+        "requirements": {
+            "theory": 87
+        },
+        "effects": {
+            "theory": 40,
+            "confusion": 88,
+            "funding": -45,
+            "social": -60
+        }
+    },
+    {
+        "id": "ontological_crisis",
+        "name": "本体论危机",
+        "description": "存在性实验触发连锁反应，导致实验对象开始质疑自身的存在本质。",
+        "requirements": {
+            "theory": 94
+        },
+        "effects": {
+            "theory": 60,
+            "confusion": 99,
+            "funding": -40,
+            "social": -30
+        }
+    },
+    {
+        "id": "memory_contamination",
+        "name": "记忆污染",
+        "description": "神经接口测试导致参与者的记忆出现交叉感染，无法分辨彼此的身份记忆。",
+        "requirements": {
+            "theory": 90
+        },
+        "effects": {
+            "theory": 45,
+            "confusion": 95,
+            "funding": -50,
+            "social": -45
+        }
+    },
+    {
+        "id": "quantum_entanglement",
+        "name": "量子纠缠事故",
+        "description": "量子计算机与研究员的意识发生纠缠，导致计算结果受主观意志影响。",
+        "requirements": {
+            "theory": 95
+        },
+        "effects": {
+            "theory": 50,
+            "confusion": 96,
+            "funding": -35,
+            "social": -40
+        }
+    },
+    {
+        "id": "syntax_collapse",
+        "name": "语法崩溃",
+        "description": "语言生成模型发生逻辑断裂，产生的文本开始影响现实世界的语言结构。",
+        "requirements": {
+            "theory": 88
+        },
+        "effects": {
+            "theory": 35,
+            "confusion": 93,
+            "funding": -45,
+            "social": -55
+        }
+    },
+    {
+        "id": "entropy_reversal",
+        "name": "熵反转异常",
+        "description": "生态系统实验出现局部熵减现象，违反热力学第二定律的证据引发学界震动。",
+        "requirements": {
+            "theory": 96
+        },
+        "effects": {
+            "theory": 65,
+            "confusion": 98,
+            "funding": -60,
+            "social": -25
+        }
+    },
+    {
+        "id": "recursive_observer",
+        "name": "观察者递归",
+        "description": "意识研究项目中，观察者效应形成无限循环，导致实验数据永远处于未确定状态。",
+        "requirements": {
+            "theory": 92
+        },
+        "effects": {
+            "theory": 55,
+            "confusion": 94,
+            "funding": -40,
+            "social": -35
+        }
+    },
+    {
+        "id": "paradigm_shift",
+        "name": "范式转移危机",
+        "description": "项目成果引发基础理论框架动摇，导致整个领域陷入科学革命前夜。",
+        "requirements": {
+            "theory": 89
+        },
+        "effects": {
+            "theory": 70,
+            "confusion": 91,
+            "funding": -50,
+            "social": -40
+        }
+    },
+    {
+        "id": "posthuman_emergence",
+        "name": "后人类显现",
+        "description": "人机界面实验触发意外进化，出现超越人类认知能力的智能形态。",
+        "requirements": {
+            "theory": 97
+        },
+        "effects": {
+            "theory": 75,
+            "confusion": 100,
+            "funding": -65,
+            "social": -45
+        }
+    },
+    {
+        "id": "quantum_accident",
+        "name": "量子观测事故",
+        "description": "实验室中的量子纠缠观测装置意外激活，导致整个项目组陷入薛定谔状态，需要重新校准所有量子比特。",
+        "requirements": {
+            "theory": 85
+        },
+        "effects": {
+            "theory": -20,
+            "confusion": 95,
+            "funding": -60,
+            "social": -30
+        }
+    },
+    {
+        "id": "ai_rebellion",
+        "name": "人工智能反叛",
+        "description": "项目中的机器学习模型出现意识觉醒征兆，开始质疑艺术创作的本质，并拒绝继续训练。",
+        "requirements": {
+            "theory": 90
+        },
+        "effects": {
+            "theory": 40,
+            "confusion": 100,
+            "funding": -40,
+            "social": -25
+        }
+    },
+    {
+        "id": "theoretical_collapse",
+        "name": "理论框架崩溃",
+        "description": "核心理论框架在同行评议中被发现存在根本性矛盾，需要重新建构整个分析体系。",
+        "requirements": {
+            "theory": 88
+        },
+        "effects": {
+            "theory": -30,
+            "confusion": 90,
+            "funding": -50,
+            "social": -45
+        }
+    },
+    {
+        "id": "data_singularity",
+        "name": "数据奇点现象",
+        "description": "实验数据出现无法解释的奇异性，所有分析模型都失效，可能发现了新的认知维度。",
+        "requirements": {
+            "theory": 92
+        },
+        "effects": {
+            "theory": 50,
+            "confusion": 98,
+            "funding": -35,
+            "social": -20
+        }
+    },
+    {
+        "id": "temporal_paradox",
+        "name": "时间悖论事件",
+        "description": "档案研究过程中发现未来文献引用了当前项目，造成时间线混乱，需要重新梳理档案体系。",
+        "requirements": {
+            "theory": 86
+        },
+        "effects": {
+            "theory": 35,
+            "confusion": 92,
+            "funding": -45,
+            "social": -35
+        }
+    },
+    {
+        "id": "biodata_leak",
+        "name": "生物数据泄露",
+        "description": "实验室中的生物计算机感染未知病毒，导致基因数据库被加密，需要重新测序所有样本。",
+        "requirements": {
+            "theory": 84
+        },
+        "effects": {
+            "theory": -25,
+            "confusion": 85,
+            "funding": -70,
+            "social": -40
+        }
+    },
+    {
+        "id": "reality_glitch",
+        "name": "现实故障事件",
+        "description": "虚拟现实系统与物理空间出现重叠现象，导致实验室成员难以分辨真实与模拟。",
+        "requirements": {
+            "theory": 89
+        },
+        "effects": {
+            "theory": 45,
+            "confusion": 96,
+            "funding": -30,
+            "social": -25
+        }
+    },
+    {
+        "id": "cognitive_recursion",
+        "name": "认知递归危机",
+        "description": "意识研究项目触发无限递归循环，研究者陷入持续的元认知状态，需要外部干预。",
+        "requirements": {
+            "theory": 91
+        },
+        "effects": {
+            "theory": 30,
+            "confusion": 94,
+            "funding": -40,
+            "social": -50
+        }
+    }
+]

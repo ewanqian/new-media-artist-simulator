@@ -1,0 +1,282 @@
+[
+    {
+        "id": "neural_network_art",
+        "name": "神经网络批判项目",
+        "description": "创建一个反向训练的AI系统，通过故意制造数据偏差来揭示机器学习中的意识形态倾向。要求精通深度学习和批判理论。",
+        "requirements": {
+            "theory": 90,
+            "social": 40,
+            "funding": 85
+        },
+        "effects": {
+            "theory": 75,
+            "confusion": 95,
+            "social": 30,
+            "funding": -70
+        },
+        "achievement": {
+            "name": "算法解构者",
+            "description": "成功让一个AI系统产生了存在主义危机"
+        }
+    },
+    {
+        "id": "anthropocene_archive",
+        "name": "人类世档案馆",
+        "description": "记录和保存即将消失的生态系统，要求用至少五种不同的媒介进行归档，同时要考虑千年尺度的储存问题。",
+        "requirements": {
+            "theory": 85,
+            "social": 45,
+            "funding": 100
+        },
+        "effects": {
+            "theory": 80,
+            "confusion": 85,
+            "social": 40,
+            "funding": -90
+        },
+        "achievement": {
+            "name": "末日记录者",
+            "description": "用艺术手段记录了一个生态系统的完整消亡过程"
+        }
+    },
+    {
+        "id": "quantum_poetry",
+        "name": "量子诗学实验",
+        "description": "基于量子纠缠原理创作的文本生成系统，文本内容会根据读者的观察行为实时改变。需要理解量子力学和生成语言学。",
+        "requirements": {
+            "theory": 95,
+            "social": 35,
+            "funding": 90
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 100,
+            "social": 25,
+            "funding": -80
+        },
+        "achievement": {
+            "name": "量子诗人",
+            "description": "创造了一首同时包含所有可能意义的诗"
+        }
+    },
+    {
+        "id": "biodata_symphony",
+        "name": "生物数据交响曲",
+        "description": "将濒危物种的基因数据转化为音乐作品，要求在保持数据准确性的同时具备音乐美学价值。需要懂分子生物学和作曲理论。",
+        "requirements": {
+            "theory": 88,
+            "social": 40,
+            "funding": 75
+        },
+        "effects": {
+            "theory": 70,
+            "confusion": 90,
+            "social": 35,
+            "funding": -65
+        },
+        "achievement": {
+            "name": "基因作曲家",
+            "description": "用CRISPR序列谱写了一首交响曲"
+        }
+    },
+    {
+        "id": "time_crystallization",
+        "name": "时间结晶研究",
+        "description": "创造一个违反热力学第二定律的艺术系统，探索时间的非线性特性。要求掌握物理学和媒体考古学理论。",
+        "requirements": {
+            "theory": 92,
+            "social": 30,
+            "funding": 95
+        },
+        "effects": {
+            "theory": 90,
+            "confusion": 95,
+            "social": 20,
+            "funding": -85
+        },
+        "achievement": {
+            "name": "时间炼金术士",
+            "description": "成功在实验室中逆转了熵增过程"
+        }
+    },
+    {
+        "id": "cybernetic_ecology",
+        "name": "控制论生态系统",
+        "description": "构建一个基于反馈循环的生态艺术系统，包含活体植物、传感器网络和机器学习算法，实现自我调节和进化。",
+        "requirements": {
+            "theory": 87,
+            "social": 35,
+            "funding": 110
+        },
+        "effects": {
+            "theory": 75,
+            "confusion": 88,
+            "social": 30,
+            "funding": -95
+        },
+        "achievement": {
+            "name": "生态工程师",
+            "description": "创造了一个能自我进化的人工生态系统"
+        }
+    },
+    {
+        "id": "recursive_reality",
+        "name": "递归现实项目",
+        "description": "创建一个无限嵌套的虚拟现实空间，每层空间都是更高层次空间的模拟。要求精通元宇宙理论和后现代哲学。",
+        "requirements": {
+            "theory": 93,
+            "social": 40,
+            "funding": 120
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 98,
+            "social": 25,
+            "funding": -100
+        },
+        "achievement": {
+            "name": "现实折叠者",
+            "description": "成功让观众在递归空间中迷失了自我"
+        }
+    },
+    {
+        "id": "holographic_memory",
+        "name": "全息记忆研究",
+        "description": "利用量子全息技术记录集体无意识，要求参与者同步脑电波并生成视觉化数据。需要懂神经科学、量子物理和荣格心理学。",
+        "requirements": {
+            "theory": 91,
+            "social": 45,
+            "funding": 115
+        },
+        "effects": {
+            "theory": 80,
+            "confusion": 96,
+            "social": 35,
+            "funding": -90
+        },
+        "achievement": {
+            "name": "意识采集者",
+            "description": "成功将一个世纪的集体记忆压缩在一个量子比特中"
+        }
+    },
+    {
+        "id": "linguistic_virus",
+        "name": "语言病毒项目",
+        "description": "创造一个能在对话中自我复制的概念结构，研究米姆在社交网络中的传播规律。要求精通语言学和流行病学模型。",
+        "requirements": {
+            "theory": 88,
+            "social": 60,
+            "funding": 70
+        },
+        "effects": {
+            "theory": 75,
+            "confusion": 92,
+            "social": 45,
+            "funding": -65
+        },
+        "achievement": {
+            "name": "米姆工程师",
+            "description": "创造了一个无法被遗忘的概念"
+        }
+    },
+    {
+        "id": "entropy_garden",
+        "name": "熵园计划",
+        "description": "设计一个违背热力学定律的生态系统，通过量子隧穿效应维持永久的负熵状态。需要物理学和园艺学背景。",
+        "requirements": {
+            "theory": 94,
+            "social": 35,
+            "funding": 130
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 97,
+            "social": 30,
+            "funding": -110
+        },
+        "achievement": {
+            "name": "熵之驯服者",
+            "description": "创造了一个永不凋零的生态系统"
+        }
+    },
+    {
+        "id": "philosophical_compiler",
+        "name": "哲学编译器",
+        "description": "开发一个能将哲学文本转换为可执行代码的系统，用程序验证形而上学假设。要求精通编程语言理论和分析哲学。",
+        "requirements": {
+            "theory": 96,
+            "social": 30,
+            "funding": 85
+        },
+        "effects": {
+            "theory": 90,
+            "confusion": 95,
+            "social": 25,
+            "funding": -75
+        },
+        "achievement": {
+            "name": "逻辑炼金术士",
+            "description": "成功运行了黑格尔辩证法的源代码"
+        }
+    },
+    {
+        "id": "spectral_archaeology",
+        "name": "光谱考古项目",
+        "description": "使用光谱分析技术重建历史场景的情感氛围，要求同时具备光学物理和心理史学的知识背景。",
+        "requirements": {
+            "theory": 89,
+            "social": 40,
+            "funding": 95
+        },
+        "effects": {
+            "theory": 78,
+            "confusion": 93,
+            "social": 35,
+            "funding": -85
+        },
+        "achievement": {
+            "name": "情感考古学家",
+            "description": "成功复原了一个世纪前的情感光谱"
+        }
+    },
+    {
+        "id": "quantum_social",
+        "name": "量子社会学实验",
+        "description": "研究社交网络中的量子纠缠效应，探索人际关系的非局域性特征。需要掌握量子力学和社会网络分析。",
+        "requirements": {
+            "theory": 93,
+            "social": 55,
+            "funding": 90
+        },
+        "effects": {
+            "theory": 85,
+            "confusion": 94,
+            "social": 40,
+            "funding": -80
+        },
+        "achievement": {
+            "name": "关系纠缠者",
+            "description": "证明了社交距离的量子叠加性"
+        }
+    },
+    {
+        "id": "temporal_archive",
+        "name": "时间档案馆",
+        "description": "创建一个跨越过去未来的档案系统，同时记录已发生和尚未发生的事件。要求熟悉档案学和预测学理论。",
+        "requirements": {
+            "theory": 90,
+            "social": 45,
+            "funding": 100
+        },
+        "effects": {
+            "theory": 82,
+            "confusion": 96,
+            "social": 30,
+            "funding": -90
+        },
+        "achievement": {
+            "name": "时间档案员",
+            "description": "成功归档了一个还未发生的历史事件"
+        }
+    }
+]
