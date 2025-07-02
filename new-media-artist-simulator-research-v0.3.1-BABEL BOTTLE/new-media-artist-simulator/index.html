@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新媒体艺术家模拟器 - 专业研究版</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 开场动画 -->
+    <div id="intro-animation" class="intro-animation hidden">
+        <div class="intro-content">
+            <h1 id="intro-title" class="intro-title">新媒体艺术家模拟器</h1>
+            <p id="intro-subtitle" class="intro-subtitle">开始你的新媒体艺术家模拟生涯</p>
+            <p id="intro-description" class="intro-description">巴别瓶 展览特别版 By 钱誉文 in VIRTURA SPACEPORT </p>
+            <p id="intro-action" class="intro-action">在创作与现实之间寻找属于你的平衡点</p>
+            <div id="intro-hint" class="intro-hint">点击任意处继续...</div>
+        </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>正在加载游戏内容...</p>
+    </div>
+
+    <!-- 新手引导 -->
+    <div id="tutorial-overlay" class="tutorial-overlay hidden">
+        <div class="tutorial-modal">
+            <h2>🎨 欢迎来到新媒体艺术家模拟器</h2>
+            
+            <div class="tutorial-step">
+                <h3>📊 八个评价维度</h3>
+                <p><strong>专业维度：</strong>理论深度、学术资本、范式突破、研究经费</p>
+                <p><strong>生存维度：</strong>焦虑指数、讽刺值、现实感、幽默度</p>
+            </div>
+
+            <div class="tutorial-step">
+                <h3>🎮 游戏玩法</h3>
+                <p>1. 选择<strong>研究场域</strong> - 探索不同的工作环境</p>
+                <p>2. 进行<strong>专业准备</strong> - 提升技能和知识</p>
+                <p>3. 启动<strong>项目研究</strong> - 开始创作实验</p>
+                <p>4. 筹措<strong>研究经费</strong> - 维持艺术创作</p>
+            </div>
+
+            <div class="tutorial-step">
+                <h3>💡 小贴士</h3>
+                <p>• 数值低于要求的选项会显示为灰色</p>
+                <p>• 鼠标悬浮卡片可以看到详细信息</p>
+                <p>• 随机抽奖按钮可以获得初始数值</p>
+                <p>• 每个选择都会影响你的艺术家发展</p>
+            </div>
+
+            <div class="tutorial-buttons">
+                <button class="tutorial-btn secondary" id="skip-tutorial">跳过教程</button>
+                <button class="tutorial-btn" id="start-game">开始游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <!-- 免责声明 -->
+            <div class="disclaimer">
+                ⚠️ 本作品为艺术表达与创作实验，所有内容仅代表虚构情境，不代表作者个人立场、观点或价值判断
+            </div>
+            
+            <h1>新媒体艺术家模拟器 巴别瓶展览特别版</h1>
+            <p class="subtitle">艺术创作的幽默现实主义体验 @EWAN CT钱誉文</p>
+        </header>
+
+        <div class="game-layout">
+            <!-- 左侧：四个操作列 -->
+            <div class="action-columns">
+                <div class="action-column" id="spaces-column">
+                    <h3>🏛️ 研究场域</h3>
+                    <div class="cards-container" id="spaces-cards"></div>
+                </div>
+
+                <div class="action-column" id="preparations-column">
+                    <h3>📚 专业准备</h3>
+                    <div class="cards-container" id="preparations-cards"></div>
+                </div>
+
+                <div class="action-column" id="projects-column">
+                    <h3>🎨 项目研究</h3>
+                    <div class="cards-container" id="projects-cards"></div>
+                </div>
+
+                <div class="action-column" id="income-column">
+                    <h3>💰 筹措经费</h3>
+                    <div class="cards-container" id="income-cards"></div>
+                </div>
+            </div>
+
+            <!-- 右侧：状态面板 -->
+            <div class="status-panel">
+                <!-- 重新开始艺术生涯按钮 -->
+                <div class="restart-section">
+                    <div id="current-status-summary" class="status-summary">
+                        <!-- 当前状态评价将在这里显示 -->
+                    </div>
+                    <button id="restart-career" class="btn-restart-career">🔄 重新开始艺术家生涯</button>
+                    <button id="end-career" class="btn-end-career" style="display: none;">🎭 结束艺术生涯</button>
+                </div>
+
+                <!-- 数值状态 -->
+                <div class="stats-section">
+                    <h3>📊 当前状态</h3>
+                    
+                    <div class="stats-category">
+                        <h4>专业维度</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">理论深度</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="theory"></div>
+                            </div>
+                            <span class="stat-value" data-stat="theory">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">学术资本</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="academic"></div>
+                            </div>
+                            <span class="stat-value" data-stat="academic">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">范式突破</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="paradigm"></div>
+                            </div>
+                            <span class="stat-value" data-stat="paradigm">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">研究经费</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="funding"></div>
+                            </div>
+                            <span class="stat-value" data-stat="funding">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-category">
+                        <h4>生存维度</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">焦虑指数</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="anxiety"></div>
+                            </div>
+                            <span class="stat-value" data-stat="anxiety">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">讽刺值</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="sarcasm"></div>
+                            </div>
+                            <span class="stat-value" data-stat="sarcasm">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">现实感</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="reality"></div>
+                            </div>
+                            <span class="stat-value" data-stat="reality">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">幽默度</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill" data-stat="humor"></div>
+                            </div>
+                            <span class="stat-value" data-stat="humor">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成就时间线 -->
+                <div class="achievements-section">
+                    <h3>🏆 成就时间线</h3>
+                    <div id="achievements-timeline" class="timeline"></div>
+                </div>
+
+                <!-- 控制按钮 -->
+                <div class="control-buttons">
+                    <button id="artist-profile" class="btn-profile">👤 艺术家档案</button>
+                    <button id="quick-start" class="btn-lottery">🎲 随机抽奖获得数值</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知容器 -->
+        <div id="notification-container"></div>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>正在加载内容...</p>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div id="loading-overlay" class="loading-overlay" style="display: flex;">
+        <div class="loading-spinner"></div>
+        <p>正在加载游戏内容...</p>
+    </div>
+
+    <!-- 左下角日志系统 -->
+    <div id="action-log" class="action-log">
+        <div class="log-header">
+            <span class="log-title">📋 动作日志</span>
+            <button class="log-toggle" id="log-toggle">─</button>
+        </div>
+        <div class="log-content" id="log-content">
+            <div class="log-entry">
+                <div class="log-time">开始</div>
+                <div class="log-action">欢迎来到新媒体艺术家模拟器！</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 艺术家档案模态框 -->
+    <div id="artist-profile-modal" class="modal hidden">
+        <div class="modal-content artist-profile-content">
+            <div class="modal-header">
+                <h2>🎨 艺术家档案</h2>
+                <button class="close-btn" id="close-artist-profile">&times;</button>
+            </div>
+            <div id="artist-profile-body" class="artist-profile-body">
+                <!-- 内容将通过JavaScript动态生成 -->
+            </div>
+            <!-- 最终选择区域 -->
+            <div class="final-choice">
+                <p style="margin-bottom: 15px; color: #ccc; font-style: italic;">
+                    当艺术家的故事走到这里，你可以选择...
+                </p>
+                <button id="disappear-in-history" class="btn-disappear">
+                    🌫️ 消失在历史长河中
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 事件模态框 -->
+    <div id="event-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="event-title"></h2>
+            <p id="event-description"></p>
+            <div id="event-choices"></div>
+        </div>
+    </div>
+
+    <!-- 底部致谢和说明 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="tech-credits">
+                <h4>🤖 技术致谢</h4>
+                <p>本作品使用 Claude 4 和 Cursor 编辑器开发制作</p>
+            </div>
+            
+            <div class="exhibition-info">
+                <h4>🎪 展览信息</h4>
+                <p><strong>CAM展览预告 | 巴别瓶：人工智能时代的语用、创造与生活形式</strong></p>
+                <p>感谢中心美术馆CAM的展览和场馆支持</p>
+            </div>
+            
+            <div class="curator-info">
+                <h4>👨‍🎨 策展人</h4>
+                <p>王旖旎 Wang Yini</p>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2024 新媒体艺术家模拟器 - 巴别瓶展览特别版 | 艺术创作实验项目</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/contentLoader.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/eventSystem.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
