@@ -1,5 +1,8 @@
 # 新媒体艺术家模拟器 v0.3.1 - 巴别瓶展览特别版 - 一键启动脚本修复版
 
+<img width="800" alt="Snipaste_2025-07-02_23-18-21" src="https://github.com/user-attachments/assets/e2de553d-ba62-4172-9880-09da777816d6" />
+<img width="800" alt="Snipaste_2025-07-02_23-17-30" src="https://github.com/user-attachments/assets/f3a6d749-9e4b-4d0f-9de0-ec249ab32390" />
+<img width="800" alt="Snipaste_2025-07-02_23-17-17" src="https://github.com/user-attachments/assets/8d950873-3897-4e6e-9580-a35e5f54700a" />
 
 ## 🎨 关于游戏本身
 
