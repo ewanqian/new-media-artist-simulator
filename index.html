@@ -24,22 +24,22 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             text-align: center;
         }
         
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 300;
             margin-bottom: 0.5rem;
             letter-spacing: 0.1em;
         }
         
         .subtitle {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #888;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             font-style: italic;
         }
         
@@ -58,6 +58,7 @@
             color: #e0e0e0;
             transition: all 0.3s ease;
             display: block;
+            text-align: left;
         }
         
         .nav-card:hover {
@@ -79,12 +80,18 @@
         }
         
         .nav-card.primary {
-            border-color: #444;
-            background: #181818;
+            border-color: #4a90e2;
+            background: linear-gradient(135deg, #181818, #1a1a2e);
         }
         
         .nav-card.primary h2 {
             color: #fff;
+        }
+        
+        .nav-card.primary .primary-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
         }
         
         .status {
@@ -123,6 +130,50 @@
             border: 1px solid #222;
             background: #0d0d0d;
         }
+        
+        .quick-actions {
+            margin: 2rem 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #aaa;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #252525;
+            border-color: #444;
+        }
     </style>
 </head>
 <body>
@@ -134,27 +185,42 @@
             <strong>2026主干版</strong> · 超文本艺术作品 · 持续更新中
         </div>
         
-        <div class="nav-grid">
-            <a href="new-media-artist-simulator/index.html" class="nav-card primary">
-                <h2>🎮 开始模拟</h2>
-                <p>体验一位新媒体艺术家的生涯。在理想与现实的夹缝中，做出你的选择。</p>
-            </a>
-            
-            <a href="docs/ARTIST_STATEMENT.md" class="nav-card">
-                <h2>📖 作品说明</h2>
-                <p>关于这件作品的理论背景、创作意图与艺术定位。</p>
+        <div class="quick-actions">
+            <a href="new-media-artist-simulator/index.html" class="btn-primary">
+                🎮 立即开始模拟
             </a>
         </div>
         
         <div class="nav-grid">
-            <a href="docs/THEORETICAL_FRAMEWORK.md" class="nav-card">
-                <h2>🎭 理论框架</h2>
-                <p>布尔迪厄艺术场域、福柯话语权力、后数字媒介理论。</p>
+            <a href="new-media-artist-simulator/index.html" class="nav-card primary">
+                <span class="primary-icon">🎨</span>
+                <h2>艺术家生涯模拟器</h2>
+                <p>体验一位新媒体艺术家的完整生涯。在理想与现实的夹缝中，在AI重构创作边界的时代，做出你的选择。</p>
             </a>
             
+            <a href="tools.html" class="nav-card">
+                <span class="primary-icon">🗡️</span>
+                <h2>作品批判工具集</h2>
+                <p>跳出自我闭环，从黑色幽默、积极鼓励、学术批评三个视角，获得针对你作品的全面批判与复盘。</p>
+            </a>
+        </div>
+        
+        <div class="nav-grid">
+            <a href="docs/ARTIST_STATEMENT.md" class="nav-card">
+                <h2>📖 作品说明</h2>
+                <p>关于这件作品的理论背景、创作意图与艺术定位。布尔迪厄艺术场域、福柯话语权力、后数字媒介理论。</p>
+            </a>
+            
+            <a href="docs/THEORETICAL_FRAMEWORK.md" class="nav-card">
+                <h2>🎭 理论框架</h2>
+                <p>作品核心理论锚点：布尔迪厄艺术场域理论、福柯话语权力理论、后数字时代媒介艺术理论。</p>
+            </a>
+        </div>
+        
+        <div class="nav-grid">
             <a href="archive/" class="nav-card">
                 <h2>📚 历史版本</h2>
-                <p>v0.3.1巴别瓶展览版、v0.2研究版等历史存档。</p>
+                <p>v0.3.1巴别瓶展览版、v0.2研究版等历史存档，见证作品的生长脉络。</p>
             </a>
         </div>
         

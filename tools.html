@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品批判工具集 | 新媒体艺术家模拟器 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #4a90e2;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .tool-card {
+            background: #151515;
+            border: 1px solid #333;
+            padding: 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            background: #1a1a1a;
+            border-color: #4a90e2;
+            transform: translateY(-2px);
+        }
+        
+        .tool-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: #fff;
+        }
+        
+        .tool-card p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .critical-tool-section {
+            background: #151515;
+            border: 1px solid #333;
+            padding: 2.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .perspective-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .perspective-option {
+            background: #0d0d0d;
+            border: 2px solid #333;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .perspective-option:hover {
+            border-color: #555;
+        }
+        
+        .perspective-option.selected {
+            border-color: #4a90e2;
+            background: #1a1a2e;
+        }
+        
+        .perspective-option h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .perspective-option p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+        }
+        
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+        }
+        
+        .result-card {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        
+        .result-tag {
+            background: #4a90e2;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .result-tag.sarcastic {
+            background: #e74c3c;
+        }
+        
+        .result-tag.encouraging {
+            background: #27ae60;
+        }
+        
+        .result-tag.academic {
+            background: #9b59b6;
+        }
+        
+        .result-content {
+            color: #ccc;
+            line-height: 1.8;
+        }
+        
+        .result-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .text-layer-formal {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        .text-layer-translation {
+            color: #aaa;
+            font-style: italic;
+            padding-left: 1rem;
+            border-left: 2px solid #555;
+            margin: 0.5rem 0;
+        }
+        
+        .text-layer-sarcasm {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #aaa;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #252525;
+            border-color: #444;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+        }
+        
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #4a90e2;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .meta {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        
+        .warning {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 1rem 1.5rem;
+            margin: 2rem 0;
+            font-size: 0.85rem;
+            color: #666;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← 返回主页</a>
+        
+        <header>
+            <h1>作品批判工具集</h1>
+            <p class="subtitle">跳出自我闭环，从不同维度审视你的创作</p>
+        </header>
+        
+        <div class="tools-grid">
+            <a href="#critical-tool" class="tool-card">
+                <span class="tool-icon">🗡️</span>
+                <h2>三视角作品批判</h2>
+                <p>从黑色幽默、积极鼓励、学术批评三个视角，获得针对你作品的全面批判。</p>
+            </a>
+            
+            <a href="#career-review" class="tool-card">
+                <span class="tool-icon">🎭</span>
+                <h2>艺术家生涯复盘</h2>
+                <p>针对你的完整创作生涯，生成全面的复盘分析与发展建议。</p>
+            </a>
+            
+            <a href="#history-archive" class="tool-card">
+                <span class="tool-icon">📚</span>
+                <h2>批判档案库</h2>
+                <p>保存你的所有批判记录，形成创作复盘档案，见证你的成长轨迹。</p>
+            </a>
+        </div>
+        
+        <div id="critical-tool" class="critical-tool-section">
+            <h2 class="section-title">🗡️ 三视角作品批判</h2>
+            
+            <div class="form-group">
+                <label for="work-name">作品名称</label>
+                <input type="text" id="work-name" placeholder="输入你的作品名称">
+            </div>
+            
+            <div class="form-group">
+                <label for="work-medium">作品媒介</label>
+                <select id="work-medium">
+                    <option value="">选择作品媒介</option>
+                    <option value="interactive">交互装置</option>
+                    <option value="video">影像艺术</option>
+                    <option value="generative">生成艺术</option>
+                    <option value="vr-xr">VR/XR作品</option>
+                    <option value="performance">表演艺术</option>
+                    <option value="installation">装置艺术</option>
+                    <option value="net-art">网络艺术</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="work-year">创作年份</label>
+                <input type="number" id="work-year" placeholder="2026" min="2000" max="2030">
+            </div>
+            
+            <div class="form-group">
+                <label for="work-concept">核心观念 / 创作初衷 *</label>
+                <textarea id="work-concept" placeholder="请描述你创作这件作品的核心观念、想要表达的主题或创作初衷..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="work-technique">技术实现 / 呈现形式</label>
+                <textarea id="work-technique" placeholder="描述作品的技术实现方式、使用的工具或呈现形式..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="work-context">展览 / 落地场景</label>
+                <textarea id="work-context" placeholder="描述作品的展览场景、落地环境或目标受众..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="work-dissatisfaction">你对作品最不满意的地方（选填）</label>
+                <textarea id="work-dissatisfaction" placeholder="如果有的话，描述你对这件作品最不满意的地方..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>选择批判视角（可多选）</label>
+                <div class="perspective-selector">
+                    <div class="perspective-option selected" data-perspective="sarcastic">
+                        <h3>🗡️ 尖锐讽刺</h3>
+                        <p>黑色幽默视角，祛魅作品的话语泡沫</p>
+                    </div>
+                    <div class="perspective-option selected" data-perspective="encouraging">
+                        <h3>🌸 积极鼓励</h3>
+                        <p>挖掘闪光点，给出可落地的优化方向</p>
+                    </div>
+                    <div class="perspective-option selected" data-perspective="academic">
+                        <h3>📚 学术批评</h3>
+                        <p>基于当代艺术批评框架的客观分析</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-generate" class="btn-generate">🎯 生成批判</button>
+            
+            <div id="result-area" class="result-section" style="display: none;">
+                <div id="loading-area" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>正在生成批判...</p>
+                </div>
+                
+                <div id="results-container"></div>
+                
+                <div class="action-buttons">
+                    <button class="btn-secondary" id="btn-copy">📋 复制结果</button>
+                    <button class="btn-secondary" id="btn-save">💾 保存到档案库</button>
+                    <button class="btn-secondary" id="btn-reset">🔄 重新开始</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="career-review" class="critical-tool-section">
+            <h2 class="section-title">🎭 艺术家生涯复盘</h2>
+            <p style="color: #888; margin-bottom: 2rem;">（此功能即将上线，敬请期待）</p>
+        </div>
+        
+        <div id="history-archive" class="critical-tool-section">
+            <h2 class="section-title">📚 批判档案库</h2>
+            <p style="color: #888; margin-bottom: 2rem;">（此功能即将上线，敬请期待）</p>
+        </div>
+        
+        <div class="warning">
+            ⚠️ 提示：本工具目前使用静态模板生成批判内容。如需更精准的AI辅助批判，请复制生成的提示词到Claude或ChatGPT中使用。
+        </div>
+        
+        <div class="meta">
+            <p>By 钱誉文 EWAN CT | 2024-2026</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/ewanqian/new-media-artist-simulator" style="color: #666; text-decoration: none;">GitHub</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const perspectiveOptions = document.querySelectorAll('.perspective-option');
+            const btnGenerate = document.getElementById('btn-generate');
+            const resultArea = document.getElementById('result-area');
+            const loadingArea = document.getElementById('loading-area');
+            const resultsContainer = document.getElementById('results-container');
+            const btnCopy = document.getElementById('btn-copy');
+            const btnSave = document.getElementById('btn-save');
+            const btnReset = document.getElementById('btn-reset');
+            
+            perspectiveOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+            
+            btnGenerate.addEventListener('click', function() {
+                const workName = document.getElementById('work-name').value;
+                const workConcept = document.getElementById('work-concept').value;
+                
+                if (!workConcept) {
+                    alert('请至少填写核心观念 / 创作初衷');
+                    return;
+                }
+                
+                const selectedPerspectives = [];
+                perspectiveOptions.forEach(option => {
+                    if (option.classList.contains('selected')) {
+                        selectedPerspectives.push(option.dataset.perspective);
+                    }
+                });
+                
+                if (selectedPerspectives.length === 0) {
+                    alert('请至少选择一个批判视角');
+                    return;
+                }
+                
+                generateCritique(workName, workConcept, selectedPerspectives);
+            });
+            
+            function generateCritique(workName, workConcept, perspectives) {
+                resultArea.style.display = 'block';
+                loadingArea.style.display = 'block';
+                resultsContainer.innerHTML = '';
+                
+                setTimeout(() => {
+                    loadingArea.style.display = 'none';
+                    
+                    let resultsHTML = '';
+                    
+                    if (perspectives.includes('sarcastic')) {
+                        resultsHTML += generateSarcasticCritique(workName, workConcept);
+                    }
+                    
+                    if (perspectives.includes('encouraging')) {
+                        resultsHTML += generateEncouragingCritique(workName, workConcept);
+                    }
+                    
+                    if (perspectives.includes('academic')) {
+                        resultsHTML += generateAcademicCritique(workName, workConcept);
+                    }
+                    
+                    resultsContainer.innerHTML = resultsHTML;
+                }, 1500);
+            }
+            
+            function generateSarcasticCritique(workName, workConcept) {
+                return `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3 class="result-title">🗡️ 尖锐讽刺 · 黑色幽默视角</h3>
+                            <span class="result-tag sarcastic">祛魅</span>
+                        </div>
+                        <div class="result-content">
+                            <p class="text-layer-formal">【正式艺术话语】</p>
+                            <p>"这件作品通过${workConcept.substring(0, 50)}...的艺术实践，探索了当代艺术的边界问题，在媒介与观念的交汇处寻找新的可能性。"</p>
+                            
+                            <p class="text-layer-translation">【现实翻译】</p>
+                            <p>说白了，你就是想通过这个作品说点什么，但又说不太清楚，于是用一些艺术术语把它包装起来，让它看起来很深刻。</p>
+                            
+                            <p class="text-layer-sarcasm">【尖锐讽刺】</p>
+                            <p>🤔 让我猜猜：你花了几个星期搞这个作品，自己觉得挺满意，但拿给朋友看他们都一脸困惑？没关系，这就是当代艺术的常态——只要你自己相信它有价值，它就有价值。至少在你破产之前。</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function generateEncouragingCritique(workName, workConcept) {
+                return `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3 class="result-title">🌸 积极鼓励 · 反思引导视角</h3>
+                            <span class="result-tag encouraging">赋能</span>
+                        </div>
+                        <div class="result-content">
+                            <p><strong>✨ 核心价值：</strong></p>
+                            <p>你的作品${workName || '（未命名）'}最可贵的地方在于，你真的在思考"${workConcept.substring(0, 30)}..."这个问题。这种真诚的探索欲，是艺术创作最宝贵的品质。</p>
+                            
+                            <p><strong>💡 优化建议：</strong></p>
+                            <p>1. 试着把你的核心观念再提炼得更清晰一些，用一句话就能说清楚你想表达什么</p>
+                            <p>2. 考虑一下观众的接受度——你想让观众感受到什么？</p>
+                            <p>3. 技术是为观念服务的，不要让技术盖过了你想表达的核心</p>
+                            
+                            <p><strong>🚀 下一步：</strong></p>
+                            <p>继续沿着这个方向探索，不要怕失败。每一件作品都是一次实验，重要的是你从中学到了什么。</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function generateAcademicCritique(workName, workConcept) {
+                return `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3 class="result-title">📚 中立客观 · 学术批评视角</h3>
+                            <span class="result-tag academic">分析</span>
+                        </div>
+                        <div class="result-content">
+                            <p><strong>【媒介分析】</strong></p>
+                            <p>这件作品在媒介选择上，体现了当代新媒体艺术的典型特征——技术与观念的结合。</p>
+                            
+                            <p><strong>【观念分析】</strong></p>
+                            <p>作品的核心观念围绕"${workConcept.substring(0, 40)}..."展开，这个议题在当下的艺术语境中具有一定的现实意义。</p>
+                            
+                            <p><strong>【语境分析】</strong></p>
+                            <p>在2026年的当下，AI技术对艺术生产的冲击、后数字时代的媒介反思，是这个作品可以进一步挖掘的语境。</p>
+                            
+                            <p><strong>【艺术史脉络】</strong></p>
+                            <p>这件作品可以与20世纪60年代的概念艺术、90年代的新媒体艺术，以及当下的后数字艺术实践形成对话。</p>
+                            
+                            <p><strong>【总结】</strong></p>
+                            <p>这是一件具有探索性的作品，在观念和媒介上都有可圈可点之处。建议进一步明确作品的问题意识，深化与艺术史和当下语境的对话。</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            btnCopy.addEventListener('click', function() {
+                const text = resultsContainer.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('已复制到剪贴板！');
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                });
+            });
+            
+            btnReset.addEventListener('click', function() {
+                document.getElementById('work-name').value = '';
+                document.getElementById('work-medium').value = '';
+                document.getElementById('work-year').value = '';
+                document.getElementById('work-concept').value = '';
+                document.getElementById('work-technique').value = '';
+                document.getElementById('work-context').value = '';
+                document.getElementById('work-dissatisfaction').value = '';
+                resultArea.style.display = 'none';
+                resultsContainer.innerHTML = '';
+            });
+        });
+    </script>
+</body>
+</html>
