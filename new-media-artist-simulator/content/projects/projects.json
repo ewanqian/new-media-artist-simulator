@@ -1,0 +1,242 @@
+[
+    {
+        "id": "ai_collaboration_art",
+        "name": "AI协作创作实验",
+        "description": "与人工智能算法协作完成一件互动装置，探索人机创意合作的可能性。",
+        "common_translation": "和电脑一起做艺术，看看能碰撞出什么火花",
+        "sarcastic_comment": "让机器帮你创作，然后号称这是'后人类艺术实践'",
+        "requirements": {
+            "theory": 25,
+            "academic": 15,
+            "funding": 40
+        },
+        "effects": {
+            "paradigm": 35,
+            "reality": 20,
+            "theory": 10,
+            "humor": 15,
+            "sarcasm": 10,
+            "funding": -35,
+            "anxiety": 8
+        },
+        "achievement": {
+            "name": "AI合作者",
+            "description": "成功与算法建立了创意伙伴关系"
+        }
+    },
+    {
+        "id": "data_visualization",
+        "name": "城市数据可视化",
+        "description": "收集城市环境数据，创作大型互动可视化装置。",
+        "common_translation": "把城市的各种数据做成好看的图表和动画",
+        "sarcastic_comment": "把数据包装成艺术品，让观众觉得看懂了什么深刻的东西",
+        "requirements": {
+            "theory": 20,
+            "academic": 10,
+            "funding": 30
+        },
+        "effects": {
+            "paradigm": 25,
+            "reality": 25,
+            "theory": 8,
+            "academic": 5,
+            "humor": 12,
+            "sarcasm": 15,
+            "funding": -25
+        },
+        "achievement": {
+            "name": "数据艺术家",
+            "description": "让抽象数据变成了具象体验"
+        }
+    },
+    {
+        "id": "biometric_installation",
+        "name": "生物识别装置",
+        "description": "创作基于心率、脑电波的实时反应装置，让作品随观众生理状态变化。",
+        "common_translation": "监测观众的身体数据，让艺术品根据你的身体状态做出反应",
+        "sarcastic_comment": "偷偷收集观众生物数据，然后说这是'身体美学研究'",
+        "requirements": {
+            "theory": 30,
+            "academic": 20,
+            "funding": 50
+        },
+        "effects": {
+            "paradigm": 30,
+            "reality": 18,
+            "theory": 12,
+            "academic": 8,
+            "anxiety": 12,
+            "humor": 8,
+            "sarcasm": 12,
+            "funding": -45
+        },
+        "achievement": {
+            "name": "生物媒体艺术家",
+            "description": "成功将身体变成了艺术媒介"
+        }
+    },
+    {
+        "id": "social_media_mirror",
+        "name": "社交媒体镜像",
+        "description": "创作反映社交媒体使用习惯的互动装置，让观众看到自己的数字行为。",
+        "common_translation": "做一个装置展示大家是怎么刷手机的",
+        "sarcastic_comment": "用艺术的名义让人们反思自己沉迷手机的行为",
+        "requirements": {
+            "theory": 15,
+            "academic": 12,
+            "funding": 25
+        },
+        "effects": {
+            "paradigm": 20,
+            "reality": 30,
+            "theory": 5,
+            "humor": 20,
+            "sarcasm": 25,
+            "funding": -20,
+            "anxiety": 5
+        },
+        "achievement": {
+            "name": "数字行为观察者",
+            "description": "成功让观众意识到了自己的数字生活"
+        }
+    },
+    {
+        "id": "climate_data_art",
+        "name": "气候数据艺术项目",
+        "description": "将全球气候变化数据转化为沉浸式体验装置。",
+        "requirements": {
+            "theory": 25,
+            "academic": 18,
+            "funding": 45
+        },
+        "effects": {
+            "paradigm": 28,
+            "reality": 22,
+            "theory": 8,
+            "academic": 10,
+            "sarcasm": 20,
+            "funding": -40,
+            "anxiety": 10
+        },
+        "achievement": {
+            "name": "气候艺术家",
+            "description": "用艺术语言表达了科学数据"
+        }
+    },
+    {
+        "id": "memory_archive_project",
+        "name": "记忆档案项目",
+        "description": "收集并数字化个人记忆物件，创建互动记忆库。",
+        "requirements": {
+            "theory": 20,
+            "academic": 15,
+            "funding": 35
+        },
+        "effects": {
+            "paradigm": 25,
+            "reality": 20,
+            "theory": 10,
+            "academic": 12,
+            "humor": 15,
+            "sarcasm": 8,
+            "funding": -30
+        },
+        "achievement": {
+            "name": "记忆考古学家",
+            "description": "成功将个人记忆转化为集体体验"
+        }
+    },
+    {
+        "id": "algorithmic_curation",
+        "name": "算法策展实验",
+        "description": "开发AI策展系统，让算法自动策划艺术展览。",
+        "requirements": {
+            "theory": 35,
+            "academic": 25,
+            "funding": 60
+        },
+        "effects": {
+            "paradigm": 40,
+            "reality": 15,
+            "theory": 15,
+            "academic": 8,
+            "sarcasm": 30,
+            "funding": -55,
+            "anxiety": 15
+        },
+        "achievement": {
+            "name": "算法策展人",
+            "description": "让机器掌握了艺术品味的权力"
+        }
+    },
+    {
+        "id": "biotech_growth_art",
+        "name": "生物科技培养艺术",
+        "description": "在实验室培养活体艺术材料，创作会成长变化的作品。",
+        "requirements": {
+            "theory": 40,
+            "academic": 30,
+            "funding": 80
+        },
+        "effects": {
+            "paradigm": 50,
+            "reality": 12,
+            "theory": 18,
+            "academic": 15,
+            "anxiety": 25,
+            "humor": 5,
+            "sarcasm": 15,
+            "funding": -75
+        },
+        "achievement": {
+            "name": "生物艺术家",
+            "description": "成功创造了有生命的艺术品"
+        }
+    },
+    {
+        "id": "quantum_entanglement_art",
+        "name": "量子纠缠艺术装置",
+        "description": "利用量子纠缠现象创作跨空间的同步艺术体验。",
+        "requirements": {
+            "theory": 60,
+            "academic": 35,
+            "funding": 100
+        },
+        "effects": {
+            "paradigm": 60,
+            "reality": 8,
+            "theory": 25,
+            "academic": 20,
+            "anxiety": 30,
+            "sarcasm": 20,
+            "funding": -90
+        },
+        "achievement": {
+            "name": "量子艺术师",
+            "description": "创造了理论上存在的艺术体验"
+        }
+    },
+    {
+        "id": "collective_consciousness",
+        "name": "集体意识映射项目",
+        "description": "通过脑机接口技术收集多人脑电数据，可视化集体意识状态。",
+        "requirements": {
+            "theory": 80,
+            "academic": 50,
+            "funding": 80
+        },
+        "effects": {
+            "paradigm": 70,
+            "reality": 10,
+            "theory": 30,
+            "academic": 25,
+            "anxiety": 35,
+            "sarcasm": 15,
+            "funding": -110
+        },
+        "achievement": {
+            "name": "意识网络构建者",
+            "description": "成功将个体意识连接成集体智慧"
+        }
+    }
+]

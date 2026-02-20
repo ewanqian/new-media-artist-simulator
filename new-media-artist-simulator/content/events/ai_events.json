@@ -1,0 +1,568 @@
+[
+    {
+        "id": "ai_skill_obsolescence",
+        "name": "技能过时危机",
+        "description": "你花了三年学习的编程框架，突然被AI工具完全取代。现在任何人都可以用自然语言生成你擅长的效果。",
+        "requirements": {
+            "theory": 30
+        },
+        "effects": {
+            "theory": -20,
+            "paradigm": 30,
+            "anxiety": 40,
+            "irony": 30
+        },
+        "choices": [
+            {
+                "text": "拥抱AI，学习提示词工程",
+                "result": {
+                    "description": "你决定成为'AI艺术家'，虽然有点讽刺，但至少能继续创作。",
+                    "effects": { "paradigm": 20, "theory": 10, "irony": 20 }
+                }
+            },
+            {
+                "text": "转向AI无法替代的手工创作",
+                "result": {
+                    "description": "你开始用双手创作，发现这才是你真正想要的。",
+                    "effects": { "theory": 20, "paradigm": -10, "funding": -20 }
+                }
+            },
+            {
+                "text": "批判AI，创作关于技术过时的作品",
+                "result": {
+                    "description": "你的作品获得了学术关注，但市场反响平平。",
+                    "effects": { "theory": 30, "academic": 20, "funding": -30 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "ai_generated_exhibition",
+        "name": "AI生成展览争议",
+        "description": "你用AI辅助创作的作品入选了重要展览，但有人质疑这是否算'你的'作品。",
+        "requirements": {
+            "academic": 40,
+            "paradigm": 30
+        },
+        "effects": {
+            "academic": 30,
+            "paradigm": 40,
+            "anxiety": 30,
+            "irony": 20
+        },
+        "choices": [
+            {
+                "text": "公开承认AI协作，强调人机共创",
+                "result": {
+                    "description": "你的诚实获得了一些尊重，但也有人认为你在'作弊'。",
+                    "effects": { "academic": 20, "paradigm": 30, "theory": 15 }
+                }
+            },
+            {
+                "text": "声称AI只是工具，就像相机一样",
+                "result": {
+                    "description": "这个比喻引发了一场关于艺术工具本质的辩论。",
+                    "effects": { "theory": 25, "academic": -10, "irony": 25 }
+                }
+            },
+            {
+                "text": "拒绝回应，让作品自己说话",
+                "result": {
+                    "description": "沉默反而让争议更大了。",
+                    "effects": { "paradigm": 20, "academic": -20, "anxiety": 20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "prompt_engineer_identity",
+        "name": "提示词工程师身份危机",
+        "description": "你开始怀疑自己是不是只是一个'提示词工程师'。这算艺术家吗？",
+        "requirements": {
+            "theory": 40,
+            "anxiety": 30
+        },
+        "effects": {
+            "theory": 20,
+            "anxiety": 50,
+            "irony": 40,
+            "paradigm": 20
+        },
+        "choices": [
+            {
+                "text": "重新定义艺术家身份",
+                "result": {
+                    "description": "你写了一篇关于'后技术艺术家'的理论文章，获得了一些关注。",
+                    "effects": { "theory": 40, "academic": 20, "paradigm": 30 }
+                }
+            },
+            {
+                "text": "回归传统媒介",
+                "result": {
+                    "description": "你开始画油画了，虽然画得很烂，但感觉很真实。",
+                    "effects": { "theory": -10, "paradigm": -20, "anxiety": -30 }
+                }
+            },
+            {
+                "text": "接受这个新身份",
+                "result": {
+                    "description": "你决定做一个'AI时代的艺术家'，这本身就是一种立场。",
+                    "effects": { "irony": 30, "paradigm": 20, "anxiety": -20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "ai_art_competition",
+        "name": "AI艺术比赛风波",
+        "description": "你参加了一个新媒体艺术比赛，发现其他参赛者都在用AI生成作品。评委似乎更喜欢那些'视觉效果好'的AI作品。",
+        "requirements": {
+            "academic": 30
+        },
+        "effects": {
+            "academic": -20,
+            "anxiety": 30,
+            "irony": 40,
+            "paradigm": 20
+        },
+        "choices": [
+            {
+                "text": "用AI做一个更炫的作品参赛",
+                "result": {
+                    "description": "你赢了，但感觉怪怪的。",
+                    "effects": { "funding": 30, "academic": -10, "irony": 30 }
+                }
+            },
+            {
+                "text": "坚持手工创作，表达对AI的抵抗",
+                "result": {
+                    "description": "你没获奖，但作品被一位策展人看中，邀请你做个展。",
+                    "effects": { "academic": 30, "theory": 20, "funding": -10 }
+                }
+            },
+            {
+                "text": "做一个关于AI艺术比赛的作品",
+                "result": {
+                    "description": "你的元作品获得了'最佳概念奖'，讽刺的是，评委会说这是'对AI时代的深刻反思'。",
+                    "effects": { "theory": 30, "paradigm": 40, "irony": 50 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "coding_is_dead",
+        "name": "代码已死宣言",
+        "description": "一位知名艺术家宣布'代码艺术已死'，引发行业震动。你花了很多年学习的创意编程，突然变得'过时'了。",
+        "requirements": {
+            "theory": 50,
+            "paradigm": 40
+        },
+        "effects": {
+            "theory": 30,
+            "paradigm": 50,
+            "anxiety": 40,
+            "irony": 30
+        },
+        "choices": [
+            {
+                "text": "写文章反驳这个宣言",
+                "result": {
+                    "description": "你的文章被转发了很多次，但大多数人只是觉得这是'一个即将过时的艺术家的挣扎'。",
+                    "effects": { "theory": 20, "academic": 10, "irony": 20 }
+                }
+            },
+            {
+                "text": "接受并转向AI艺术",
+                "result": {
+                    "description": "你开始学习AI工具，发现其实也挺有意思的。",
+                    "effects": { "paradigm": 30, "theory": -10, "irony": 25 }
+                }
+            },
+            {
+                "text": "做一个关于'过时'的作品",
+                "result": {
+                    "description": "你用'过时'的代码创作了一件关于过时的作品，这个悖论让策展人们很兴奋。",
+                    "effects": { "theory": 40, "paradigm": 30, "academic": 20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "ai_replacement_anxiety",
+        "name": "被取代焦虑症",
+        "description": "你发现自己越来越难以入睡。每天晚上都在想：AI会不会完全取代艺术家？我学这些还有什么意义？",
+        "requirements": {
+            "anxiety": 50
+        },
+        "effects": {
+            "anxiety": 60,
+            "theory": -10,
+            "funding": -20,
+            "irony": 20
+        },
+        "choices": [
+            {
+                "text": "寻求心理咨询",
+                "result": {
+                    "description": "心理咨询师说这是'时代性焦虑'，很多人都有。你感觉好了一点。",
+                    "effects": { "anxiety": -40, "funding": -30 }
+                }
+            },
+            {
+                "text": "把焦虑转化为创作",
+                "result": {
+                    "description": "你创作了一系列关于焦虑的作品，意外获得了共鸣。",
+                    "effects": { "theory": 20, "paradigm": 30, "anxiety": -20 }
+                }
+            },
+            {
+                "text": "接受虚无，放弃艺术",
+                "result": {
+                    "description": "你决定转行做产品经理，至少工资稳定。",
+                    "effects": { "funding": 50, "theory": -50, "academic": -40, "paradigm": -30 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "digital_heritage_urgent",
+        "name": "数字遗产紧急保护",
+        "description": "你意识到很多早期的数字艺术作品正在消失——软件过时、服务器关闭、格式无法读取。新媒体正在变成'旧媒体'。",
+        "requirements": {
+            "theory": 60,
+            "academic": 40
+        },
+        "effects": {
+            "theory": 30,
+            "academic": 40,
+            "paradigm": 20,
+            "funding": -30
+        },
+        "choices": [
+            {
+                "text": "发起数字艺术档案项目",
+                "result": {
+                    "description": "你获得了一个小型基金支持，开始建立数字艺术档案。这是一项寂寞但有意义的工作。",
+                    "effects": { "academic": 30, "theory": 20, "funding": 20 }
+                }
+            },
+            {
+                "text": "创作关于数字消逝的作品",
+                "result": {
+                    "description": "你的作品'数字熵'在双年展上引起了关注。",
+                    "effects": { "theory": 30, "paradigm": 40, "academic": 20 }
+                }
+            },
+            {
+                "text": "这关我什么事？",
+                "result": {
+                    "description": "你选择无视，继续做自己的创作。但这个念头一直困扰着你。",
+                    "effects": { "anxiety": 20, "irony": 30 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "ai_collaboration_dilemma",
+        "name": "AI协作困境",
+        "description": "一个商业项目邀请你用AI创作。报酬丰厚，但你不确定这是否符合你的艺术理念。",
+        "requirements": {
+            "funding": 30
+        },
+        "effects": {
+            "funding": 50,
+            "theory": -10,
+            "irony": 30,
+            "anxiety": 20
+        },
+        "choices": [
+            {
+                "text": "接受，艺术也需要生存",
+                "result": {
+                    "description": "项目很成功，你赚了一笔钱。但你在艺术家朋友面前有点抬不起头。",
+                    "effects": { "funding": 60, "academic": -20, "irony": 40 }
+                }
+            },
+            {
+                "text": "拒绝，坚持自己的原则",
+                "result": {
+                    "description": "你拒绝了，虽然有点遗憾，但保持了内心的平静。",
+                    "effects": { "theory": 20, "anxiety": -10, "funding": -20 }
+                }
+            },
+            {
+                "text": "接受，但用AI做一个批判AI的作品",
+                "result": {
+                    "description": "这个悖论让客户很困惑，但作品意外地火了。",
+                    "effects": { "funding": 30, "theory": 30, "paradigm": 30, "irony": 50 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "new_media_becomes_old",
+        "name": "新媒体变成旧媒体",
+        "description": "你突然意识到：'新媒体艺术'这个概念本身已经过时了。当一切都是数字的时候，'新媒体'还有什么意义？",
+        "requirements": {
+            "theory": 70,
+            "paradigm": 50
+        },
+        "effects": {
+            "theory": 50,
+            "paradigm": 40,
+            "anxiety": 30,
+            "irony": 40
+        },
+        "choices": [
+            {
+                "text": "写一篇理论文章重新定义",
+                "result": {
+                    "description": "你的文章'泛在媒体艺术宣言'引发了讨论，有人说是深刻洞察，有人说是故弄玄虚。",
+                    "effects": { "theory": 40, "academic": 30, "irony": 20 }
+                }
+            },
+            {
+                "text": "放弃标签，只做艺术",
+                "result": {
+                    "description": "你决定不再纠结于定义，专注于创作本身。",
+                    "effects": { "anxiety": -30, "paradigm": 20, "theory": 10 }
+                }
+            },
+            {
+                "text": "拥抱'旧媒体艺术'身份",
+                "result": {
+                    "description": "你开始自称'旧媒体艺术家'，这个反讽的身份反而让你获得了关注。",
+                    "effects": { "irony": 50, "paradigm": 30, "academic": 20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "study_abroad_reality",
+        "name": "留学梦碎",
+        "description": "你花了两年准备出国读艺术硕士，突然发现：国外的学校也在用同样的AI工具，学费却要几十万。这值得吗？",
+        "requirements": {
+            "funding": 40,
+            "theory": 40
+        },
+        "effects": {
+            "funding": -40,
+            "anxiety": 40,
+            "irony": 30,
+            "theory": 20
+        },
+        "choices": [
+            {
+                "text": "还是去吧，学历很重要",
+                "result": {
+                    "description": "你去了，发现确实学到了一些东西，但债务也很真实。",
+                    "effects": { "academic": 40, "theory": 20, "funding": -60 }
+                }
+            },
+            {
+                "text": "放弃留学，自学AI艺术",
+                "result": {
+                    "description": "你用省下的钱买了一台好电脑，开始自学。虽然没有学位，但作品越来越好。",
+                    "effects": { "paradigm": 30, "funding": 20, "academic": -20 }
+                }
+            },
+            {
+                "text": "做一个关于留学产业的作品",
+                "result": {
+                    "description": "你的作品'留学梦工厂'在社交媒体上火了，引发了很多讨论。",
+                    "effects": { "theory": 30, "paradigm": 40, "irony": 40 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "commercial_vs_art",
+        "name": "商业与艺术的边界",
+        "description": "一个科技公司邀请你做'艺术顾问'。薪水是现在收入的三倍，但你可能再也没有时间做自己的创作了。",
+        "requirements": {
+            "funding": 30,
+            "academic": 30
+        },
+        "effects": {
+            "funding": 80,
+            "theory": -20,
+            "academic": -30,
+            "anxiety": 30
+        },
+        "choices": [
+            {
+                "text": "接受，艺术可以等",
+                "result": {
+                    "description": "你接受了工作，三年后再也没做过自己的作品。但你的银行账户很满意。",
+                    "effects": { "funding": 100, "theory": -40, "paradigm": -30 }
+                }
+            },
+            {
+                "text": "拒绝，艺术是我的生命",
+                "result": {
+                    "description": "你拒绝了，继续做自己的创作。虽然穷，但内心平静。",
+                    "effects": { "theory": 20, "paradigm": 20, "funding": -20 }
+                }
+            },
+            {
+                "text": "接受，但坚持每周一天做自己的创作",
+                "result": {
+                    "description": "你找到了一个平衡，虽然很累，但至少没有完全放弃。",
+                    "effects": { "funding": 50, "theory": 10, "anxiety": 20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "viral_art_accident",
+        "name": "意外走红",
+        "description": "你随手发的一个AI生成作品在社交媒体上火了。几百万人看过，但评论区都在问'这是什么AI生成的？'",
+        "requirements": {
+            "paradigm": 20
+        },
+        "effects": {
+            "funding": 30,
+            "academic": -20,
+            "irony": 50,
+            "paradigm": 20
+        },
+        "choices": [
+            {
+                "text": "享受流量，继续做类似作品",
+                "result": {
+                    "description": "你成了'网红艺术家'，但艺术圈的人开始疏远你。",
+                    "effects": { "funding": 50, "academic": -40, "irony": 40 }
+                }
+            },
+            {
+                "text": "澄清这不是你的主要创作方向",
+                "result": {
+                    "description": "你发了声明，但没什么人关心。流量很快就过去了。",
+                    "effects": { "theory": 10, "funding": -10 }
+                }
+            },
+            {
+                "text": "借机宣传你的'真正'作品",
+                "result": {
+                    "description": "你试图把流量转化为对严肃艺术的关注，效果一般。",
+                    "effects": { "academic": 10, "theory": 10, "funding": 10 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "ai_copyright_mess",
+        "name": "AI版权纠纷",
+        "description": "你发现有人用你的作品训练AI模型，生成的作品和你的风格很像。法律上这算侵权吗？没人说得清。",
+        "requirements": {
+            "academic": 40,
+            "paradigm": 30
+        },
+        "effects": {
+            "academic": 20,
+            "anxiety": 40,
+            "funding": -20,
+            "irony": 30
+        },
+        "choices": [
+            {
+                "text": "起诉，维护自己的权益",
+                "result": {
+                    "description": "官司打了两年，最后和解。你获得了一些赔偿，但律师费更高。",
+                    "effects": { "funding": -50, "academic": 30, "theory": 20 }
+                }
+            },
+            {
+                "text": "公开谴责，但不起诉",
+                "result": {
+                    "description": "你的声明获得了一些同情，但实际问题没有解决。",
+                    "effects": { "academic": 20, "irony": 20 }
+                }
+            },
+            {
+                "text": "无所谓，风格本来就不是我的",
+                "result": {
+                    "description": "你决定不纠结，继续创作。这种态度反而让一些人敬佩。",
+                    "effects": { "anxiety": -20, "paradigm": 20, "irony": 30 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "post_ai_identity",
+        "name": "后AI身份探索",
+        "description": "你开始思考：在AI时代，艺术家的独特价值到底是什么？是创意？是眼光？还是仅仅是'人类'这个标签？",
+        "requirements": {
+            "theory": 60,
+            "anxiety": 40
+        },
+        "effects": {
+            "theory": 40,
+            "paradigm": 30,
+            "anxiety": 20,
+            "irony": 30
+        },
+        "choices": [
+            {
+                "text": "深入理论研究，寻找答案",
+                "result": {
+                    "description": "你写了一本关于'AI时代艺术家的本体论'的书，学术圈很感兴趣，但销量惨淡。",
+                    "effects": { "theory": 50, "academic": 40, "funding": -20 }
+                }
+            },
+            {
+                "text": "用创作来探索这个问题",
+                "result": {
+                    "description": "你的'人机边界'系列作品获得了策展人的关注。",
+                    "effects": { "paradigm": 40, "theory": 20, "academic": 20 }
+                }
+            },
+            {
+                "text": "接受不确定性，活在当下",
+                "result": {
+                    "description": "你决定不再纠结这个问题，专注于眼前的创作。这反而是一种智慧。",
+                    "effects": { "anxiety": -40, "paradigm": 20 }
+                }
+            }
+        ]
+    },
+    {
+        "id": "final_realization",
+        "name": "最终领悟",
+        "description": "经过这么多年的挣扎，你突然明白了一件事：艺术从来不是关于技术，而是关于人。AI可以生成图像，但无法生成意义。",
+        "requirements": {
+            "theory": 80,
+            "paradigm": 60
+        },
+        "effects": {
+            "theory": 60,
+            "paradigm": 50,
+            "anxiety": -50,
+            "irony": 40
+        },
+        "choices": [
+            {
+                "text": "创作一件关于这个领悟的作品",
+                "result": {
+                    "description": "你的作品'意义的边界'被认为是近年来最重要的新媒体艺术作品之一。",
+                    "effects": { "theory": 40, "academic": 50, "paradigm": 40 },
+                    "achievement": { "name": "意义追寻者", "description": "在AI时代找到了艺术的本质" }
+                }
+            },
+            {
+                "text": "把这个领悟写成书",
+                "result": {
+                    "description": "你的书成为了艺术院校的推荐读物，虽然版税不多，但影响深远。",
+                    "effects": { "theory": 50, "academic": 60, "funding": 10 }
+                }
+            },
+            {
+                "text": "默默继续创作，不需要解释",
+                "result": {
+                    "description": "你选择不宣扬这个领悟，只是安静地创作。这种谦逊反而让作品更有力量。",
+                    "effects": { "paradigm": 30, "anxiety": -30 }
+                }
+            }
+        ]
+    }
+]

@@ -1,0 +1,166 @@
+[
+    {
+        "id": "abundance_path",
+        "name": "丰盈之路",
+        "description": "拥抱技术丰盈，追求视觉奇观。利用AI生成海量内容，创造沉浸式体验。",
+        "philosophy": "技术即艺术，丰盈即美学",
+        "requirements": {
+            "funding": 60
+        },
+        "effects": {
+            "academic": 20,
+            "paradigm": 30,
+            "funding": -40,
+            "anxiety": 10
+        },
+        "narratives": {
+            "formal": "探索技术丰盈主义创作方法论，构建多感官沉浸式艺术体验系统",
+            "casual": "用各种炫酷技术做大型装置，视觉效果拉满",
+            "ironic": "甲方要什么你就做什么，反正都是AI生成的"
+        }
+    },
+    {
+        "id": "restraint_path",
+        "name": "克制之道",
+        "description": "极简主义，反思技术依赖。用最少的数字手段，表达最深的思考。",
+        "philosophy": "少即是多，克制即力量",
+        "requirements": {
+            "theory": 70
+        },
+        "effects": {
+            "theory": 40,
+            "paradigm": 50,
+            "funding": -20,
+            "academic": 30
+        },
+        "narratives": {
+            "formal": "实践批判性新媒体艺术，以极简形式质询技术本体论",
+            "casual": "用最简单的技术做最有深度的作品",
+            "ironic": "反正你也买不起设备，不如说这是'极简主义'"
+        }
+    },
+    {
+        "id": "chaos_path",
+        "name": "混沌探索",
+        "description": "拥抱AI生成的不确定性，探索算法美学与随机性。",
+        "philosophy": "失控即创造，混沌即秩序",
+        "requirements": {
+            "paradigm": 50
+        },
+        "effects": {
+            "paradigm": 60,
+            "theory": 20,
+            "funding": -30,
+            "anxiety": 30
+        },
+        "narratives": {
+            "formal": "研究生成艺术与算法诗学，探索人机协作的创作边界",
+            "casual": "让AI随便生成，看看能出什么",
+            "ironic": "你也不知道作品会变成什么样，但这正是'概念'"
+        }
+    },
+    {
+        "id": "resistance_path",
+        "name": "抵抗运动",
+        "description": "回归手工与物质性，拒绝完全数字化。",
+        "philosophy": "人的痕迹，物的温度",
+        "requirements": {
+            "theory": 60,
+            "academic": 40
+        },
+        "effects": {
+            "theory": 30,
+            "academic": 40,
+            "paradigm": 40,
+            "funding": -50
+        },
+        "narratives": {
+            "formal": "实践后数字艺术，在技术饱和时代重新发现物质性与手工价值",
+            "casual": "不想被AI取代，那就做AI做不了的东西",
+            "ironic": "最后发现手工比写代码还累"
+        }
+    },
+    {
+        "id": "opportunism_path",
+        "name": "投机策略",
+        "description": "在商业与技术间游走，将艺术作为职业跳板。",
+        "philosophy": "艺术是手段，生存是目的",
+        "requirements": {
+            "funding": 40
+        },
+        "effects": {
+            "funding": 50,
+            "academic": -20,
+            "anxiety": 20,
+            "irony": 40
+        },
+        "narratives": {
+            "formal": "探索艺术与产业的跨界融合，构建可持续的创意实践模式",
+            "casual": "先做个作品集，然后转行做设计",
+            "ironic": "艺术学位终于派上用场了——做PPT"
+        }
+    },
+    {
+        "id": "ai_collaboration",
+        "name": "AI协作实验",
+        "description": "与AI深度协作，探索人机共创的新可能。",
+        "philosophy": "不是被取代，而是进化",
+        "requirements": {
+            "theory": 50,
+            "paradigm": 40
+        },
+        "effects": {
+            "paradigm": 50,
+            "theory": 30,
+            "funding": -25,
+            "anxiety": 15
+        },
+        "narratives": {
+            "formal": "探索人机协作的创作范式，重新定义艺术家在AI时代的角色",
+            "casual": "用AI做助手，自己当艺术总监",
+            "ironic": "以前是自己做，现在是教AI做，还是累"
+        }
+    },
+    {
+        "id": "critical_technology",
+        "name": "技术批判实践",
+        "description": "用技术批判技术，揭示数字时代的隐秘逻辑。",
+        "philosophy": "批判是最好的参与",
+        "requirements": {
+            "theory": 80,
+            "academic": 50
+        },
+        "effects": {
+            "theory": 50,
+            "academic": 40,
+            "paradigm": 30,
+            "funding": -35
+        },
+        "narratives": {
+            "formal": "实践批判性技术艺术，揭示算法权力与数据政治",
+            "casual": "用技术作品批评技术，很酷的概念",
+            "ironic": "用MacBook批评资本主义，用iPhone批判监控社会"
+        }
+    },
+    {
+        "id": "digital_heritage",
+        "name": "数字遗产计划",
+        "description": "在新媒体成为'非遗'之前，记录和保存即将消失的数字实践。",
+        "philosophy": "今天的实验，明天的遗产",
+        "requirements": {
+            "theory": 65,
+            "academic": 60
+        },
+        "effects": {
+            "theory": 35,
+            "academic": 50,
+            "paradigm": 25,
+            "funding": -30
+        },
+        "narratives": {
+            "formal": "开展数字文化遗产保护研究，记录即将消失的新媒体艺术实践",
+            "casual": "趁新媒体还没完全变成老媒体，赶紧记录下来",
+            "ironic": "你正在用最新技术保存'即将过时'的技术，这很当代"
+        }
+    }
+]

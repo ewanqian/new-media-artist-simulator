@@ -1,0 +1,242 @@
+[
+    {
+        "id": "phenomenology_lab",
+        "name": "现象学实验空间",
+        "description": "一个完全黑暗的空间，观众必须放弃视觉感官，通过触觉和听觉重新认知艺术。每个体验者都要写一篇现象学分析报告。",
+        "requirements": {
+            "theory": 85,
+            "social": 30,
+            "funding": 50
+        },
+        "effects": {
+            "theory": 70,
+            "social": 20,
+            "confusion": 80,
+            "funding": -45
+        },
+        "achievement": {
+            "name": "感知研究者",
+            "description": "成功让观众质疑了自己的所有感官经验"
+        }
+    },
+    {
+        "id": "archive_space",
+        "name": "媒体考古实验室",
+        "description": "收集了从留声机到区块链的所有过时媒体设备，研究技术退化的美学价值。每件设备都必须保持原始故障状态。",
+        "requirements": {
+            "theory": 75,
+            "social": 40,
+            "funding": 90
+        },
+        "effects": {
+            "theory": 65,
+            "social": 30,
+            "confusion": 75,
+            "funding": -80
+        },
+        "achievement": {
+            "name": "媒体考古学家",
+            "description": "成功修复了一台无法修复的设备"
+        }
+    },
+    {
+        "id": "cognitive_space",
+        "name": "认知科学艺术空间",
+        "description": "将脑电波数据可视化的实验室，观众必须通过脑机接口才能激活作品。要求同时精通神经科学和数据艺术。",
+        "requirements": {
+            "theory": 90,
+            "social": 45,
+            "funding": 100
+        },
+        "effects": {
+            "theory": 80,
+            "social": 35,
+            "confusion": 90,
+            "funding": -70
+        },
+        "achievement": {
+            "name": "意识探索者",
+            "description": "成功让观众看见了自己的思维"
+        }
+    },
+    {
+        "id": "quantum_art_lab",
+        "name": "量子艺术实验室",
+        "description": "基于量子纠缠原理的跨地域艺术空间，两地观众的行为会相互影响作品状态。需要懂量子物理和互联网艺术。",
+        "requirements": {
+            "theory": 95,
+            "social": 60,
+            "funding": 120
+        },
+        "effects": {
+            "theory": 85,
+            "social": 50,
+            "confusion": 95,
+            "funding": -90
+        },
+        "achievement": {
+            "name": "量子艺术家",
+            "description": "成功创造了一个同时存在和不存在的作品"
+        }
+    },
+    {
+        "id": "anthropocene_lab",
+        "name": "人类世研究空间",
+        "description": "研究人类活动对地球系统影响的实验室，必须采集真实的环境数据，同时兼顾艺术表现和科学严谨。",
+        "requirements": {
+            "theory": 80,
+            "social": 55,
+            "funding": 85
+        },
+        "effects": {
+            "theory": 75,
+            "social": 45,
+            "confusion": 85,
+            "funding": -60
+        },
+        "achievement": {
+            "name": "人类世见证者",
+            "description": "成功用艺术记录了一个物种的消失"
+        }
+    },
+    {
+        "id": "post_internet_lab",
+        "name": "后互联网研究所",
+        "description": "研究网络时代信息过载的实验空间，所有作品必须同时在线上线下呈现，且保持数据实时更新。需要精通网络协议和数据库技术。",
+        "requirements": {
+            "theory": 88,
+            "social": 45,
+            "funding": 75
+        },
+        "effects": {
+            "theory": 65,
+            "social": 40,
+            "confusion": 85,
+            "funding": -55
+        },
+        "achievement": {
+            "name": "数据洪流掌控者",
+            "description": "成功在信息过载中制造了更多信息过载"
+        }
+    },
+    {
+        "id": "system_aesthetics",
+        "name": "系统美学实验室",
+        "description": "研究复杂系统的自组织美学，要求作品必须是一个自运行的生态系统，持续至少一年不需人工干预。",
+        "requirements": {
+            "theory": 92,
+            "social": 35,
+            "funding": 95
+        },
+        "effects": {
+            "theory": 80,
+            "social": 25,
+            "confusion": 90,
+            "funding": -85
+        },
+        "achievement": {
+            "name": "系统构建者",
+            "description": "创造了一个自我维持的艺术生态系统"
+        }
+    },
+    {
+        "id": "time_based_art",
+        "name": "时基媒体研究中心",
+        "description": "专注于时间维度的艺术实践，作品必须跨越过去、现在和未来三个时间维度，要求掌握档案学和未来学理论。",
+        "requirements": {
+            "theory": 86,
+            "social": 50,
+            "funding": 70
+        },
+        "effects": {
+            "theory": 75,
+            "social": 35,
+            "confusion": 95,
+            "funding": -60
+        },
+        "achievement": {
+            "name": "时间编织者",
+            "description": "成功让观众在同一时刻体验了三个时间维度"
+        }
+    },
+    {
+        "id": "critical_code",
+        "name": "批判性编程空间",
+        "description": "探索代码作为文化文本的实验室，所有作品都必须以源代码形式呈现，同时要求具备解构主义批评理论基础。",
+        "requirements": {
+            "theory": 90,
+            "social": 30,
+            "funding": 65
+        },
+        "effects": {
+            "theory": 85,
+            "social": 20,
+            "confusion": 88,
+            "funding": -50
+        },
+        "achievement": {
+            "name": "代码诗人",
+            "description": "用一段无法运行的代码表达了深刻的哲学思考"
+        }
+    },
+    {
+        "id": "posthuman_studio",
+        "name": "后人类艺术工作室",
+        "description": "研究人工智能、生物科技与艺术创作的交互实验室，要求同时具备生物学、计算机科学和哲学背景。",
+        "requirements": {
+            "theory": 95,
+            "social": 40,
+            "funding": 110
+        },
+        "effects": {
+            "theory": 90,
+            "social": 30,
+            "confusion": 100,
+            "funding": -95
+        },
+        "achievement": {
+            "name": "物种跨越者",
+            "description": "成功创造了一个无法分辨是人类还是AI创作的作品"
+        }
+    },
+    {
+        "id": "archaeology_media",
+        "name": "媒体考古发掘场",
+        "description": "重新发现和激活废弃媒体技术的实验空间，要求对每件技术废墟进行系谱学分析和功能重构。",
+        "requirements": {
+            "theory": 83,
+            "social": 35,
+            "funding": 80
+        },
+        "effects": {
+            "theory": 70,
+            "social": 25,
+            "confusion": 85,
+            "funding": -70
+        },
+        "achievement": {
+            "name": "数字考古学家",
+            "description": "成功让一台1980年代的计算机运行了Web3程序"
+        }
+    },
+    {
+        "id": "embodied_cognition",
+        "name": "具身认知实验室",
+        "description": "研究身体、空间与认知的关系，观众必须通过特定的身体姿势才能触发作品，要求熟悉现象学和认知科学。",
+        "requirements": {
+            "theory": 87,
+            "social": 45,
+            "funding": 75
+        },
+        "effects": {
+            "theory": 80,
+            "social": 35,
+            "confusion": 90,
+            "funding": -65
+        },
+        "achievement": {
+            "name": "身体解码者",
+            "description": "设计出一个只有特定姿势才能理解的装置"
+        }
+    }
+]

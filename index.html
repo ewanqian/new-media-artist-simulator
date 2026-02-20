@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新媒体艺术家模拟器 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 3rem;
+            font-style: italic;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .nav-card {
+            background: #151515;
+            border: 1px solid #333;
+            padding: 2rem;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-card:hover {
+            background: #1a1a1a;
+            border-color: #555;
+            transform: translateY(-2px);
+        }
+        
+        .nav-card h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 0.8rem;
+        }
+        
+        .nav-card p {
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.6;
+        }
+        
+        .meta {
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 2rem;
+        }
+        
+        .meta a {
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .meta a:hover {
+            color: #999;
+        }
+        
+        .warning {
+            font-size: 0.75rem;
+            color: #444;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #222;
+            background: #0d0d0d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>新媒体艺术家模拟器</h1>
+        <p class="subtitle">在AI时代的虚无中寻找创作的价值</p>
+        
+        <div class="nav-grid">
+            <a href="new-media-artist-simulator/index.html" class="nav-card">
+                <h2>🎮 开始模拟</h2>
+                <p>体验一位新媒体艺术家的生涯。在理想与现实的夹缝中，做出你的选择。</p>
+            </a>
+            
+            <a href="docs/ARTIST_STATEMENT.md" class="nav-card">
+                <h2>📖 作品说明</h2>
+                <p>关于这件作品的理论背景、创作意图与艺术定位。</p>
+            </a>
+        </div>
+        
+        <div class="meta">
+            <p>By 钱誉文 EWAN CT | 2024-2026</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/ewancht/new-media-artist-simulator">GitHub</a>
+            </p>
+        </div>
+        
+        <div class="warning">
+            ⚠️ 本作品为艺术表达与创作实验，所有内容仅代表虚构情境，不代表作者个人立场、观点或价值判断
+        </div>
+    </div>
+</body>
+</html>

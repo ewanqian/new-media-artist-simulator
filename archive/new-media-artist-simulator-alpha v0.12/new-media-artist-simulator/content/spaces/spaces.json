@@ -1,0 +1,342 @@
+[
+    {
+        "id": "virtual_space",
+        "name": "虚拟艺术空间",
+        "description": "一个充满各种投影和全息影像的空间，观众找不到入口和出口",
+        "requirements": {
+            "theory": 40,
+            "social": 30,
+            "funding": 60
+        },
+        "effects": {
+            "theory": 25,
+            "social": 45,
+            "confusion": 65,
+            "funding": -30
+        },
+        "achievement": {
+            "name": "迷宫建造师",
+            "description": "成功让观众在虚拟空间中迷失方向超过两小时"
+        }
+    },
+    {
+        "id": "meta_gallery",
+        "name": "元宇宙画廊",
+        "description": "声称要颠覆传统艺术展览形式，实际上就是一堆QR码贴在墙上",
+        "requirements": {
+            "theory": 35,
+            "social": 50,
+            "funding": 45
+        },
+        "effects": {
+            "theory": -20,
+            "social": 60,
+            "confusion": 70,
+            "funding": 80
+        },
+        "achievement": {
+            "name": "扫码大师",
+            "description": "让观众扫遍整个展厅的二维码却什么都没看懂"
+        }
+    },
+    {
+        "id": "sound_box",
+        "name": "声音艺术盒子",
+        "description": "一个黑暗的房间播放各种噪音，美其名曰'城市声景'",
+        "requirements": {
+            "theory": 45,
+            "social": 25,
+            "funding": 30
+        },
+        "effects": {
+            "theory": 30,
+            "social": 35,
+            "confusion": 55,
+            "funding": -25
+        },
+        "achievement": {
+            "name": "噪音制造者",
+            "description": "成功用地铁刹车声说服观众这是前卫音乐"
+        }
+    },
+    {
+        "id": "empty_museum",
+        "name": "空白美术馆",
+        "description": "一个完全空白的展厅，号称在探讨'存在与虚无'",
+        "requirements": {
+            "theory": 55,
+            "social": 40,
+            "funding": 35
+        },
+        "effects": {
+            "theory": 40,
+            "social": 30,
+            "confusion": 75,
+            "funding": -40
+        },
+        "achievement": {
+            "name": "虚无大师",
+            "description": "成功举办了一场没有任何展品的展览"
+        }
+    },
+    {
+        "id": "tech_cave",
+        "name": "科技艺术洞穴",
+        "description": "充斥着各种坏掉的电子设备，自称是对科技社会的思考",
+        "requirements": {
+            "theory": 50,
+            "social": 35,
+            "funding": 55
+        },
+        "effects": {
+            "theory": 35,
+            "social": 40,
+            "confusion": 60,
+            "funding": -35
+        },
+        "achievement": {
+            "name": "科技废物再利用专家",
+            "description": "用坏掉的手机组成装置还获得了好评"
+        }
+    },
+    {
+        "id": "infinite_loop",
+        "name": "无限循环空间",
+        "description": "一个只放循环播放视频的房间，自称是对时间的艺术探索",
+        "requirements": {
+            "theory": 30,
+            "social": 45,
+            "funding": 40
+        },
+        "effects": {
+            "theory": 20,
+            "social": 50,
+            "confusion": 45,
+            "funding": 30
+        },
+        "achievement": {
+            "name": "循环制造者",
+            "description": "让观众看同一个视频看到忘记时间"
+        }
+    },
+    {
+        "id": "data_maze",
+        "name": "数据迷宫",
+        "description": "墙上全是随机生成的数据可视化图表，没人知道这些数据是什么",
+        "requirements": {
+            "theory": 40,
+            "social": 35,
+            "funding": 50
+        },
+        "effects": {
+            "theory": 30,
+            "social": 40,
+            "confusion": 80,
+            "funding": 45
+        },
+        "achievement": {
+            "name": "数据艺术家",
+            "description": "用毫无意义的数据图表讲述了一个动人故事"
+        }
+    },
+    {
+        "id": "quantum_box",
+        "name": "量子艺术空间",
+        "description": "声称运用量子物理原理，实际上就是一些会闪的LED灯",
+        "requirements": {
+            "theory": 60,
+            "social": 30,
+            "funding": 45
+        },
+        "effects": {
+            "theory": 45,
+            "social": 35,
+            "confusion": 85,
+            "funding": -20
+        },
+        "achievement": {
+            "name": "量子忽悠者",
+            "description": "成功用物理术语解释了一个普通的灯光装置"
+        }
+    },
+    {
+        "id": "bio_art_lab",
+        "name": "生物艺术实验室",
+        "description": "满是培养皿和显微镜，实际上只养了一些发霉的面包",
+        "requirements": {
+            "theory": 55,
+            "social": 25,
+            "funding": 65
+        },
+        "effects": {
+            "theory": 40,
+            "social": 30,
+            "confusion": 70,
+            "funding": -45
+        },
+        "achievement": {
+            "name": "伪科学艺术家",
+            "description": "把实验室废弃物变成了新媒体艺术"
+        }
+    },
+    {
+        "id": "time_capsule",
+        "name": "时间胶囊空间",
+        "description": "收集各种过期物品，美其名曰'对当代社会的考古学研究'",
+        "requirements": {
+            "theory": 35,
+            "social": 40,
+            "funding": 30
+        },
+        "effects": {
+            "theory": 25,
+            "social": 45,
+            "confusion": 50,
+            "funding": 20
+        },
+        "achievement": {
+            "name": "时间收藏家",
+            "description": "成功把垃圾堆变成了'当代生活档案馆'"
+        }
+    },
+    {
+        "id": "space_port_vr",
+        "name": "虚拟太空港",
+        "description": "号称是'未来太空移民的训练场所'，实际上是个极其简陋的3D建模空间，还经常崩溃",
+        "requirements": {
+            "theory": 50,
+            "social": 40,
+            "funding": 80
+        },
+        "effects": {
+            "theory": 35,
+            "social": 45,
+            "confusion": 90,
+            "funding": -60
+        },
+        "achievement": {
+            "name": "太空梦想家",
+            "description": "成功让用户体验了比现实航天还不靠谱的虚拟太空"
+        }
+    },
+    {
+        "id": "digital_gravity",
+        "name": "数字失重舱",
+        "description": "声称能模拟真实太空失重环境，实际上就是让3D模型随机飘来飘去",
+        "requirements": {
+            "theory": 45,
+            "social": 35,
+            "funding": 65
+        },
+        "effects": {
+            "theory": 30,
+            "social": 50,
+            "confusion": 75,
+            "funding": -40
+        },
+        "achievement": {
+            "name": "虚拟物理学家",
+            "description": "用错误的物理引擎让所有物体都飘着"
+        }
+    },
+    {
+        "id": "space_community",
+        "name": "太空社区模拟器",
+        "description": "号称是'首个数字太空移民社区'，但用户只能在方块房间里发表情包聊天",
+        "requirements": {
+            "theory": 40,
+            "social": 60,
+            "funding": 55
+        },
+        "effects": {
+            "theory": 20,
+            "social": 70,
+            "confusion": 65,
+            "funding": 40
+        },
+        "achievement": {
+            "name": "太空社交达人",
+            "description": "把普通聊天室包装成了星际社交平台"
+        }
+    },
+    {
+        "id": "cosmic_research",
+        "name": "宇宙研究中心",
+        "description": "自称是'跨星际科研基地'，实际上就是复制粘贴了一些NASA的公开数据",
+        "requirements": {
+            "theory": 65,
+            "social": 30,
+            "funding": 70
+        },
+        "effects": {
+            "theory": 45,
+            "social": 35,
+            "confusion": 85,
+            "funding": -50
+        },
+        "achievement": {
+            "name": "伪科学家",
+            "description": "用公开数据假装进行了深空探索研究"
+        }
+    },
+    {
+        "id": "space_mall",
+        "name": "太空商业中心",
+        "description": "号称是'首个太空购物中心'，其实就是普通电商平台换了个太空皮肤",
+        "requirements": {
+            "theory": 35,
+            "social": 70,
+            "funding": 90
+        },
+        "effects": {
+            "theory": -30,
+            "social": 80,
+            "confusion": 60,
+            "funding": 100
+        },
+        "achievement": {
+            "name": "太空奸商",
+            "description": "成功把普通商品包装成太空特产"
+        }
+    },
+    {
+        "id": "astro_education",
+        "name": "航天训练营",
+        "description": "声称提供'专业航天员培训'，实际上就是看几个太空纪录片放放VR",
+        "requirements": {
+            "theory": 55,
+            "social": 45,
+            "funding": 60
+        },
+        "effects": {
+            "theory": 25,
+            "social": 55,
+            "confusion": 70,
+            "funding": 60
+        },
+        "achievement": {
+            "name": "太空教育家",
+            "description": "用科普视频冒充了航天训练课程"
+        }
+    },
+    {
+        "id": "space_meditation",
+        "name": "太空冥想舱",
+        "description": "号称能提供'零重力冥想体验'，就是放了个星空壁纸配太空白噪音",
+        "requirements": {
+            "theory": 40,
+            "social": 50,
+            "funding": 45
+        },
+        "effects": {
+            "theory": 20,
+            "social": 60,
+            "confusion": 55,
+            "funding": 30
+        },
+        "achievement": {
+            "name": "心灵导师",
+            "description": "把普通冥想APP伪装成了太空心理治疗"
+        }
+    }
+]
