@@ -30,7 +30,7 @@
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 300;
             margin-bottom: 0.5rem;
             letter-spacing: 0.1em;
@@ -39,7 +39,7 @@
         .subtitle {
             font-size: 1rem;
             color: #888;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             font-style: italic;
         }
         
@@ -47,7 +47,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
         
         .nav-card {
@@ -57,6 +57,7 @@
             text-decoration: none;
             color: #e0e0e0;
             transition: all 0.3s ease;
+            display: block;
         }
         
         .nav-card:hover {
@@ -75,6 +76,28 @@
             font-size: 0.9rem;
             color: #888;
             line-height: 1.6;
+        }
+        
+        .nav-card.primary {
+            border-color: #444;
+            background: #181818;
+        }
+        
+        .nav-card.primary h2 {
+            color: #fff;
+        }
+        
+        .status {
+            background: #111;
+            border: 1px solid #222;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .status strong {
+            color: #888;
         }
         
         .meta {
@@ -107,8 +130,12 @@
         <h1>新媒体艺术家模拟器</h1>
         <p class="subtitle">在AI时代的虚无中寻找创作的价值</p>
         
+        <div class="status">
+            <strong>2026主干版</strong> · 超文本艺术作品 · 持续更新中
+        </div>
+        
         <div class="nav-grid">
-            <a href="new-media-artist-simulator/index.html" class="nav-card">
+            <a href="new-media-artist-simulator/index.html" class="nav-card primary">
                 <h2>🎮 开始模拟</h2>
                 <p>体验一位新媒体艺术家的生涯。在理想与现实的夹缝中，做出你的选择。</p>
             </a>
@@ -119,10 +146,22 @@
             </a>
         </div>
         
+        <div class="nav-grid">
+            <a href="docs/THEORETICAL_FRAMEWORK.md" class="nav-card">
+                <h2>🎭 理论框架</h2>
+                <p>布尔迪厄艺术场域、福柯话语权力、后数字媒介理论。</p>
+            </a>
+            
+            <a href="archive/" class="nav-card">
+                <h2>📚 历史版本</h2>
+                <p>v0.3.1巴别瓶展览版、v0.2研究版等历史存档。</p>
+            </a>
+        </div>
+        
         <div class="meta">
             <p>By 钱誉文 EWAN CT | 2024-2026</p>
             <p style="margin-top: 0.5rem;">
-                <a href="https://github.com/ewancht/new-media-artist-simulator">GitHub</a>
+                <a href="https://github.com/ewanqian/new-media-artist-simulator">GitHub</a>
             </p>
         </div>
         
