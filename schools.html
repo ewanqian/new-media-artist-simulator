@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六大艺术流派 | 新媒体艺术家模拟器 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #4a90e2;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .schools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .school-card {
+            background: #151515;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .school-card:hover {
+            border-color: #4a90e2;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(74, 144, 226, 0.15);
+        }
+        
+        .school-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .school-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .school-tagline {
+            color: #4a90e2;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .school-description {
+            color: #aaa;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .school-section {
+            margin-bottom: 1.2rem;
+        }
+        
+        .school-section h3 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .school-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .school-section li {
+            color: #888;
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        
+        .school-section li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #4a90e2;
+        }
+        
+        .stats-box {
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stats-title {
+            font-size: 0.9rem;
+            color: #4a90e2;
+            margin-bottom: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .stat-item {
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .stat-value {
+            color: #4a90e2;
+            font-weight: bold;
+        }
+        
+        .stat-value.positive {
+            color: #4caf50;
+        }
+        
+        .stat-value.negative {
+            color: #f44336;
+        }
+        
+        .representative-artists {
+            font-style: italic;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+        }
+        
+        .meta {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .schools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← 返回主页</a>
+        
+        <header>
+            <h1>2026年六大艺术流派</h1>
+            <p class="subtitle">在AI重构创作边界的时代，选择属于你的艺术道路</p>
+        </header>
+        
+        <div class="schools-grid">
+            <div class="school-card">
+                <span class="school-icon">🔍</span>
+                <h2>媒介反思派</h2>
+                <p class="school-tagline">用科技但克制，反思媒介本身</p>
+                
+                <div class="school-description">
+                    在AI工具泛滥的时代，他们选择对技术保持距离。不是反对科技，而是把科技当作反思的对象，而非创作的工具。他们的作品追问：当一切都可以被AI生成时，艺术的本质到底是什么？
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>媒介即信息，而非工具</li>
+                        <li>技术的限度就是艺术的边界</li>
+                        <li>在自动化中寻找人的痕迹</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>复古数字技术（早期计算机艺术）</li>
+                        <li>模拟电路、手工焊接</li>
+                        <li>故障艺术（Glitch Art）</li>
+                        <li>AI的"误用"与"错用"</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>学术认可度高，但市场有限</li>
+                        <li>美术馆常客，但卖作品很难</li>
+                        <li>在艺术院校任教是常见选择</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>理论深度</span>
+                            <span class="stat-value positive">+25</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>范式突破</span>
+                            <span class="stat-value positive">+20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>研究经费</span>
+                            <span class="stat-value negative">-15</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>焦虑指数</span>
+                            <span class="stat-value">+10</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：（待补充）
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <span class="school-icon">🌪️</span>
+                <h2>生成混沌派</h2>
+                <p class="school-tagline">纯AI生成，探索生成艺术边界</p>
+                
+                <div class="school-description">
+                    他们拥抱AI的全部力量。提示词是他们的画笔，模型是他们的画布。他们不担心"这算不算艺术"，而是直接用AI探索可能性的边界——无穷的变体、不可预测的涌现、机器的"梦境"。
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>生成即创作，变体即作品</li>
+                        <li>拥抱不可预测性与涌现性</li>
+                        <li>人是引导者，而非创造者</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>大型生成模型（DALL-E、Midjourney等）</li>
+                        <li>扩散模型、Transformer</li>
+                        <li>生成对抗网络（GAN）</li>
+                        <li>提示词工程（Prompt Engineering）</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>商业机会多，但艺术圈争议大</li>
+                        <li>网红艺术家的诞生地</li>
+                        <li>被批评为"没有灵魂"，但观众喜欢</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>范式突破</span>
+                            <span class="stat-value positive">+30</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>研究经费</span>
+                            <span class="stat-value positive">+20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>学术资本</span>
+                            <span class="stat-value negative">-20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>讽刺值</span>
+                            <span class="stat-value positive">+25</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：Refik Anadol（影响者）、Mario Klingemann（影响者）
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <span class="school-icon">🌌</span>
+                <h2>空间沉浸派</h2>
+                <p class="school-tagline">XR、空间计算、沉浸式文旅</p>
+                
+                <div class="school-description">
+                    他们的舞台是整个空间。VR头显、投影映射、互动装置、沉浸式剧场——他们创造让人"走进"的艺术。AI是他们的助手，帮助他们构建更复杂的虚拟世界和互动体验。
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>体验即作品，在场即意义</li>
+                        <li>身体是感知的界面</li>
+                        <li>空间本身就是艺术媒介</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>VR/AR/MR、空间计算</li>
+                        <li>投影映射（Projection Mapping）</li>
+                        <li>实时渲染引擎（Unity、Unreal）</li>
+                        <li>传感器、动作捕捉</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>沉浸式文旅项目很多，但预算波动大</li>
+                        <li>团队作战，单打独斗很难</li>
+                        <li>商业与艺术的边界最模糊</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>研究经费</span>
+                            <span class="stat-value positive">+35</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>范式突破</span>
+                            <span class="stat-value positive">+15</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>焦虑指数</span>
+                            <span class="stat-value positive">+20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>现实感</span>
+                            <span class="stat-value positive">+15</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：TeamLab、Olafur Eliasson（影响者）
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <span class="school-icon">⌨️</span>
+                <h2>代码原生派</h2>
+                <p class="school-tagline">坚持纯手工创意编程，拒绝AI</p>
+                
+                <div class="school-description">
+                    在AI写代码的时代，他们选择自己敲每一行字符。对他们来说，代码不是工具，而是思想的直接体现，是手的延伸。他们的作品可能不那么"炫"，但每一个像素都有体温。
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>代码是诗，是思想的直接书写</li>
+                        <li>人的时间与劳动本身就是意义</li>
+                        <li>拒绝黑箱，拥抱透明</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>Processing、p5.js、openFrameworks</li>
+                        <li>TouchDesigner、Max/MSP</li>
+                        <li>纯手工编写算法</li>
+                        <li>开源精神，代码即作品</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>在技术圈最受尊重</li>
+                        <li>可以去技术公司做创意技术专家</li>
+                        <li>艺术圈觉得他们"不够艺术"</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>理论深度</span>
+                            <span class="stat-value positive">+15</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>学术资本</span>
+                            <span class="stat-value positive">+20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>现实感</span>
+                            <span class="stat-value positive">+25</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>范式突破</span>
+                            <span class="stat-value negative">-10</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：Casey Reas（Processing创始人）、Golan Levin
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <span class="school-icon">🌍</span>
+                <h2>社会介入派</h2>
+                <p class="school-tagline">用新媒体技术做公共艺术、社会议题</p>
+                
+                <div class="school-description">
+                    对他们来说，美术馆不是终点，街头才是。AI是他们的工具，用来放大社会声音、揭示数据偏见、介入公共讨论。他们的作品不放在白盒子里，而是活在社会现实中。
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>艺术要介入现实，而非逃避</li>
+                        <li>技术是社会变革的工具</li>
+                        <li>观众是参与者，而非观看者</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>数据新闻、数据可视化</li>
+                        <li>社交媒体介入、互动公共装置</li>
+                        <li>参与式设计、工作坊</li>
+                        <li>AI伦理、算法批判</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>基金会、艺术机构支持多</li>
+                        <li>在公共艺术领域很受欢迎</li>
+                        <li>商业画廊不太感兴趣</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>学术资本</span>
+                            <span class="stat-value positive">+25</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>现实感</span>
+                            <span class="stat-value positive">+30</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>研究经费</span>
+                            <span class="stat-value positive">+15</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>幽默度</span>
+                            <span class="stat-value negative">-15</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：Trevor Paglen、Laurie Anderson（影响者）
+                </div>
+            </div>
+            
+            <div class="school-card">
+                <span class="school-icon">🔀</span>
+                <h2>跨媒介融合派</h2>
+                <p class="school-tagline">数字媒介与传统实体媒介融合</p>
+                
+                <div class="school-description">
+                    他们不相信"取代"，只相信"融合"。AI生成的图像被打印在宣纸上，数字雕刻被铸造成青铜，区块链确权的NFT被做成实体版画。他们在数字与物质之间的缝隙里创作。
+                </div>
+                
+                <div class="school-section">
+                    <h3>💡 核心观念</h3>
+                    <ul>
+                        <li>新旧不是对立，而是对话</li>
+                        <li>物质性是数字的锚点</li>
+                        <li>在边界处寻找可能性</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>🛠️ 技术手段</h3>
+                    <ul>
+                        <li>数字生成 + 手工制作</li>
+                        <li>3D打印、CNC雕刻</li>
+                        <li>区块链确权、NFT实体化</li>
+                        <li>AR增强实体作品</li>
+                    </ul>
+                </div>
+                
+                <div class="school-section">
+                    <h3>📉 生存状态</h3>
+                    <ul>
+                        <li>收藏家和传统画廊比较接受</li>
+                        <li>作品有实体，好销售</li>
+                        <li>最"安全"的选择，但也最不激进</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-box">
+                    <div class="stats-title">📊 流派倾向（开局加成）</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span>研究经费</span>
+                            <span class="stat-value positive">+25</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>学术资本</span>
+                            <span class="stat-value positive">+15</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>现实感</span>
+                            <span class="stat-value positive">+20</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>范式突破</span>
+                            <span class="stat-value negative">-5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="representative-artists">
+                    代表艺术家：（待补充）
+                </div>
+            </div>
+        </div>
+        
+        <div class="meta">
+            <p>By 钱誉文 EWAN CT | 2024-2026</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/ewanqian/new-media-artist-simulator" style="color: #666; text-decoration: none;">GitHub</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
