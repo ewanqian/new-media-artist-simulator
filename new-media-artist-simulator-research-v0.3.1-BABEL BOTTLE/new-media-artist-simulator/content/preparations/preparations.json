@@ -1,0 +1,244 @@
+[
+    {
+        "id": "media_theory_reading",
+        "name": "媒体理论阅读小组",
+        "description": "系统性研读从本雅明到维利里奥的媒体理论经典著作。",
+        "common_translation": "一起读晦涩难懂的理论书籍",
+        "sarcastic_comment": "花三个月时间讨论一句话到底是什么意思",
+        "requirements": {
+            "theory": 10,
+            "academic": 5
+        },
+        "effects": {
+            "theory": 20,
+            "academic": 25,
+            "paradigm": 8,
+            "funding": -15,
+            "reality": -10,
+            "humor": -5,
+            "sarcasm": 8
+        },
+        "achievement": {
+            "name": "理论通晓者",
+            "description": "能够用艰深的理论术语解释任何现象"
+        }
+    },
+    {
+        "id": "academic_writing",
+        "name": "学术论文写作训练",
+        "description": "学习如何用学术语言包装艺术实践，撰写符合期刊标准的论文。",
+        "common_translation": "学习如何把简单的事情说得特别复杂",
+        "sarcastic_comment": "用一万字论证为什么要做一个五分钟的作品",
+        "requirements": {
+            "theory": 15,
+            "academic": 10
+        },
+        "effects": {
+            "theory": 15,
+            "academic": 30,
+            "paradigm": 5,
+            "funding": -10,
+            "anxiety": 8,
+            "reality": -12,
+            "humor": -8,
+            "sarcasm": 12
+        },
+        "achievement": {
+            "name": "学术写手",
+            "description": "成功用理论术语掩盖了作品的空洞"
+        }
+    },
+    {
+        "id": "critical_theory_seminar",
+        "name": "批判理论研讨班",
+        "description": "深入研究后结构主义、女性主义和去殖民主义理论框架。",
+        "common_translation": "学习如何批判一切现存的东西",
+        "sarcastic_comment": "用理论武装自己，然后发现生活中没什么可以不被批判的",
+        "requirements": {
+            "theory": 25,
+            "academic": 15,
+            "funding": 20
+        },
+        "effects": {
+            "theory": 25,
+            "academic": 20,
+            "paradigm": 12,
+            "funding": -25,
+            "anxiety": 10,
+            "reality": -15,
+            "humor": -10,
+            "sarcasm": 15
+        },
+        "achievement": {
+            "name": "批判理论家",
+            "description": "成功解构了所有无法解构的事物"
+        }
+    },
+    {
+        "id": "philosophy_intensive",
+        "name": "哲学密集课程",
+        "description": "从海德格尔到德勒兹，系统学习影响当代艺术的哲学思想。",
+        "common_translation": "读一堆死去哲学家的难懂思想",
+        "sarcastic_comment": "花半年时间理解一个概念，然后发现没人关心",
+        "requirements": {
+            "theory": 30,
+            "academic": 20,
+            "funding": 35
+        },
+        "effects": {
+            "theory": 30,
+            "academic": 25,
+            "paradigm": 15,
+            "funding": -40,
+            "anxiety": 12,
+            "reality": -18,
+            "humor": -12,
+            "sarcasm": 10
+        },
+        "achievement": {
+            "name": "哲学艺术家",
+            "description": "能够用哲学概念为任何作品找到深刻意义"
+        }
+    },
+    {
+        "id": "curatorial_studies",
+        "name": "策展研究工作坊",
+        "description": "学习如何策划展览，理解艺术机构的运作逻辑和权力结构。",
+        "requirements": {
+            "theory": 20,
+            "academic": 25,
+            "funding": 30
+        },
+        "effects": {
+            "theory": 15,
+            "academic": 35,
+            "paradigm": 10,
+            "funding": -35,
+            "reality": -8,
+            "humor": -5,
+            "sarcasm": 20
+        },
+        "achievement": {
+            "name": "策展人",
+            "description": "掌握了艺术世界的话语权运作机制"
+        }
+    },
+    {
+        "id": "art_history_bootcamp",
+        "name": "艺术史强化训练",
+        "description": "从古典到当代，建构完整的艺术史知识体系。",
+        "requirements": {
+            "theory": 35,
+            "academic": 15
+        },
+        "effects": {
+            "theory": 20,
+            "academic": 40,
+            "paradigm": 8,
+            "funding": -20,
+            "reality": -12,
+            "humor": -8,
+            "sarcasm": 15
+        },
+        "achievement": {
+            "name": "艺术史学者",
+            "description": "能够为任何作品找到历史先例和理论依据"
+        }
+    },
+    {
+        "id": "research_methodology",
+        "name": "研究方法论训练",
+        "description": "学习质性研究、田野调查、档案研究等学术研究方法。",
+        "requirements": {
+            "theory": 40,
+            "academic": 30,
+            "funding": 25
+        },
+        "effects": {
+            "theory": 25,
+            "academic": 30,
+            "paradigm": 15,
+            "funding": -30,
+            "anxiety": 8,
+            "reality": -10,
+            "humor": -12,
+            "sarcasm": 8
+        },
+        "achievement": {
+            "name": "研究专家",
+            "description": "掌握了让任何观点都显得有理有据的方法"
+        }
+    },
+    {
+        "id": "dissertation_writing",
+        "name": "博士论文写作指导",
+        "description": "在导师指导下完成关于新媒体艺术的博士论文。",
+        "requirements": {
+            "theory": 60,
+            "academic": 40,
+            "funding": 50
+        },
+        "effects": {
+            "theory": 35,
+            "academic": 50,
+            "paradigm": 20,
+            "funding": -60,
+            "anxiety": 25,
+            "reality": -25,
+            "humor": -20,
+            "sarcasm": 12
+        },
+        "achievement": {
+            "name": "博士艺术家",
+            "description": "成功用200页论文证明了一个显而易见的观点"
+        }
+    },
+    {
+        "id": "postdoc_research",
+        "name": "博士后研究项目",
+        "description": "在顶尖艺术院校进行为期两年的博士后研究。",
+        "requirements": {
+            "theory": 80,
+            "academic": 60,
+            "funding": 80
+        },
+        "effects": {
+            "theory": 40,
+            "academic": 60,
+            "paradigm": 25,
+            "funding": -90,
+            "anxiety": 20,
+            "reality": -30,
+            "humor": -25,
+            "sarcasm": 15
+        },
+        "achievement": {
+            "name": "学术精英",
+            "description": "达到了理论高峰但失去了生活常识"
+        }
+    },
+    {
+        "id": "visiting_scholar",
+        "name": "国际访问学者",
+        "description": "在海外顶级艺术机构担任访问学者，建立国际学术网络。",
+        "requirements": {
+            "theory": 70,
+            "academic": 50,
+            "funding": 100
+        },
+        "effects": {
+            "theory": 30,
+            "academic": 55,
+            "paradigm": 30,
+            "funding": -120,
+            "anxiety": 15,
+            "reality": -20,
+            "humor": -15,
+            "sarcasm": 25
+        },
+        "achievement": {
+            "name": "国际学者",
+            "description": "在全世界范围内建立了无用的学术关系"
+        }
+    }
+]
