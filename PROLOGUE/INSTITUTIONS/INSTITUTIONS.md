@@ -175,8 +175,8 @@
 
 | ID | 名称 | 真实原型 | 坐标 |
 |----|------|----------|------|
-| MUS_201 | MoMA (Museum of Modern Art) | MoMA | 纽约 |
-| MUS_202 | Tate Modern | Tate Modern | 伦敦 |
+| MUS_201 | MoMA (Museum of Modern Art) | 现代艺术中心 | 纽约 |
+| MUS_202 | Tate Modern | 泰特现代馆 | 伦敦 |
 | MUS_203 | Centre Pompidou | Centre Pompidou | 巴黎 |
 | MUS_204 | Guggenheim Bilbao | Guggenheim | 毕尔巴鄂 |
 | MUS_205 | ZKM Karlsruhe | ZKM | 卡尔斯鲁厄 |
@@ -224,8 +224,8 @@
 |----|------|------|--------|------|
 | GAL_001 | 蓝岸画廊 | 上海 | 林雅婷 | 2020 |
 | GAL_002 | 香格纳画廊 | 上海 | 劳伦斯 | 1996 |
-| GAL_003 | 佩斯画廊 | 北京 | 马克 | 2008 |
-| GAL_004 | 麦勒画廊 | 北京/瑞士 | 艾格尼丝 | 2007 |
+| GAL_003 | 北画廊 | 北京 | 马克 | 2008 |
+| GAL_004 | 风画廊 | 北京/瑞士 | 艾格尼丝 | 2007 |
 
 ## 虚构
 
