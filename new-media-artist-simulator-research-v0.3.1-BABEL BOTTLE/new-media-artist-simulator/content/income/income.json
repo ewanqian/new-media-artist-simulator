@@ -1,0 +1,237 @@
+[
+    {
+        "id": "teaching_gig",
+        "name": "艺术院校兼职教学",
+        "description": "在艺术院校担任兼职讲师，教授新媒体艺术基础课程。",
+        "common_translation": "去学校当老师，给学生上课赚点工资",
+        "sarcastic_comment": "用标准答案教学生如何做'实验性'艺术",
+        "requirements": {
+            "theory": 20,
+            "academic": 15
+        },
+        "effects": {
+            "funding": 45,
+            "reality": 20,
+            "sarcasm": 15,
+            "humor": 10,
+            "theory": -12,
+            "academic": -8,
+            "anxiety": 8
+        },
+        "achievement": {
+            "name": "教育工作者",
+            "description": "成功将反叛精神标准化为课程大纲"
+        }
+    },
+    {
+        "id": "commercial_design",
+        "name": "商业设计外包",
+        "description": "为企业制作宣传视频和互动展示，将新媒体技能商业化。",
+        "common_translation": "给公司做设计赚钱，用艺术技能服务商业需求",
+        "sarcastic_comment": "把批判资本主义的艺术技能拿来为资本主义服务",
+        "requirements": {
+            "paradigm": 15,
+            "reality": 10
+        },
+        "effects": {
+            "funding": 60,
+            "reality": 25,
+            "sarcasm": 25,
+            "humor": 15,
+            "theory": -18,
+            "academic": -15,
+            "anxiety": 12
+        },
+        "achievement": {
+            "name": "商业艺术家",
+            "description": "成功将艺术理想变现为市场价值"
+        }
+    },
+    {
+        "id": "tech_consultant",
+        "name": "技术顾问工作",
+        "description": "为文化机构提供数字化转型咨询服务。",
+        "common_translation": "给文化单位当技术顾问，帮他们搞数字化",
+        "sarcastic_comment": "帮助传统机构用高科技包装过时的文化产品",
+        "requirements": {
+            "paradigm": 20,
+            "reality": 15,
+            "funding": 10
+        },
+        "effects": {
+            "funding": 50,
+            "reality": 30,
+            "sarcasm": 20,
+            "humor": 8,
+            "theory": -15,
+            "academic": -12,
+            "anxiety": 10
+        },
+        "achievement": {
+            "name": "数字化推手",
+            "description": "帮助文化机构完成了表面的技术升级"
+        }
+    },
+    {
+        "id": "art_therapy",
+        "name": "艺术治疗师",
+        "description": "运用新媒体技术进行心理治疗和康复训练。",
+        "common_translation": "用艺术帮助别人治疗心理问题",
+        "sarcastic_comment": "把解构一切的艺术用来重建别人的心理健康",
+        "requirements": {
+            "theory": 25,
+            "reality": 20,
+            "funding": 15
+        },
+        "effects": {
+            "funding": 40,
+            "reality": 35,
+            "humor": 20,
+            "anxiety": -10,
+            "theory": -10,
+            "academic": -8,
+            "sarcasm": 12
+        },
+        "achievement": {
+            "name": "治愈系艺术家",
+            "description": "用破坏性艺术修复了破碎的心灵"
+        }
+    },
+    {
+        "id": "social_media_manager",
+        "name": "社交媒体运营",
+        "description": "为艺术机构管理社交媒体账号，制作吸引眼球的内容。",
+        "requirements": {
+            "reality": 15,
+            "humor": 10
+        },
+        "effects": {
+            "funding": 35,
+            "reality": 30,
+            "sarcasm": 30,
+            "humor": 25,
+            "theory": -20,
+            "academic": -18,
+            "anxiety": 15
+        },
+        "achievement": {
+            "name": "流量操盘手",
+            "description": "成功将深刻思考包装成15秒的短视频"
+        }
+    },
+    {
+        "id": "corporate_workshop",
+        "name": "企业创新工作坊",
+        "description": "为企业员工提供创意思维训练，用艺术方法激发商业创新。",
+        "requirements": {
+            "paradigm": 25,
+            "reality": 20,
+            "humor": 15
+        },
+        "effects": {
+            "funding": 70,
+            "reality": 25,
+            "sarcasm": 35,
+            "humor": 15,
+            "theory": -25,
+            "academic": -20,
+            "anxiety": 18
+        },
+        "achievement": {
+            "name": "创新教练",
+            "description": "教会了管理层如何用艺术思维提高销售额"
+        }
+    },
+    {
+        "id": "influencer_collaboration",
+        "name": "网红艺术合作",
+        "description": "与社交媒体网红合作，制作病毒式传播的艺术内容。",
+        "requirements": {
+            "reality": 25,
+            "humor": 20,
+            "sarcasm": 15
+        },
+        "effects": {
+            "funding": 80,
+            "reality": 35,
+            "sarcasm": 40,
+            "humor": 30,
+            "theory": -30,
+            "academic": -25,
+            "anxiety": 20
+        },
+        "achievement": {
+            "name": "病毒艺术家",
+            "description": "让艺术作品的传播量超过了思考量"
+        }
+    },
+    {
+        "id": "nft_speculation",
+        "name": "NFT艺术炒作",
+        "description": "参与NFT市场投机，将艺术品代币化进行交易。",
+        "requirements": {
+            "paradigm": 20,
+            "reality": 30,
+            "sarcasm": 25
+        },
+        "effects": {
+            "funding": 80,
+            "reality": 40,
+            "sarcasm": 50,
+            "anxiety": 30,
+            "theory": -40,
+            "academic": -35,
+            "humor": 20
+        },
+        "achievement": {
+            "name": "数字投机客",
+            "description": "成功让艺术品的金融价值远超艺术价值"
+        }
+    },
+    {
+        "id": "reality_tv_consultant",
+        "name": "真人秀艺术顾问",
+        "description": "为电视节目提供艺术包装，让娱乐内容显得更有文化深度。",
+        "requirements": {
+            "reality": 35,
+            "humor": 25,
+            "sarcasm": 30
+        },
+        "effects": {
+            "funding": 90,
+            "reality": 45,
+            "sarcasm": 45,
+            "humor": 35,
+            "theory": -35,
+            "academic": -30,
+            "anxiety": 25
+        },
+        "achievement": {
+            "name": "娱乐包装师",
+            "description": "让观众以为自己在看高雅艺术节目"
+        }
+    },
+    {
+        "id": "luxury_brand_campaign",
+        "name": "奢侈品牌合作",
+        "description": "为国际奢侈品牌创作艺术装置，服务高端消费市场。",
+        "requirements": {
+            "paradigm": 30,
+            "reality": 40,
+            "funding": 20
+        },
+        "effects": {
+            "funding": 100,
+            "reality": 50,
+            "sarcasm": 60,
+            "anxiety": 35,
+            "theory": -50,
+            "academic": -40,
+            "humor": 25
+        },
+        "achievement": {
+            "name": "奢华艺术家",
+            "description": "用批判消费主义的艺术为消费主义服务"
+        }
+    }
+] 
