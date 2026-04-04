@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统总览 - 新媒体时间模拟器</title>
+  <meta name="description" content="新媒体时间模拟器核心机制总览：干员壳体、技能插槽、地图层级、项目挂载、资源流转、结局逻辑。">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #f5f5f7;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: #6366f1;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #6b7280;
+      font-weight: 300;
+    }
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 32px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: #1f2937;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    .section h3 {
+      font-size: 1.2rem;
+      margin: 20px 0 10px;
+      color: #374151;
+    }
+    .section p {
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+    .section ul {
+      margin-left: 20px;
+      margin-bottom: 16px;
+    }
+    .section li {
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+    .concept-card {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      border-left: 4px solid #6366f1;
+    }
+    .concept-card h4 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+    .concept-card p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+      color: #64748b;
+    }
+    .archetype-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .archetype-card {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .archetype-card h4 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: #1f2937;
+    }
+    .archetype-card .flow {
+      font-size: 0.8rem;
+      color: #6366f1;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .archetype-card p {
+      font-size: 0.85rem;
+      margin-bottom: 0;
+    }
+    .slot-table {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px 16px;
+      margin-top: 12px;
+    }
+    .slot-name {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+    .slot-desc {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .map-region {
+      background: #f9fafb;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .map-region h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: #1f2937;
+    }
+    .map-region .character {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+    .flow-diagram {
+      background: #f0fdf4;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .flow-diagram .step {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin: 2px;
+    }
+    .flow-diagram .arrow {
+      color: #059669;
+      margin: 0 4px;
+    }
+    footer {
+      text-align: center;
+      color: #6b7280;
+      padding: 20px 0 40px;
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 16px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .section {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="./index.html" class="back-link">← 返回门户首页</a>
+      <h1>系统总览</h1>
+      <div class="subtitle">新媒体时间模拟器 · 核心机制说明</div>
+    </header>
+
+    <div class="section">
+      <h2>一句话概括这个项目</h2>
+      <p>这是一个<strong>把当代新媒体艺术生态转译成可玩策略游戏</strong>的实验：你扮演一个进入场域的创作者，通过选择流派、装配方法论技能、在不同地图移动做行动、挂项目攒资源，在20回合内走出你自己的创作生涯。</p>
+      <p>它的本质不是"让你玩艺术家"，而是用游戏规则把"创作生态"这个模糊的东西，拆解成可追踪的<strong>时间、资源、场域、技能、关系</strong>五个维度。</p>
+    </div>
+
+    <div class="section">
+      <h2>干员壳体 / 流派</h2>
+      <p>一开始你会测评出倾向，然后选一个"干员壳体"。壳体不是职业，是<strong>生存策略的初始包</strong>，它决定了你：</p>
+      <ul>
+        <li>初始资源分配（时间/资金/体力/名声）</li>
+        <li>自带的固定技能</li>
+        <li>额外解锁的槽位</li>
+        <li>不同的结局判定偏向</li>
+      </ul>
+      <p>当前预置三个基础流派：</p>
+      <div class="archetype-grid">
+        <div class="archetype-card">
+          <h4>纯 研 究 型</h4>
+          <div class="flow">知识优先 · 低资源高潜力</div>
+          <p>适合慢慢攒方法论、沉下心做研究，走长线学术/理论路线。</p>
+        </div>
+        <div class="archetype-card">
+          <h4>项 目 型</h4>
+          <div class="flow">生产优先 · 资源周转快</div>
+          <p>适合不断接项目、挂研发、刷产出，走项目密集生存路线。</p>
+        </div>
+        <div class="archetype-card">
+          <h4>场 域 游 牧 型</h4>
+          <div class="flow">探索优先 · 多地图解锁</div>
+          <p>适合到处跑、碰机会、捡随机掉落，走奇遇驱动路线。</p>
+        </div>
+      </div>
+      <p style="margin-top: 16px;">后续可以扩展更多流派：建筑跨界型、机构策展型、开源技术型、驻留流浪型...</p>
+    </div>
+
+    <div class="section">
+      <h2>技能插槽 / 功能芯片</h2>
+      <p>技能不是传统RPG的"攻击+N"，这个设计思路来自 <strong>Agent Skills / 方法论模块化</strong>：每个技能就是一块<strong>功能芯片</strong>，插进去就获得一种处理信息和行动的方式。</p>
+      <p>分成五类槽位，对应不同层面的创作功能：</p>
+      <div class="slot-table">
+        <div class="slot-name">方法论槽</div>
+        <div class="slot-desc">认知芯片：你怎么看问题、怎么定义问题 → <em>空间感知协议、批判性转译...</em></div>
+        <div class="slot-name">工具槽</div>
+        <div class="slot-desc">执行芯片：你用什么技术做东西 → <em>节点锻造、实时渲染、材料试验...</em></div>
+        <div class="slot-name">接口槽</div>
+        <div class="slot-desc">合作芯片：你怎么跟外界对接 → <em>策展黑话编译器、跨学科翻译...</em></div>
+        <div class="slot-name">生存槽</div>
+        <div class="slot-desc">后勤芯片：你怎么维持创作 → <em>预算招魂、 grants 打猎、兼职缓冲...</em></div>
+        <div class="slot-name">特勤槽</div>
+        <div class="slot-desc">特殊芯片：非常规操作 → <em>档案打捞术、风险幽默、机构漂移...</em></div>
+      </div>
+      <p style="margin-top: 16px;">不同流派开局带不同槽位，游戏过程中可以在地图里捡到新技能，你自由组合出自己的工作流。</p>
+      <div class="concept-card">
+        <h4>设计思想</h4>
+        <p>这个插槽系统本质是在说：一个艺术家的"能力"，其实就是一套可装配的方法论。你拣到什么就用什么，拼出你的工作流。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>地图与场域系统</h2>
+      <p>地图不是背景，地图就是<strong>场域生态表</strong>。不同区域有不同的：</p>
+      <ul>
+        <li>技能掉落倾向</li>
+        <li>NPC 遭遇概率</li>
+        <li>项目机会类型</li>
+        <li>资源消耗倍率</li>
+        <li>解锁阶段要求</li>
+      </ul>
+      <p>当前开放六大区域：</p>
+      <div class="map-region">
+        <h4>榕树湾工作区</h4>
+        <div class="character">气质：入门共享 · 夜间社交 · 旧工程整理</div>
+      </div>
+      <div class="map-region">
+        <h4>深港加速走廊</h4>
+        <div class="character">气质：提案密集 · 品牌对接 · 现场测试</div>
+      </div>
+      <div class="map-region">
+        <h4>南岭学院与展厅群</h4>
+        <div class="character">气质：讲座评图 · 学院系统 · 作品陈述</div>
+      </div>
+      <div class="map-region">
+        <h4>离线渲染农场</h4>
+        <div class="character">气质：算力缓存 · 工具重构 · 闭关预演</div>
+      </div>
+      <div class="map-region">
+        <h4>北方双年展工地</h4>
+        <div class="character">气质：大空间部署 · 团队协作 · 媒体关系</div>
+      </div>
+      <div class="map-region">
+        <h4>海外驻留港</h4>
+        <div class="character">气质：跨学科相遇 · 原型生产 · 赞助连接</div>
+      </div>
+      <p style="margin-top: 16px;">每个大地图下面还有子地图，比如深港走廊里有"提案会议室""黑盒测试场"..."。进不同子地图，消耗不同资源，掉不同东西。</p>
+    </div>
+
+    <div class="section">
+      <h2>后勤与研发挂载</h2>
+      <p>这就是你说的"类似种菜/挂渲染"机制：</p>
+      <ul>
+        <li>你可以在当前地图选一个项目"挂上"</li>
+        <li>项目需要若干回合才能完成</li>
+        <li>完成后给你对应的资源奖励，可能解锁新技能</li>
+        <li>同一时间只能挂一个，你可以随时换，但进度不保留</li>
+      </ul>
+      <p>已有项目类型：</p>
+      <ul>
+        <li>创作类：环幕失真仪式...</li>
+        <li>申请类：驻留申请计划...</li>
+        <li>整理类：技能模块化整理...</li>
+        <li>商业类：品牌空间提案...</li>
+        <li>理论类：方法论宣言重写...</li>
+      </ul>
+      <div class="concept-card">
+        <h4>为什么要"挂着"</h4>
+        <p>因为真实创作就是这样：作品不是点一下就出来，它需要时间在后台"生长"。你挂上去，继续跑地图做行动，到点收成。这就是对"创作周期"的模拟。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>资源与流转</h2>
+      <p>所有行动都消耗资源，所有收获都增加资源。核心六种资源：</p>
+      <div class="concept-card">
+        <h4>时间</h4>
+        <p>最硬的通货。每行动一次就耗时间，时间到 20 回合就进入结局。</p>
+      </div>
+      <div class="concept-card">
+        <h4>资金</h4>
+        <p>维持创作的燃料。有些地图和项目要花钱，没钱寸步难行。</p>
+      </div>
+      <div class="concept-card">
+        <h4>体力</h4>
+        <p>高强度行动耗体力，体力太低会影响收益。需要找地方养。</p>
+      </div>
+      <div class="concept-card">
+        <h4>名声</h4>
+        <p>影响力货币。名声够了才能进高级区域，接大项目。</p>
+      </div>
+      <div class="concept-card">
+        <h4>档案</h4>
+        <p>你做过的东西积累下来就是档案。档案能解锁新可能性。</p>
+      </div>
+      <div class="concept-card">
+        <h4>关系</h4>
+        <p>在地图里认识 NPC 攒下的人情。关系能带来特殊事件。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>NPC 与生态节点</h2>
+      <p>NPC 不是剧情工具人，他们是<strong>制度环境的具象化</strong>：</p>
+      <ul>
+        <li>老炮张 → 出来早的地方实践者</li>
+        <li>王教授 → 学院系统守门人</li>
+        <li>甲方姐 → 品牌/赞助接口</li>
+        <li>孟工 → 技术协作提供者</li>
+        <li>开源幽灵 → 匿名知识社区</li>
+        <li>驻留管理员 → 国际场域守门人</li>
+      </ul>
+      <p>在不同地图遭遇不同 NPC，他们会给你不同的事件选项，影响你的资源和技能。</p>
+    </div>
+
+    <div class="section">
+      <h2>完整一局流程</h2>
+      <div class="flow-diagram">
+        <span class="step">测评倾向</span>
+        <span class="arrow">→</span>
+        <span class="step">推荐流派</span>
+        <span class="arrow">→</span>
+        <span class="step">选择壳体</span>
+        <span class="arrow">→</span>
+        <span class="step">装配初始技能</span>
+        <span class="arrow">→</span>
+        <span class="step">进入游戏</span>
+        <br>
+        <span class="step">选地图/子地图</span>
+        <span class="arrow">→</span>
+        <span class="step">执行区域行动</span>
+        <span class="arrow">→</span>
+        <span class="step">可能遇 NPC</span>
+        <span class="arrow">→</span>
+        <span class="step">可能掉技能</span>
+        <span class="arrow">→</span>
+        <span class="step">挂研发项目</span>
+        <br>
+        <span class="step">回合 +1</span>
+        <span class="arrow">→</span>
+        <span class="step">项目推进</span>
+        <span class="arrow">→</span>
+        <span class="step">重复</span>
+        <span class="arrow">→</span>
+        <span class="step">20 回合</span>
+        <span class="arrow">→</span>
+        <span class="step">结局判定</span>
+      </div>
+      <p style="margin-top: 16px;">一局大概 5-15 分钟，骨架已经闭环，可以完整玩完。</p>
+    </div>
+
+    <div class="section">
+      <h2>存档与后续扩展</h2>
+      <ul>
+        <li>进度存在浏览器 localStorage，刷新不丢</li>
+        <li>支持导出/导入存档 JSON，可以备份</li>
+        <li>所有内容都在 data/ 层，加新流派/新地图/新技能只需要改 JSON 数据</li>
+        <li>预留了后续接 AI 扩写对话和事件的口子，但第一阶段先把骨架做硬</li>
+      </ul>
+    </div>
+
+    <footer>
+      <p><a href="./index.html">返回门户首页</a> · <a href="./site/new-media-time-simulator/">进入试玩</a></p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>新媒体时间模拟器 — 艺术生态、生存策略与技能演化实验</title>
-  <meta name="description" content="新媒体时间模拟器：艺术生态、生存策略与技能演化实验。一个关于创作、资源与场域的技能装配实验游戏。">
+  <meta name="description" content="一个把新媒体艺术生态转译成可玩的时间、资源与场域系统的实验引擎。">
   <style>
     * {
       box-sizing: border-box;
@@ -19,196 +19,432 @@
       min-height: 100vh;
     }
     .container {
-      max-width: 1000px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 40px 20px;
     }
-    header {
+    /* Hero */
+    .hero {
       text-align: center;
       padding: 60px 0 40px;
       color: white;
     }
-    h1 {
-      font-size: 2.8rem;
+    .hero h1 {
+      font-size: 3.2rem;
       font-weight: 700;
       margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
-    .subtitle {
-      font-size: 1.3rem;
+    .hero .subtitle {
+      font-size: 1.4rem;
       font-weight: 300;
-      opacity: 0.9;
-      margin-bottom: 8px;
+      opacity: 0.95;
+      margin-bottom: 20px;
     }
-    .tagline {
-      font-size: 0.95rem;
-      opacity: 0.7;
+    .hero .tagline {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    /* CTA */
+    .cta-bar {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cta-button.primary {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    .cta-button.secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+    /* Sections */
+    section {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin: 32px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      color: #2d2d2d;
+    }
+    section h3 {
+      font-size: 1.2rem;
+      margin: 20px 0 10px;
+      color: #374151;
+    }
+    section p {
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .feature-card {
+      padding: 20px 16px;
+      background: #f9fafb;
+      border-radius: 10px;
+      border-left: 4px solid #6366f1;
+    }
+    .feature-card h4 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: #1f2937;
+    }
+    .feature-card p {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 0;
+    }
+    /* System Grid */
+    .system-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
       margin-top: 20px;
     }
+    .system-item {
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+    .system-item h4 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: #1e293b;
+    }
+    .system-item p {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0;
+    }
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #6366f1;
+    }
+    .timeline-item.done::before {
+      background: #10b981;
+    }
+    .timeline-item h4 {
+      font-size: 0.95rem;
+      color: #1f2937;
+      margin-bottom: 2px;
+    }
+    .timeline-item p {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 0;
+    }
+    /* Portal Grid */
     .portal-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin: 40px 0;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
     }
     .portal-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      padding: 32px 28px;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px 16px;
       text-decoration: none;
       color: #1a1a1a;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 2px solid transparent;
     }
     .portal-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      border-color: #6366f1;
     }
     .portal-card h3 {
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      color: #2d2d2d;
+      font-size: 1.1rem;
+      margin: 0 0 6px;
+      color: #1f2937;
     }
     .portal-card p {
-      font-size: 0.95rem;
-      color: #666;
-      margin-bottom: 16px;
-    }
-    .card-footer {
       font-size: 0.85rem;
-      color: #888;
-      border-top: 1px solid #eee;
-      padding-top: 12px;
-      margin-top: 12px;
+      color: #6b7280;
+      margin: 0;
     }
-    .badge {
+    .portal-card .badge {
       display: inline-block;
-      padding: 4px 10px;
+      margin-top: 10px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      border-radius: 6px;
       background: #6366f1;
       color: white;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 500;
     }
-    .badge.prototype {
+    .portal-card .badge.ready {
       background: #10b981;
     }
-    .badge.archive {
-      background: #6b7280;
-    }
-    .badge.knowledge {
+    .portal-card .badge.wip {
       background: #f59e0b;
     }
-    .about {
-      background: rgba(255, 255, 255, 0.98);
-      border-radius: 16px;
-      padding: 32px;
-      margin: 40px 0;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    .portal-card .badge.archive {
+      background: #6b7280;
     }
-    .about h2 {
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-      color: #2d2d2d;
-    }
-    .about p {
-      color: #555;
-      margin-bottom: 12px;
-    }
+    /* Concept tags */
     .concept-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
     .concept-tag {
       padding: 6px 12px;
-      background: #f3f4f6;
+      background: #f1f5f9;
       border-radius: 8px;
       font-size: 0.85rem;
-      color: #4b5563;
+      color: #475569;
     }
     footer {
       text-align: center;
       color: rgba(255, 255, 255, 0.6);
-      padding: 40px 0 20px;
+      padding: 20px 0 40px;
       font-size: 0.9rem;
     }
     footer a {
       color: rgba(255, 255, 255, 0.9);
     }
     @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
+      .hero h1 {
+        font-size: 2.2rem;
       }
-      .subtitle {
+      .hero .subtitle {
         font-size: 1.1rem;
       }
       .container {
         padding: 20px 16px;
       }
-      header {
+      .hero {
         padding: 30px 0 20px;
+      }
+      section {
+        padding: 24px 20px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
+    <header class="hero">
       <h1>新媒体时间模拟器</h1>
       <div class="subtitle">艺术生态、生存策略与技能演化实验</div>
-      <div class="tagline">一个关于创作、资源与场域的技能装配实验游戏</div>
+      <div class="tagline">一个把新媒体艺术生态转译成可玩的时间、资源与场域系统的实验引擎。</div>
+      <div class="cta-bar">
+        <a href="./site/new-media-time-simulator/" class="cta-button primary">立即开始玩</a>
+        <a href="./overview.html" class="cta-button secondary">系统总览</a>
+      </div>
     </header>
 
-    <div class="portal-grid">
-      <a href="./site/new-media-time-simulator/" class="portal-card">
-        <h3>进入模拟器</h3>
-        <p>开始一局游戏：测评你的艺术家倾向，选择流派，装配技能，探索地图，挂载研发，在艺术生态中生存演化。</p>
-        <span class="badge prototype">React 原型</span>
-        <div class="card-footer">可玩 · 存档本地 · 持续开发中</div>
-      </a>
-
-      <a href="./site/settings/" class="portal-card">
-        <h3>设定阅读器</h3>
-        <p>阅读完整世界观：六大身份路径、九大艺术派系、场域理论、项目系统、NPC 档案，继承自旧版的文本资产。</p>
-        <span class="badge knowledge">内容库</span>
-        <div class="card-footer">文献整理 · 世界观原料 · 持续补充</div>
-      </a>
-
-      <a href="./site/knowledge/" class="portal-card">
-        <h3>知识网络</h3>
-        <p>概念图谱：梳理新媒体艺术创作生态中的关键词、关系网络、知识地形，这是一个实验性的索引。</p>
-        <span class="badge knowledge">研究</span>
-        <div class="card-footer">概念概括 · 关系图谱 · 建设中</div>
-      </a>
-
-      <a href="https://github.com/ewanqian/new-media-artist-simulator/tree/archive/text-simulator-2026" target="_blank" class="portal-card">
-        <h3>旧版档案</h3>
-        <p>原始纯文字版《新媒体艺术家模拟器》，2026 年文本原型的完整存档，保留原始研究脉络。</p>
-        <span class="badge archive">归档</span>
-        <div class="card-footer">历史版本 · 完整保留 · 只读</div>
-      </a>
-    </div>
-
-    <div class="about">
-      <h2>这是什么项目</h2>
-      <p>这不是一个传统意义上的“游戏”，也不是一个纯粹的“艺术作品”，它更像一个<strong>可玩的思想实验</strong>——用策略 RPG + 技能插槽系统，模拟一个新媒体艺术家在当代艺术生态中的生存、演化与创作。</p>
-      <p>你可以把它理解为：一个关于“创作方法论装配”的沙盒，一个场域影响的生态模拟器，一次将艺术世界转译成游戏规则的尝试。</p>
+    <section>
+      <h2>为什么会有这个项目</h2>
+      <p>这不是凭空做出来的游戏，它是从一份<strong>文本原型</strong>一步步生长出来的：</p>
+      <p>最早叫《新媒体艺术家模拟器》，是以文本设定为主，尝试用叙事去呈现当代艺术生态里的生存状态。玩过几轮之后发现：如果把"艺术家的创作"本身当成一个<strong>策略生存问题</strong>，其实更适合用<strong>技能节点 + 地图探索 + 研发挂载</strong>这套机制来承载。</p>
+      <p>所以我们从纯文本升级成了 React 网页原型：保留原来对艺术生态的观察和黑色幽默，但把叙事变成了一套<strong>可交互的规则系统</strong>。</p>
       <div class="concept-tags">
-        <span class="concept-tag">🎮 网页游戏原型</span>
-        <span class="concept-tag">🧩 技能插槽系统</span>
-        <span class="concept-tag">🗺️ 场域生态模拟</span>
-        <span class="concept-tag">⏳ 时间推进机制</span>
-        <span class="concept-tag">🎭 身份流派选择</span>
-        <span class="concept-tag">🌱 研发挂载养成</span>
-        <span class="concept-tag">📝 继承旧版文本</span>
-        <span class="concept-tag">🧪 持续实验中</span>
+        <span class="concept-tag">🎮 可玩思想实验</span>
+        <span class="concept-tag">🧩 方法论模块化</span>
+        <span class="concept-tag">🗺️ 场域就是机制</span>
+        <span class="concept-tag">⏳ 时间即资源</span>
+        <span class="concept-tag">🌱 创作即养成</span>
       </div>
-    </div>
+    </section>
+
+    <section>
+      <h2>现在你就能玩到什么</h2>
+      <p>这还是一个原型，但骨架已经闭环。你可以完整走完一局：</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>测评艺术家倾向</h4>
+          <p>三道题测出你的创作路径，系统推荐匹配的流派</p>
+        </div>
+        <div class="feature-card">
+          <h4>选择干员壳体</h4>
+          <p>不同的艺术流派，不同的初始技能和资源分配</p>
+        </div>
+        <div class="feature-card">
+          <h4>装配技能插槽</h4>
+          <p>五类槽位，把你的认知/执行/社交方法拼成工作流</p>
+        </div>
+        <div class="feature-card">
+          <h4>探索场域地图</h4>
+          <p>六大区域各有气质，不同地图掉不同技能和机会</p>
+        </div>
+        <div class="feature-card">
+          <h4>执行区域行动</h4>
+          <p>每次行动消耗资源，也可能解锁新技能、遭遇 NPC</p>
+        </div>
+        <div class="feature-card">
+          <h4>挂载研发项目</h4>
+          <p>像挂渲染一样挂项目，回合推进后收获成品资源</p>
+        </div>
+        <div class="feature-card">
+          <h4>积累资源资产</h4>
+          <p>时间、资金、名声、档案...不同流派不同生存策略</p>
+        </div>
+        <div class="feature-card">
+          <h4>20回合结局归档</h4>
+          <p>不同的资源组合会走出不同的创作生涯结局</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>核心系统拆解</h2>
+      <p>这个模拟器的设计思路，不是"做一个美术游戏"，而是"用游戏规则转译真实生态"。几个核心层：</p>
+      <div class="system-grid">
+        <div class="system-item">
+          <h4>🧩 节点技能系统</h4>
+          <p>技能不是"攻击+2"，而是把创作方法论拆成可装配的功能芯片</p>
+        </div>
+        <div class="system-item">
+          <h4>🗺️ 地图与场域系统</h4>
+          <p>地图不是背景，是资源概率、NPC群落、技能掉落的生态表</p>
+        </div>
+        <div class="system-item">
+          <h4>⏳ 后勤与研发系统</h4>
+          <p>创作需要时间，项目可以挂着推进，像种菜一样等收获</p>
+        </div>
+        <div class="system-item">
+          <h4>👥 NPC 与制度环境</h4>
+          <p>老炮张、王教授、甲方姐...他们不是剧情，是生态节点</p>
+        </div>
+        <div class="system-item">
+          <h4>💾 本地缓存存档</h4>
+          <p>进度存在你的浏览器里，随时可以导出存档带走</p>
+        </div>
+        <div class="system-item">
+          <h4>📦 材料再利用</h4>
+          <p>拿到的技能、资源、档案都可以成为下一局的养料</p>
+        </div>
+      </div>
+      <p style="margin-top: 20px;">如果想更细地理解每个系统是什么，可以去看<a href="./overview.html">系统总览页</a>。</p>
+    </section>
+
+    <section>
+      <h2>开发时间线</h2>
+      <div class="timeline">
+        <div class="timeline-item done">
+          <h4>文本原型期</h4>
+          <p>纯文字设定 + 叙事问答，完成第一轮世界观铺陈</p>
+        </div>
+        <div class="timeline-item done">
+          <h4>世界观整理期</h4>
+          <p>萃取身份路径、派系、空间、NPC，梳理可转译内容</p>
+        </div>
+        <div class="timeline-item done">
+          <h4>React 原型期</h4>
+          <p>搭出测评/技能/地图/研发/存档完整骨架，可玩闭环</p>
+        </div>
+        <div class="timeline-item done">
+          <h4>Pages 门户期</h4>
+          <p>做官网级入口，把原型、设定、知识、档案串成项目</p>
+        </div>
+        <div class="timeline-item">
+          <h4>设定阅读器开发</h4>
+          <p>把旧版研究文本整理成可浏览的世界观文献</p>
+        </div>
+        <div class="timeline-item">
+          <h4>知识网络概括</h4>
+          <p>把关键词关系做成实验性知识地形图</p>
+        </div>
+        <div class="timeline-item">
+          <h4>玩法深化迭代</h4>
+          <p>数值平衡、更多地图、更多NPC对话、更多技能</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>立即进入</h2>
+      <p>这是一个持续实验的项目，你可以从任意入口进去：</p>
+      <div class="portal-grid">
+        <a href="./site/new-media-time-simulator/" class="portal-card">
+          <h3>进入模拟器</h3>
+          <p>开始一局完整游戏</p>
+          <span class="badge ready">可玩原型</span>
+        </a>
+        <a href="./overview.html" class="portal-card">
+          <h3>系统总览</h3>
+          <p>看懂核心设计思路</p>
+          <span class="badge ready">已就绪</span>
+        </a>
+        <a href="./site/settings/" class="portal-card">
+          <h3>设定阅读器</h3>
+          <p>阅读完整世界观文献</p>
+          <span class="badge wip">建设中</span>
+        </a>
+        <a href="./site/knowledge/" class="portal-card">
+          <h3>知识网络</h3>
+          <p>概念关系地形图</p>
+          <span class="badge wip">建设中</span>
+        </a>
+        <a href="https://github.com/ewanqian/new-media-artist-simulator/tree/archive/text-simulator-2026" target="_blank" class="portal-card">
+          <h3>旧版档案</h3>
+          <p>原始文本原型存档</p>
+          <span class="badge archive">归档</span>
+        </a>
+        <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank" class="portal-card">
+          <h3>GitHub 仓库</h3>
+          <p>查看源代码与开发进度</p>
+          <span class="badge">开源</span>
+        </a>
+      </div>
+    </section>
 
     <footer>
-      <p>托管在 <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank">GitHub</a> · 基于 React + Vite 构建 · 运行在 GitHub Pages</p>
+      <p>托管在 <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank">GitHub</a> · 实验性艺术项目 · 持续开发中</p>
     </footer>
   </div>
 </body>
