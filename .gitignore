@@ -2,7 +2,8 @@
 node_modules/
 
 # Build output
-site/
+# site/ 保留，初始构建产物需要提交到仓库让 GitHub Pages 能访问
+# 只忽略源码目录下的构建中间产物
 new-media-time-simulator/node_modules/
 new-media-time-simulator/dist/
 
