@@ -36,6 +36,82 @@ export const getRegionById = (id) => regions.find((item) => item.id === id);
 export const getProjectById = (id) => projects.find((item) => item.id === id);
 export const getSkillById = (id) => skills.find((item) => item.id === id);
 
+export const livingConditions = [
+  {
+    id: 'floor-camping',
+    name: '打地铺时代',
+    description: '临时借住，睡工作室角落，设备和想法混在一起',
+    flavorText: '你所有的东西都在同一个空间里：电脑、被子、硬盘、没洗的杯子和未完成的想法。',
+    effects: {
+      funds: -1,
+      stamina: -1,
+      anxiety: +2,
+      archiveLossChance: 0.15,
+      actionFreedom: +2
+    }
+  },
+  {
+    id: 'rental',
+    name: '出租屋时代',
+    description: '有自己的床，工作生活开始混在一起，要处理房租',
+    flavorText: '你终于有门可以关上，但也开始意识到，每个月都有人比作品先来催你。',
+    effects: {
+      stability: +2,
+      funds: -2,
+      nightEfficiency: +1,
+      loneliness: +1
+    }
+  },
+  {
+    id: 'shared-studio',
+    name: '共享工作室',
+    description: '有工位，容易遇人，容易获得信息，但空间不完全属于你',
+    flavorText: '你拥有了一张桌子，也同时获得了别人的工单、聊天、通知和凌晨一点的灵感传染。',
+    effects: {
+      networkGrowth: +2,
+      encounterChance: +2,
+      noise: +1,
+      projectContagion: +1
+    }
+  },
+  {
+    id: 'semi-independent',
+    name: '半独立工作室',
+    description: '能存材料设备，能做完整原型，有自己的排期节奏',
+    flavorText: '项目能力上去了，文档管理好了，固定成本也上去了，容易进入"只干活不生活"的循环。',
+    effects: {
+      projectCapacity: +2,
+      archiveQuality: +2,
+      fixedCosts: +2,
+      workLifeBlend: +1
+    }
+  },
+  {
+    id: 'stable-studio',
+    name: '稳定工作室',
+    description: '有清晰分区，能接待合作方，能做复杂测试',
+    flavorText: '高级项目解锁，接待和提案加成，资金压力明显提高，维护成本也大。',
+    effects: {
+      highTierUnlock: +2,
+      hostingBonus: +1,
+      fundPressure: +3,
+      maintenance: +2
+    }
+  },
+  {
+    id: 'gallery-stage',
+    name: '展示型工作室 / Fancy 阶段',
+    description: '能出席活动，有体面会客界面，社会可见度上升',
+    flavorText: '你终于进入那些灯光很好、酒也不错的场合。但你知道，每一次被看见之后，真正的问题只是被推迟，而不是消失。',
+    effects: {
+      highTierChance: +2,
+      reputationGrowth: +2,
+      visibility: +2,
+      anxiety: +1
+    }
+  }
+];
+
 export const createInitialState = () => ({
   stage: 'intro',
   answers: [],
@@ -51,6 +127,7 @@ export const createInitialState = () => ({
   unlockedSkills: [],
   currentRegionId: 'region_rongshore',
   currentSubmapId: 'sub_cowork',
+  livingConditionId: 'floor-camping',
   turn: 1,
   phase: 1,
   stats: {
@@ -77,7 +154,7 @@ export const createInitialState = () => ({
     manifestoCore: 0
   },
   activeProjects: [],
-  log: ['欢迎来到《新媒体时间模拟器》。先测一下你到底是哪种艺术生态生物。'],
+  log: ['欢迎来到《新媒体艺术时间模拟器》。先测一下你到底是哪种艺术生态生物。'],
   encounter: null,
   ending: null
 });
