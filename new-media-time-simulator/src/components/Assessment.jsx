@@ -9,10 +9,10 @@ export default function Assessment({ answers, onAnswer, onFinish, recommendedArc
 
   return (
     <section className="panel panel--hero">
-      <div className="eyebrow">角色测评 / 干员预设</div>
-      <h1>新媒体时间模拟器</h1>
+      <div className="eyebrow">创作倾向测评 / 档案推荐</div>
+      <h1>新媒体艺术时间模拟器</h1>
       <p className="lead">
-        从旧版纯文本艺术生涯模拟器，升级成一个带地图、技能插槽、研发队列和黑色幽默 NPC 的 React 网页原型。
+        一份关于创作方法、预算压力与场域关系的可玩档案。接管一份艺术家履历，在一个创作周期里决定它的走向。
       </p>
 
       {!isComplete ? (
@@ -43,7 +43,7 @@ export default function Assessment({ answers, onAnswer, onFinish, recommendedArc
               disabled={answers.length !== assessmentQuestions.length}
               onClick={() => onFinish(getRecommendedArchetype(answers))}
             >
-              生成推荐干员
+              生成推荐档案
             </button>
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function Assessment({ answers, onAnswer, onFinish, recommendedArc
           </div>
           <div className="button-row">
             <button className="primary-button" onClick={() => onChooseRecommendation(recommendation?.id)}>
-              以该干员进入生态
+              接管这份档案
             </button>
           </div>
         </div>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>新媒体时间模拟器 — 艺术生态、生存策略与技能演化实验</title>
-  <meta name="description" content="一个把新媒体艺术生态转译成可玩的时间、资源与场域系统的实验引擎。">
+  <title>新媒体艺术时间模拟器 — 创作、场域与生存关系的艺术生态实验</title>
+  <meta name="description" content="一份关于创作方法、预算压力与场域关系的可玩档案。你接管一份艺术家档案，在一个创作周期里决定它如何继续发展。">
   <style>
     * {
       box-sizing: border-box;
@@ -30,13 +30,13 @@
       color: white;
     }
     .hero h1 {
-      font-size: 3.2rem;
+      font-size: 3.0rem;
       font-weight: 700;
       margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
     .hero .subtitle {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 300;
       opacity: 0.95;
       margin-bottom: 20px;
@@ -87,7 +87,7 @@
     section h2 {
       font-size: 1.6rem;
       margin-bottom: 16px;
-      color: #2d2d2d;
+      color: #1f2937;
     }
     section h3 {
       font-size: 1.2rem;
@@ -97,6 +97,14 @@
     section p {
       color: #4b5563;
       margin-bottom: 12px;
+    }
+    section ul {
+      margin-left: 20px;
+      margin-bottom: 16px;
+    }
+    section li {
+      color: #4b5563;
+      margin-bottom: 6px;
     }
     /* Feature Grid */
     .feature-grid {
@@ -258,10 +266,10 @@
     }
     @media (max-width: 768px) {
       .hero h1 {
-        font-size: 2.2rem;
+        font-size: 2.0rem;
       }
       .hero .subtitle {
-        font-size: 1.1rem;
+        font-size: 1.0rem;
       }
       .container {
         padding: 20px 16px;
@@ -278,151 +286,155 @@
 <body>
   <div class="container">
     <header class="hero">
-      <h1>新媒体时间模拟器</h1>
-      <div class="subtitle">艺术生态、生存策略与技能演化实验</div>
-      <div class="tagline">一个把新媒体艺术生态转译成可玩的时间、资源与场域系统的实验引擎。</div>
+      <h1>新媒体艺术时间模拟器</h1>
+      <div class="subtitle">一份关于创作方法、预算压力与场域关系的可玩档案</div>
+      <div class="tagline">一个把创作、合作、预算、档案与场域关系转译成时间推进系统的网页作品。</div>
       <div class="cta-bar">
-        <a href="./site/new-media-time-simulator/" class="cta-button primary">立即开始玩</a>
+        <a href="./site/new-media-time-simulator/" class="cta-button primary">开始一轮创作</a>
         <a href="./overview.html" class="cta-button secondary">系统总览</a>
       </div>
     </header>
 
     <section>
-      <h2>为什么会有这个项目</h2>
-      <p>这不是凭空做出来的游戏，它是从一份<strong>文本原型</strong>一步步生长出来的：</p>
-      <p>最早叫《新媒体艺术家模拟器》，是以文本设定为主，尝试用叙事去呈现当代艺术生态里的生存状态。玩过几轮之后发现：如果把"艺术家的创作"本身当成一个<strong>策略生存问题</strong>，其实更适合用<strong>技能节点 + 地图探索 + 研发挂载</strong>这套机制来承载。</p>
-      <p>所以我们从纯文本升级成了 React 网页原型：保留原来对艺术生态的观察和黑色幽默，但把叙事变成了一套<strong>可交互的规则系统</strong>。</p>
+      <h2>这是什么作品</h2>
+      <p>这不是传统意义上的职业扮演游戏。</p>
+      <p>你不是在操控一个"角色"，而是在<strong>接管一份艺术家档案</strong>：浏览他的过往项目、方法习惯、合作关系与现实压力，然后在一个阶段性的创作周期里，决定这份档案会如何继续发展。</p>
+      <p>它起源于一份纯文字设定作品，现在升级成可交互系统：保留对当代艺术生态的观察和黑色幽默，把叙事转译成一套关于时间分配、场域选择、方法装配的实验规则。</p>
       <div class="concept-tags">
-        <span class="concept-tag">🎮 可玩思想实验</span>
-        <span class="concept-tag">🧩 方法论模块化</span>
-        <span class="concept-tag">🗺️ 场域就是机制</span>
+        <span class="concept-tag">📝 可玩思想实验</span>
+        <span class="concept-tag">🧩 方法节点装配</span>
+        <span class="concept-tag">🗺️ 场域就是关系</span>
         <span class="concept-tag">⏳ 时间即资源</span>
-        <span class="concept-tag">🌱 创作即养成</span>
+        <span class="concept-tag">🌱 创作即周期</span>
       </div>
     </section>
 
     <section>
-      <h2>现在你就能玩到什么</h2>
-      <p>这还是一个原型，但骨架已经闭环。你可以完整走完一局：</p>
+      <h2>一轮创作周期你会做什么</h2>
+      <p>这还是一个原型，但骨架已经闭环。你可以完整走一遍：</p>
       <div class="feature-grid">
         <div class="feature-card">
-          <h4>测评艺术家倾向</h4>
-          <p>三道题测出你的创作路径，系统推荐匹配的流派</p>
+          <h4>测评创作倾向</h4>
+          <p>几个问题测出你的实践偏好，系统匹配推荐档案</p>
         </div>
         <div class="feature-card">
-          <h4>选择干员壳体</h4>
-          <p>不同的艺术流派，不同的初始技能和资源分配</p>
+          <h4>接管艺术家档案</h4>
+          <p>不同实践谱系，不同的履历、资源和方法习惯</p>
         </div>
         <div class="feature-card">
-          <h4>装配技能插槽</h4>
-          <p>五类槽位，把你的认知/执行/社交方法拼成工作流</p>
+          <h4>配置方法网络</h4>
+          <p>五层节点，把你的知识、技术、合作方式拼成工作网络</p>
         </div>
         <div class="feature-card">
-          <h4>探索场域地图</h4>
-          <p>六大区域各有气质，不同地图掉不同技能和机会</p>
+          <h4>进入场域线路</h4>
+          <p>六大城市场域各有气质，不同场域出不同机会</p>
         </div>
         <div class="feature-card">
-          <h4>执行区域行动</h4>
-          <p>每次行动消耗资源，也可能解锁新技能、遭遇 NPC</p>
+          <h4>执行现场工作</h4>
+          <p>每次行动消耗资源，也可能遇到关系人物、捡到新方法</p>
         </div>
         <div class="feature-card">
-          <h4>挂载研发项目</h4>
-          <p>像挂渲染一样挂项目，回合推进后收获成品资源</p>
+          <h4>立项排入在制</h4>
+          <p>像挂渲染一样立项，周期到了收获成品与资源</p>
         </div>
         <div class="feature-card">
-          <h4>积累资源资产</h4>
-          <p>时间、资金、名声、档案...不同流派不同生存策略</p>
+          <h4>积累档案资产</h4>
+          <p>预算、档案、关系...不同谱系不同生存策略</p>
         </div>
         <div class="feature-card">
-          <h4>20回合结局归档</h4>
-          <p>不同的资源组合会走出不同的创作生涯结局</p>
+          <h4>本轮归档结案</h4>
+          <p>20个工作单位后，生成一份阶段性创作记录</p>
         </div>
       </div>
     </section>
 
     <section>
-      <h2>核心系统拆解</h2>
-      <p>这个模拟器的设计思路，不是"做一个美术游戏"，而是"用游戏规则转译真实生态"。几个核心层：</p>
+      <h2>核心系统框架</h2>
+      <p>设计思路不是"做一个艺术主题游戏"，而是用系统转译真实创作生态。几个核心层：</p>
       <div class="system-grid">
         <div class="system-item">
-          <h4>🧩 节点技能系统</h4>
-          <p>技能不是"攻击+2"，而是把创作方法论拆成可装配的功能芯片</p>
+          <h4>🧩 方法网络与实践节点</h4>
+          <p>技能不是攻击加成，是把创作方法论拆成可装配的实践节点</p>
         </div>
         <div class="system-item">
-          <h4>🗺️ 地图与场域系统</h4>
-          <p>地图不是背景，是资源概率、NPC群落、技能掉落的生态表</p>
+          <h4>🗺️ 场域线路与工作现场</h4>
+          <p>地图不是背景，是不同艺术生态的资源概率、关系群落、机会分布</p>
         </div>
         <div class="system-item">
-          <h4>⏳ 后勤与研发系统</h4>
-          <p>创作需要时间，项目可以挂着推进，像种菜一样等收获</p>
+          <h4>📋 在制项目与排期</h4>
+          <p>创作需要周期，你可以立项挂着，继续跑场，到点收成</p>
         </div>
         <div class="system-item">
-          <h4>👥 NPC 与制度环境</h4>
-          <p>老炮张、王教授、甲方姐...他们不是剧情，是生态节点</p>
+          <h4>💰 预算、档案与关系</h4>
+          <p>所有行动都流转资源：时间、钱、名声、作品积累、人脉...</p>
         </div>
         <div class="system-item">
-          <h4>💾 本地缓存存档</h4>
-          <p>进度存在你的浏览器里，随时可以导出存档带走</p>
+          <h4>👥 关系人物与场域接口</h4>
+          <p>老炮张、王教授...他们不是剧情，是不同制度位置的具象化</p>
         </div>
         <div class="system-item">
-          <h4>📦 材料再利用</h4>
-          <p>拿到的技能、资源、档案都可以成为下一局的养料</p>
+          <h4>💾 本地归档与导出</h4>
+          <p>进度存在你的浏览器，随时可以导出存档带走</p>
         </div>
       </div>
-      <p style="margin-top: 20px;">如果想更细地理解每个系统是什么，可以去看<a href="./overview.html">系统总览页</a>。</p>
+      <p style="margin-top: 20px;">如果想更细理解每个系统，可以去看<a href="./overview.html">系统总览页</a>。</p>
     </section>
 
     <section>
       <h2>开发时间线</h2>
       <div class="timeline">
         <div class="timeline-item done">
-          <h4>文本原型期</h4>
-          <p>纯文字设定 + 叙事问答，完成第一轮世界观铺陈</p>
+          <h4>文本原型阶段</h4>
+          <p>纯文字设定 + 世界观铺陈，完成第一轮生态观察</p>
         </div>
         <div class="timeline-item done">
-          <h4>世界观整理期</h4>
-          <p>萃取身份路径、派系、空间、NPC，梳理可转译内容</p>
+          <h4>世界观整理阶段</h4>
+          <p>萃取身份路径、实践谱系、场域空间、关系人物</p>
         </div>
         <div class="timeline-item done">
-          <h4>React 原型期</h4>
-          <p>搭出测评/技能/地图/研发/存档完整骨架，可玩闭环</p>
+          <h4>系统化阶段</h4>
+          <p>把文本转译成方法节点、场域系统、在制项目、资源流转规则</p>
         </div>
         <div class="timeline-item done">
-          <h4>Pages 门户期</h4>
-          <p>做官网级入口，把原型、设定、知识、档案串成项目</p>
+          <h4>React 原型阶段</h4>
+          <p>做成可玩网页原型，部署到 GitHub Pages，骨架闭环</p>
+        </div>
+        <div class="timeline-item done">
+          <h4>气质校准阶段</h4>
+          <p>把游戏黑话翻译成艺术生态原生词汇，统一作品语气</p>
         </div>
         <div class="timeline-item">
           <h4>设定阅读器开发</h4>
-          <p>把旧版研究文本整理成可浏览的世界观文献</p>
+          <p>把旧版研究文本整理成可浏览的世界观档案</p>
         </div>
         <div class="timeline-item">
           <h4>知识网络概括</h4>
           <p>把关键词关系做成实验性知识地形图</p>
         </div>
         <div class="timeline-item">
-          <h4>玩法深化迭代</h4>
-          <p>数值平衡、更多地图、更多NPC对话、更多技能</p>
+          <h4>内容深化迭代</h4>
+          <p>更多场域、更多项目、更多关系人物对话</p>
         </div>
       </div>
     </section>
 
     <section>
       <h2>立即进入</h2>
-      <p>这是一个持续实验的项目，你可以从任意入口进去：</p>
+      <p>这是一个持续实验的艺术作品，你可以从任意入口进去：</p>
       <div class="portal-grid">
         <a href="./site/new-media-time-simulator/" class="portal-card">
-          <h3>进入模拟器</h3>
-          <p>开始一局完整游戏</p>
+          <h3>开始一轮创作</h3>
+          <p>接管一份档案走完全程</p>
           <span class="badge ready">可玩原型</span>
         </a>
         <a href="./overview.html" class="portal-card">
           <h3>系统总览</h3>
-          <p>看懂核心设计思路</p>
+          <p>看懂核心设计框架</p>
           <span class="badge ready">已就绪</span>
         </a>
         <a href="./site/settings/" class="portal-card">
           <h3>设定阅读器</h3>
-          <p>阅读完整世界观文献</p>
+          <p>阅读完整世界观档案</p>
           <span class="badge wip">建设中</span>
         </a>
         <a href="./site/knowledge/" class="portal-card">
@@ -444,7 +456,7 @@
     </section>
 
     <footer>
-      <p>托管在 <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank">GitHub</a> · 实验性艺术项目 · 持续开发中</p>
+      <p>托管在 <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank">GitHub</a> · 实验性艺术作品 · 持续开发中</p>
     </footer>
   </div>
 </body>

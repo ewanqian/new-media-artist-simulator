@@ -30,12 +30,12 @@ export default function Dashboard({
       <section className="panel panel--wide">
         <div className="section-title-row">
           <div>
-            <div className="eyebrow">干员状态</div>
+            <div className="eyebrow">档案状态</div>
             <h2>{archetype?.name}</h2>
           </div>
           <div className="phase-box">
             <strong>阶段 {state.phase}</strong>
-            <span>第 {state.turn} 周</span>
+            <span>第 {state.turn} 工作单位</span>
           </div>
         </div>
         <p>{archetype?.description}</p>
@@ -113,8 +113,8 @@ export default function Dashboard({
 
       <section className="panel">
         <div className="section-title-row">
-          <h2>技能插槽</h2>
-          <span className="hint">受 Agent Skills 逻辑启发的可组合节点。</span>
+          <h2>方法网络</h2>
+          <span className="hint">受 Agent Skills 逻辑启发的可组合实践节点。</span>
         </div>
         <div className="slot-list">
           {Object.entries(slotLabels).map(([slot, label]) => {
@@ -139,8 +139,8 @@ export default function Dashboard({
 
       <section className="panel">
         <div className="section-title-row">
-          <h2>研发挂载</h2>
-          <span className="hint">像种菜一样挂项目，回合推进后收成。</span>
+          <h2>在制项目</h2>
+          <span className="hint">像挂渲染一样立项，工作单位推进后收成。</span>
         </div>
         <div className="project-list">
           {projects.map((project) => (
@@ -149,7 +149,7 @@ export default function Dashboard({
               <p>{project.description}</p>
               <div className="small-text">耗时：{project.duration} 回合</div>
               <button className="secondary-button" disabled={Boolean(state.ending)} onClick={() => onStartProject(project.id)}>
-                挂载研发
+                立项排入在制
               </button>
             </div>
           ))}

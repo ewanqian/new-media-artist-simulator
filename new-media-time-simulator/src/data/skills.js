@@ -1,9 +1,9 @@
 export const slotLabels = {
-  methodology: '方法论槽',
-  tool: '工具槽',
-  network: '接口槽',
-  survival: '生存槽',
-  special: '特勤槽'
+  methodology: '知识层',
+  tool: '技术层',
+  network: '接口层',
+  survival: '生存层',
+  special: '偏门手段'
 };
 
 export const skills = [

@@ -4,8 +4,8 @@ export default function ArchetypePicker({ recommendedArchetypeId, onSelect }) {
   return (
     <section className="panel">
       <div className="section-title-row">
-        <h2>干员外壳</h2>
-        <span className="hint">可无视推荐，直接选你想玩的流派。</span>
+        <h2>艺术家档案</h2>
+        <span className="hint">可无视推荐，直接选你想接管的实践谱系。</span>
       </div>
       <div className="card-grid">
         {archetypes.map((archetype) => (
@@ -20,7 +20,7 @@ export default function ArchetypePicker({ recommendedArchetypeId, onSelect }) {
               {archetype.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}
             </div>
             <p className="small-text">被动：{archetype.passive}</p>
-            <button className="secondary-button" onClick={() => onSelect(archetype.id)}>选择这个干员</button>
+            <button className="secondary-button" onClick={() => onSelect(archetype.id)}>接管这份档案</button>
           </article>
         ))}
       </div>
