@@ -94,26 +94,27 @@ npm run preview
 
 ## GitHub Pages 部署
 
-本项目配合根目录是一个**门户结构**：
+本项目采用**源码 + 构建产物分离**的门户结构：
 - 根目录 `index.html`：门户首页（四个入口）
-- `./new-media-time-simulator/`：React 游戏原型构建产物
-- `./settings/`：设定阅读器（待开发）
-- `./knowledge/`：知识网络概括页（待开发）
+- `new-media-time-simulator/`：React 原型**源码目录**（开发在这里进行）
+- `site/new-media-time-simulator/`：React 原型**构建产物**（`npm run deploy:docs` 自动生成）
+- `site/settings/`：设定阅读器（待开发）
+- `site/knowledge/`：知识网络概括页（待开发）
 
 ### 部署流程：
 
 ```bash
-# 进入 React 原型目录
+# 进入 React 源码目录
 cd new-media-time-simulator
 
 # 安装依赖
 npm install
 
-# 构建并同步到根目录
+# 构建并同步到 site 目录
 npm run deploy:docs
 ```
 
-这会把 React 构建产物自动同步到**根目录的 `new-media-time-simulator/` 文件夹，门户首页 `index.html 就能直接链接到它。
+这会把 React 构建产物自动同步到**根目录的 `site/new-media-time-simulator/` 文件夹**，门户首页 `index.html` 就能直接链接到它。
 
 最后在 GitHub 仓库设置中，把 GitHub Pages 指向 **`/(root)`** 即可。
 

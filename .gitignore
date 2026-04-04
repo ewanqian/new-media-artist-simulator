@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build output
+site/
+new-media-time-simulator/node_modules/
+new-media-time-simulator/dist/
+
+# OS
+.DS_Store
+Thumbs.db
