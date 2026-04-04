@@ -1,245 +1,215 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新媒体艺术家模拟器 2026</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 900px;
-            width: 100%;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.1em;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: #888;
-            margin-bottom: 2rem;
-            font-style: italic;
-        }
-        
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-        
-        .nav-card {
-            background: #151515;
-            border: 1px solid #333;
-            padding: 2rem;
-            text-decoration: none;
-            color: #e0e0e0;
-            transition: all 0.3s ease;
-            display: block;
-            text-align: left;
-        }
-        
-        .nav-card:hover {
-            background: #1a1a1a;
-            border-color: #555;
-            transform: translateY(-2px);
-        }
-        
-        .nav-card h2 {
-            font-size: 1.3rem;
-            font-weight: 400;
-            margin-bottom: 0.8rem;
-        }
-        
-        .nav-card p {
-            font-size: 0.9rem;
-            color: #888;
-            line-height: 1.6;
-        }
-        
-        .nav-card.primary {
-            border-color: #4a90e2;
-            background: linear-gradient(135deg, #181818, #1a1a2e);
-        }
-        
-        .nav-card.primary h2 {
-            color: #fff;
-        }
-        
-        .nav-card.primary .primary-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .status {
-            background: #111;
-            border: 1px solid #222;
-            padding: 1rem 1.5rem;
-            margin-bottom: 2rem;
-            font-size: 0.85rem;
-            color: #666;
-        }
-        
-        .status strong {
-            color: #888;
-        }
-        
-        .meta {
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 2rem;
-        }
-        
-        .meta a {
-            color: #666;
-            text-decoration: none;
-        }
-        
-        .meta a:hover {
-            color: #999;
-        }
-        
-        .warning {
-            font-size: 0.75rem;
-            color: #444;
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border: 1px solid #222;
-            background: #0d0d0d;
-        }
-        
-        .quick-actions {
-            margin: 2rem 0;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: white;
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #1a1a1a;
-            color: #aaa;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            border: 1px solid #333;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: #252525;
-            border-color: #444;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新媒体时间模拟器 — 艺术生态、生存策略与技能演化实验</title>
+  <meta name="description" content="新媒体时间模拟器：艺术生态、生存策略与技能演化实验。一个关于创作、资源与场域的技能装配实验游戏。">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    header {
+      text-align: center;
+      padding: 60px 0 40px;
+      color: white;
+    }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 1.3rem;
+      font-weight: 300;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    .tagline {
+      font-size: 0.95rem;
+      opacity: 0.7;
+      margin-top: 20px;
+    }
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 40px 0;
+    }
+    .portal-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-decoration: none;
+      color: #1a1a1a;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .portal-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    }
+    .portal-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #2d2d2d;
+    }
+    .portal-card p {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 16px;
+    }
+    .card-footer {
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid #eee;
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #6366f1;
+      color: white;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge.prototype {
+      background: #10b981;
+    }
+    .badge.archive {
+      background: #6b7280;
+    }
+    .badge.knowledge {
+      background: #f59e0b;
+    }
+    .about {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 32px;
+      margin: 40px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    .about h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: #2d2d2d;
+    }
+    .about p {
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .concept-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .concept-tag {
+      padding: 6px 12px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+    footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 40px 0 20px;
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+      }
+      .container {
+        padding: 20px 16px;
+      }
+      header {
+        padding: 30px 0 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>新媒体艺术家模拟器</h1>
-        <p class="subtitle">在AI时代的虚无中寻找创作的价值</p>
-        
-        <div class="status">
-            <strong>2026主干版</strong> · 超文本艺术作品 · 持续更新中
-        </div>
-        
-        <div class="quick-actions">
-            <a href="new-media-artist-simulator/index.html" class="btn-primary">
-                🎮 立即开始模拟
-            </a>
-        </div>
-        
-        <div class="nav-grid">
-            <a href="new-media-artist-simulator/index.html" class="nav-card primary">
-                <span class="primary-icon">🎨</span>
-                <h2>艺术家生涯模拟器</h2>
-                <p>体验一位新媒体艺术家的完整生涯。在理想与现实的夹缝中，在AI重构创作边界的时代，做出你的选择。</p>
-            </a>
-            
-            <a href="tools.html" class="nav-card">
-                <span class="primary-icon">🗡️</span>
-                <h2>作品批判工具集</h2>
-                <p>跳出自我闭环，从黑色幽默、积极鼓励、学术批评三个视角，获得针对你作品的全面批判与复盘。</p>
-            </a>
-        </div>
-        
-        <div class="nav-grid">
-            <a href="schools.html" class="nav-card">
-                <span class="primary-icon">🎭</span>
-                <h2>六大艺术流派</h2>
-                <p>2026年当下新媒体艺术的六大核心流派：媒介反思派、生成混沌派、空间沉浸派、代码原生派、社会介入派、跨媒介融合派。</p>
-            </a>
-            
-            <a href="docs/ARTIST_STATEMENT.md" class="nav-card">
-                <h2>📖 作品说明</h2>
-                <p>关于这件作品的理论背景、创作意图与艺术定位。布尔迪厄艺术场域、福柯话语权力、后数字媒介理论。</p>
-            </a>
-        </div>
-        
-        <div class="nav-grid">
-            <a href="docs/THEORETICAL_FRAMEWORK.md" class="nav-card">
-                <h2>🎭 理论框架</h2>
-                <p>作品核心理论锚点：布尔迪厄艺术场域理论、福柯话语权力理论、后数字时代媒介艺术理论。</p>
-            </a>
-            
-            <a href="archive/" class="nav-card">
-                <h2>📚 历史版本</h2>
-                <p>v0.3.1巴别瓶展览版、v0.2研究版等历史存档，见证作品的生长脉络。</p>
-            </a>
-        </div>
-        
-        <div class="meta">
-            <p>By 钱誉文 EWAN CT | 2024-2026</p>
-            <p style="margin-top: 0.5rem;">
-                <a href="https://github.com/ewanqian/new-media-artist-simulator">GitHub</a>
-            </p>
-        </div>
-        
-        <div class="warning">
-            ⚠️ 本作品为艺术表达与创作实验，所有内容仅代表虚构情境，不代表作者个人立场、观点或价值判断
-        </div>
+  <div class="container">
+    <header>
+      <h1>新媒体时间模拟器</h1>
+      <div class="subtitle">艺术生态、生存策略与技能演化实验</div>
+      <div class="tagline">一个关于创作、资源与场域的技能装配实验游戏</div>
+    </header>
+
+    <div class="portal-grid">
+      <a href="./new-media-time-simulator/" class="portal-card">
+        <h3>进入模拟器</h3>
+        <p>开始一局游戏：测评你的艺术家倾向，选择流派，装配技能，探索地图，挂载研发，在艺术生态中生存演化。</p>
+        <span class="badge prototype">React 原型</span>
+        <div class="card-footer">可玩 · 存档本地 · 持续开发中</div>
+      </a>
+
+      <a href="./settings/" class="portal-card">
+        <h3>设定阅读器</h3>
+        <p>阅读完整世界观：六大身份路径、九大艺术派系、场域理论、项目系统、NPC 档案，继承自旧版的文本资产。</p>
+        <span class="badge knowledge">内容库</span>
+        <div class="card-footer">文献整理 · 世界观原料 · 持续补充</div>
+      </a>
+
+      <a href="./knowledge/" class="portal-card">
+        <h3>知识网络</h3>
+        <p>概念图谱：梳理新媒体艺术创作生态中的关键词、关系网络、知识地形，这是一个实验性的索引。</p>
+        <span class="badge knowledge">研究</span>
+        <div class="card-footer">概念概括 · 关系图谱 · 建设中</div>
+      </a>
+
+      <a href="https://github.com/ewanqian/new-media-artist-simulator/tree/archive/text-simulator-2026" target="_blank" class="portal-card">
+        <h3>旧版档案</h3>
+        <p>原始纯文字版《新媒体艺术家模拟器》，2026 年文本原型的完整存档，保留原始研究脉络。</p>
+        <span class="badge archive">归档</span>
+        <div class="card-footer">历史版本 · 完整保留 · 只读</div>
+      </a>
     </div>
+
+    <div class="about">
+      <h2>这是什么项目</h2>
+      <p>这不是一个传统意义上的“游戏”，也不是一个纯粹的“艺术作品”，它更像一个<strong>可玩的思想实验</strong>——用策略 RPG + 技能插槽系统，模拟一个新媒体艺术家在当代艺术生态中的生存、演化与创作。</p>
+      <p>你可以把它理解为：一个关于“创作方法论装配”的沙盒，一个场域影响的生态模拟器，一次将艺术世界转译成游戏规则的尝试。</p>
+      <div class="concept-tags">
+        <span class="concept-tag">🎮 网页游戏原型</span>
+        <span class="concept-tag">🧩 技能插槽系统</span>
+        <span class="concept-tag">🗺️ 场域生态模拟</span>
+        <span class="concept-tag">⏳ 时间推进机制</span>
+        <span class="concept-tag">🎭 身份流派选择</span>
+        <span class="concept-tag">🌱 研发挂载养成</span>
+        <span class="concept-tag">📝 继承旧版文本</span>
+        <span class="concept-tag">🧪 持续实验中</span>
+      </div>
+    </div>
+
+    <footer>
+      <p>托管在 <a href="https://github.com/ewanqian/new-media-artist-simulator" target="_blank">GitHub</a> · 基于 React + Vite 构建 · 运行在 GitHub Pages</p>
+    </footer>
+  </div>
 </body>
 </html>

@@ -1,0 +1,69 @@
+import { assessmentQuestions, archetypes } from '../data/archetypes.js';
+import { getRecommendedArchetype } from '../engine/gameEngine.js';
+
+export default function Assessment({ answers, onAnswer, onFinish, recommendedArchetypeId, onChooseRecommendation }) {
+  const isComplete = answers.length === assessmentQuestions.length;
+  const recommendation = recommendedArchetypeId
+    ? archetypes.find((item) => item.id === recommendedArchetypeId)
+    : null;
+
+  return (
+    <section className="panel panel--hero">
+      <div className="eyebrow">角色测评 / 干员预设</div>
+      <h1>新媒体时间模拟器</h1>
+      <p className="lead">
+        从旧版纯文本艺术生涯模拟器，升级成一个带地图、技能插槽、研发队列和黑色幽默 NPC 的 React 网页原型。
+      </p>
+
+      {!isComplete ? (
+        <div className="assessment-list">
+          {assessmentQuestions.map((question, index) => (
+            <div className="question-card" key={question.id}>
+              <div className="question-index">Q{index + 1}</div>
+              <h3>{question.title}</h3>
+              <div className="option-grid">
+                {question.options.map((option) => {
+                  const selected = answers[index]?.label === option.label;
+                  return (
+                    <button
+                      key={option.label}
+                      className={`option-button ${selected ? 'is-selected' : ''}`}
+                      onClick={() => onAnswer(index, option)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          <div className="button-row">
+            <button
+              className="primary-button"
+              disabled={answers.length !== assessmentQuestions.length}
+              onClick={() => onFinish(getRecommendedArchetype(answers))}
+            >
+              生成推荐干员
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="recommend-card">
+          <div className="eyebrow">推荐结果</div>
+          <h2>{recommendation?.name}</h2>
+          <p>{recommendation?.description}</p>
+          <div className="tag-row">
+            {recommendation?.tags.map((tag) => (
+              <span className="tag" key={tag}>{tag}</span>
+            ))}
+          </div>
+          <div className="button-row">
+            <button className="primary-button" onClick={() => onChooseRecommendation(recommendation?.id)}>
+              以该干员进入生态
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
