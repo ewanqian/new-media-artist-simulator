@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -49,3 +49,26 @@ jobs:
 
       - name: Desktop and mobile browser smoke tests
         run: npx playwright test -c playwright.v03.config.mjs
+
+      - name: Publish v0.3 branch preview under /v03/
+        if: github.event_name == 'push' && github.ref == 'refs/heads/vnext/systemic-gameplay-foundation'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf /tmp/nmas-pages
+          git clone --quiet --branch gh-pages --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" /tmp/nmas-pages
+          rm -rf /tmp/nmas-pages/v03
+          mkdir -p /tmp/nmas-pages/v03
+          cp -R new-media-time-simulator/dist/. /tmp/nmas-pages/v03/
+          touch /tmp/nmas-pages/.nojekyll
+          cd /tmp/nmas-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v03 .nojekyll
+          if git diff --cached --quiet; then
+            echo "Preview already current."
+          else
+            git commit -m "deploy: update v0.3 branch preview"
+            git push origin gh-pages
+          fi
