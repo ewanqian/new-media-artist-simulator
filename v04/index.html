@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="新媒体艺术家模拟器 v0.4：以注意力为核心资源的文字系统原型。" />
+  <title>新媒体艺术家模拟器 v0.4 / Attention Loop</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-money" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 15h10M12 8v8"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-project" viewBox="0 0 24 24"><path d="M4 7.5h6l1.5 2H20v9H4z"/><path d="M4 7.5V5h5l1.5 2.5"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+    <symbol id="i-node" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="15" cy="18" r="2"/><path d="m8 7 8-1M7 9l7 7M17 8l-2 8"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><path d="M4 7h16v13H4zM3 4h18v3H3z"/><path d="M9 11h6"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><path d="M5 17h2M10 13v4M15 9v8M20 5v12"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13M14 8l4 4-4 4"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <strong>NEW MEDIA ARTIST SIMULATOR</strong>
+        <span>v0.4 / ATTENTION LOOP</span>
+      </div>
+      <div class="status-strip" id="statusStrip"></div>
+      <button class="quiet-button" id="helpButton" type="button">?</button>
+    </header>
+
+    <main class="game-grid">
+      <section class="stream-panel" aria-label="叙事流">
+        <div class="stream-meta">
+          <span id="chapterLabel">周一 · 09:20</span>
+          <span class="mode-label">TEXT / SYSTEM</span>
+        </div>
+        <div class="story-stream" id="storyStream" aria-live="polite"></div>
+        <div class="choice-dock" id="choiceDock"></div>
+      </section>
+
+      <aside class="ledger-panel" aria-label="项目与记录">
+        <section class="ledger-section current-project">
+          <div class="section-title"><svg class="icon"><use href="#i-project"/></svg>当前项目</div>
+          <div id="projectCard"></div>
+        </section>
+        <section class="ledger-section">
+          <div class="section-title"><svg class="icon"><use href="#i-node"/></svg>持续影响</div>
+          <div class="threads" id="threadList"></div>
+        </section>
+        <section class="ledger-section archive-section">
+          <button class="section-title section-toggle" id="archiveToggle" type="button">
+            <span><svg class="icon"><use href="#i-archive"/></svg>档案</span>
+            <span id="archiveCount">0</span>
+          </button>
+          <div class="archive-list" id="archiveList" hidden></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="command-bar">
+      <div class="command-hint"><span>1–3 行动</span><span>Enter 结束本周</span><span>A 档案</span></div>
+      <button id="endWeekButton" type="button">结束本周 <svg class="icon"><use href="#i-arrow"/></svg></button>
+    </footer>
+  </div>
+
+  <dialog id="helpDialog">
+    <button class="dialog-close" id="helpClose" type="button">×</button>
+    <h2>这版只测试三个东西</h2>
+    <p><strong>注意力</strong>是主要资源。每周恢复 6 点，你决定把它花在制作、关系、申请、修复或搁置上。</p>
+    <p><strong>文本流</strong>承担世界。事件通过邮件、群聊、现场记录、项目笔记进入，不再铺满功能面板。</p>
+    <p><strong>项目会记住你做过的事。</strong>失败、搁置和旧素材会成为之后事件的条件，而不是简单扣分。</p>
+    <p class="keyline">键盘：1 / 2 / 3 选择，Enter 进入下一周，A 展开档案。</p>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
