@@ -41,3 +41,11 @@ jobs:
           test -f dist/index.html
           grep -Eq '(src|href)="\./assets/' dist/index.html
           test -s dist/index.html
+
+      - name: Install pinned browser smoke-test harness
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.60.0
+          npx playwright install --with-deps chromium
+
+      - name: Desktop and mobile browser smoke tests
+        run: npx playwright test -c playwright.v03.config.mjs
