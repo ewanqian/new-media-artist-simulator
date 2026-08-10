@@ -17,7 +17,7 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
-const V05WorldHub = lazy(() => import('./v05/web/V05WorldHub.jsx'));
+const V05Wireframe = lazy(() => import('./v05/web/V05Wireframe.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -26,8 +26,8 @@ export default function App() {
   const preview = params.get('core') || pathPreview;
   if (preview === 'v05') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入 v0.5 World Hub…</section></main>}>
-        <V05WorldHub />
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
+        <V05Wireframe />
       </Suspense>
     );
   }
@@ -92,7 +92,7 @@ function LegacySimulator() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'new-media-time-simulator-save.json';
+    anchor.download = 'new-media-artist-simulator-save.json';
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -114,7 +114,7 @@ function LegacySimulator() {
       <header className="topbar">
         <div>
           <div className="eyebrow">React / Vite / GitHub Pages</div>
-          <strong>新媒体时间模拟器</strong>
+          <strong>新媒体艺术家模拟器</strong>
         </div>
         <p>艺术生态、生存策略与技能演化实验</p>
       </header>
