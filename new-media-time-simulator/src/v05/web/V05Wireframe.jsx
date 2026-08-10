@@ -1,43 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { computeTiers, practices, skills, worldNodes } from '../model.ts';
+import { computeTiers, practices, skills } from '../model.ts';
+import {
+  facilityById,
+  globalSystems,
+  legacyResearchSpaceTemplates,
+  relevantSpecialistServices,
+  spatialFacilities,
+  spatialRegions
+} from '../locationGraph.ts';
 import './v05-wireframe.css';
 
 const SAVE_KEY = 'nmas-v05-world-hub-preview';
-
-const NODE_LABELS = {
-  'hub-cafe': ['咖啡馆', 'CAFÉ'],
-  'hub-workbench': ['工作台', 'WORKBENCH'],
-  'hub-stage-forge': ['场地预演', 'VENUE TEST'],
-  'hub-exchange': ['设备交换', 'EXCHANGE'],
-  'hub-archive': ['档案', 'ARCHIVE']
-};
-
-const FACILITY_NAMES = {
-  'shared-studio': '共享工位 B-201',
-  'river-diner': '江边大排档',
-  'loading-dock': '后门装卸区',
-  'pitch-room': '提案会议室',
-  'black-box': '黑盒测试场',
-  'production-yard': '制作后场',
-  'lecture-hall': '理论讲堂',
-  gallery: '学院展厅',
-  'open-call-office': '征集办公室',
-  'compute-rack': '算力机架',
-  'preview-node': '预演代理站',
-  'recovery-bay': '数据抢救间',
-  hangar: '旧机库展场',
-  'media-desk': '媒体接待区',
-  'production-office': '制作办公室',
-  'residency-lab': '驻留实验室',
-  'border-cafe': '边界咖啡馆',
-  'project-room': '项目房间'
-};
 
 const VENUE_PRESETS = [
   { id: 'flat', name: '平面屏', spec: '16:9 / 单输出', diagram: '[          SCREEN          ]', note: '基础构图、字幕安全区、单路播放。' },
   { id: 'wide', name: '超宽屏', spec: '32:9 / 双输出', diagram: '[        LEFT | RIGHT        ]', note: '跨屏构图、拼接、双路同步。' },
   { id: 'ring', name: '环形屏', spec: '360° / 多输出', diagram: '(   SCREEN  ·  SCREEN  ·   )', note: '循环内容、接缝、观众方向变化。' },
-  { id: 'dome', name: '球幕', spec: 'DOME / FISHEYE', diagram: '        ______\n     .-´      `-.\n    /   DOME     \\n    `------------´', note: '鱼眼构图、地平线、中心畸变。' }
+  { id: 'dome', name: '球幕', spec: 'DOME / FISHEYE', diagram: '        ______\n     .-´      `-.\n    /   DOME     \\\n    `------------´', note: '鱼眼构图、地平线、中心畸变。' }
 ];
 
 function makeFreshSave() {
@@ -49,7 +28,7 @@ function makeFreshSave() {
     attentionMax: 6,
     cash: 3200,
     worldLevel: 1,
-    currentNodeId: 'hub-cafe',
+    currentRegionId: 'region-rongshore',
     learnedSkillIds: [],
     primaryProject: {
       name: '未命名信号装置',
@@ -65,11 +44,16 @@ function makeFreshSave() {
       id: 'task-01',
       title: '任务 01 / 第一个可运行版本',
       goals: [
-        { id: 'g1', label: '查看工作台', done: false },
+        { id: 'g1', label: '查看当前项目', done: false },
         { id: 'g2', label: '进入一个地点', done: false },
-        { id: 'g3', label: '完成一次场地预演', done: false }
+        { id: 'g3', label: '在实际场地完成一次预演', done: false }
       ]
     },
+    relations: [
+      { id: 'peer', label: '同行', state: '熟悉', note: '会交换信息，但还没有共同项目。' },
+      { id: 'venue-contact', label: '场地联系人', state: '弱连接', note: '愿意提供空档，技术条件需要提前确认。' },
+      { id: 'producer', label: '制作方', state: '未建立', note: '只有项目进入制作阶段后才会形成稳定关系。' }
+    ],
     archive: [{ type: '系统', title: '存档建立', text: '第 1 周。' }]
   };
 }
@@ -77,27 +61,26 @@ function makeFreshSave() {
 function normalizeSave(raw) {
   const fresh = makeFreshSave();
   if (!raw || typeof raw !== 'object') return fresh;
+  const legacyRegion = typeof raw.currentNodeId === 'string' && raw.currentNodeId.startsWith('region-')
+    ? raw.currentNodeId
+    : fresh.currentRegionId;
   return {
     ...fresh,
     ...raw,
     screen: 'title',
+    currentRegionId: raw.currentRegionId || legacyRegion,
     menuBook: fresh.menuBook,
     primaryProject: { ...fresh.primaryProject, ...(raw.primaryProject || {}) },
+    relations: Array.isArray(raw.relations) ? raw.relations : fresh.relations,
     archive: Array.isArray(raw.archive) ? raw.archive : fresh.archive
   };
 }
 
-function displayNode(node) {
-  const override = NODE_LABELS[node.id];
-  if (override) return { name: override[0], shortName: override[1] };
-  return { name: node.name, shortName: node.shortName };
-}
-
 export default function V05Wireframe() {
   const [save, setSave] = useState(makeFreshSave);
-  const [surface, setSurface] = useState('map');
+  const [surface, setSurface] = useState('world');
   const [archiveOpen, setArchiveOpen] = useState(false);
-  const [selectedFacility, setSelectedFacility] = useState(0);
+  const [selectedFacilityId, setSelectedFacilityId] = useState('shared-studio');
 
   useEffect(() => {
     try {
@@ -107,21 +90,27 @@ export default function V05Wireframe() {
   }, []);
 
   useEffect(() => {
-    if (save.practiceId) localStorage.setItem(SAVE_KEY, JSON.stringify({ ...save, screen: 'map' }));
+    if (save.practiceId) localStorage.setItem(SAVE_KEY, JSON.stringify({ ...save, screen: 'play' }));
   }, [save]);
 
   useEffect(() => {
     const onKey = (event) => {
+      if (save.screen !== 'play') return;
       const key = event.key.toLowerCase();
       if (key === 'a') {
         event.preventDefault();
         setArchiveOpen((value) => !value);
+        return;
       }
-      if (key === 'm' && save.screen === 'map') setSurface('map');
-      if (event.key === 'Escape') {
-        if (archiveOpen) setArchiveOpen(false);
-        else setSurface('map');
+      if (archiveOpen && event.key === 'Escape') {
+        setArchiveOpen(false);
+        return;
       }
+      if (key === 'm') setSurface('world');
+      if (key === 'p') { setSurface('projects'); finishGoal('g1'); }
+      if (key === 'w') setSurface('workbench');
+      if (key === 'r') setSurface('relations');
+      if (event.key === 'Escape') setSurface('world');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -129,47 +118,59 @@ export default function V05Wireframe() {
 
   const practice = useMemo(() => practices.find((item) => item.id === save.practiceId), [save.practiceId]);
   const learnedSkills = useMemo(() => skills.filter((item) => save.learnedSkillIds.includes(item.id)), [save.learnedSkillIds]);
-  const currentNode = worldNodes.find((item) => item.id === save.currentNodeId) || worldNodes[0];
+  const currentRegion = useMemo(
+    () => spatialRegions.find((item) => item.id === save.currentRegionId) || spatialRegions[0],
+    [save.currentRegionId]
+  );
 
   function startNew() {
     localStorage.removeItem(SAVE_KEY);
     setSave({ ...makeFreshSave(), screen: 'direction' });
-    setSurface('map');
+    setSurface('world');
   }
 
   function continueGame() {
     if (!save.practiceId) setSave((current) => ({ ...current, screen: 'direction' }));
-    else setSave((current) => ({ ...current, screen: 'map' }));
+    else setSave((current) => ({ ...current, screen: 'play' }));
   }
 
   function chooseDirection(id) {
     const selected = practices.find((item) => item.id === id);
     const fresh = makeFreshSave();
-    fresh.screen = 'map';
+    fresh.screen = 'play';
     fresh.practiceId = id;
     fresh.learnedSkillIds = selected?.starterSkills || [];
-    fresh.archive.push({ type: '起始方向', title: selected?.name || id, text: '作为初始能力与语言入口，不锁定后续发展。' });
+    fresh.archive.push({ type: '起始方向', title: selected?.name || id, text: '作为起始能力入口。' });
     setSave(fresh);
-    setSurface('map');
+    setSurface('world');
   }
 
   function finishGoal(id) {
     setSave((current) => ({
       ...current,
-      menuBook: { ...current.menuBook, goals: current.menuBook.goals.map((goal) => goal.id === id ? { ...goal, done: true } : goal) }
+      menuBook: {
+        ...current.menuBook,
+        goals: current.menuBook.goals.map((goal) => goal.id === id ? { ...goal, done: true } : goal)
+      }
     }));
   }
 
-  function openNode(node) {
-    if (node.unlockAt > save.worldLevel) return;
-    setSave((current) => ({ ...current, currentNodeId: node.id }));
-    setSelectedFacility(0);
-    if (node.id === 'hub-cafe') setSurface('cafe');
-    else if (node.id === 'hub-workbench') { setSurface('workbench'); finishGoal('g1'); }
-    else if (node.id === 'hub-stage-forge') setSurface('venue');
-    else if (node.id === 'hub-exchange') setSurface('exchange');
-    else if (node.id === 'hub-archive') setArchiveOpen(true);
-    else { setSurface('location'); finishGoal('g2'); }
+  function openSystem(id) {
+    if (id === 'archive') {
+      setArchiveOpen(true);
+      return;
+    }
+    if (id === 'projects') finishGoal('g1');
+    setSurface(id);
+  }
+
+  function openRegion(region) {
+    if (region.unlockAt > save.worldLevel) return;
+    const firstFacility = region.facilityIds[0];
+    setSave((current) => ({ ...current, currentRegionId: region.id }));
+    setSelectedFacilityId(firstFacility);
+    setSurface('location');
+    finishGoal('g2');
   }
 
   function spendAttention(cost, entry) {
@@ -203,21 +204,41 @@ export default function V05Wireframe() {
   return (
     <div className="wf-shell">
       <header className="wf-header">
-        <button className="wf-title-button" onClick={() => setSurface('map')}>新媒体艺术家模拟器</button>
+        <button className="wf-title-button" onClick={() => setSurface('world')}>新媒体艺术家模拟器</button>
         <div className="wf-header-state"><span>第 {save.week} 周</span><span>注意力 {save.attention}/{save.attentionMax}</span><span>¥{save.cash}</span></div>
-        <div className="wf-header-actions"><button onClick={() => setSurface('map')}>地图</button><button onClick={() => setArchiveOpen(true)}>档案 [A]</button></div>
+        <button className="wf-end-week" onClick={endWeek}>结束本周</button>
       </header>
 
-      <main className="wf-main">
-        {surface === 'map' && <WorldMap save={save} onOpen={openNode} />}
-        {surface === 'cafe' && <Cafe save={save} onBack={() => setSurface('map')} onSpend={spendAttention} />}
-        {surface === 'workbench' && <Workbench save={save} practice={practice} learnedSkills={learnedSkills} onBack={() => setSurface('map')} setSave={setSave} />}
-        {surface === 'venue' && <VenueTest save={save} onBack={() => setSurface('map')} onSpend={spendAttention} onComplete={() => finishGoal('g3')} />}
-        {surface === 'exchange' && <Exchange save={save} onBack={() => setSurface('map')} />}
-        {surface === 'location' && <Location node={currentNode} selected={selectedFacility} setSelected={setSelectedFacility} onBack={() => setSurface('map')} onSpend={spendAttention} />}
-      </main>
+      <div className="wf-app-grid">
+        <GlobalNav active={surface} onOpen={openSystem} />
+        <main className="wf-main">
+          {surface === 'world' && <WorldMap save={save} currentRegion={currentRegion} onOpen={openRegion} />}
+          {surface === 'projects' && <Projects save={save} onSpend={spendAttention} />}
+          {surface === 'workbench' && <Workbench save={save} practice={practice} learnedSkills={learnedSkills} setSave={setSave} />}
+          {surface === 'relations' && <Relations save={save} />}
+          {surface === 'location' && (
+            <Location
+              region={currentRegion}
+              selectedFacilityId={selectedFacilityId}
+              setSelectedFacilityId={setSelectedFacilityId}
+              onBack={() => setSurface('world')}
+              onSpend={spendAttention}
+              onVenue={() => setSurface('venue')}
+            />
+          )}
+          {surface === 'venue' && (
+            <VenueTest
+              save={save}
+              facilityId={selectedFacilityId}
+              onBack={() => setSurface('location')}
+              onSpend={spendAttention}
+              onComplete={() => finishGoal('g3')}
+            />
+          )}
+        </main>
+      </div>
 
-      <footer className="wf-footer"><span>M 地图　A 档案　Esc 返回</span><button onClick={endWeek}>结束本周</button></footer>
+      <footer className="wf-footer"><span>M 世界　P 项目　W 工作台　R 关系　A 档案</span><span>{currentRegion.name}</span></footer>
       {archiveOpen && <Archive save={save} practice={practice} onClose={() => setArchiveOpen(false)} />}
     </div>
   );
@@ -255,26 +276,45 @@ function DirectionSelect({ onSelect, onBack }) {
   );
 }
 
-function WorldMap({ save, onOpen }) {
+function GlobalNav({ active, onOpen }) {
+  return (
+    <nav className="wf-global-nav" aria-label="主要系统">
+      {globalSystems.map((item) => (
+        <button key={item.id} className={active === item.id ? 'active' : ''} onClick={() => onOpen(item.id)}>
+          <strong>{item.label}</strong><small>{item.shortcut}</small>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function WorldMap({ save, currentRegion, onOpen }) {
+  const adjacent = currentRegion.adjacentIds
+    .map((id) => spatialRegions.find((region) => region.id === id)?.name)
+    .filter(Boolean);
   return (
     <section className="wf-world-layout">
       <div className="wf-map-column">
-        <div className="wf-section-head"><h2>世界地图</h2><span>位置与场所关系 / 低保真</span></div>
+        <div className="wf-section-head"><h2>世界</h2><span>区域关系</span></div>
         <div className="wf-map-scroll">
           <div className="wf-map">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              {worldNodes.flatMap((node) => node.adjacentIds.map((id) => {
-                const target = worldNodes.find((item) => item.id === id);
-                if (!target || node.id > target.id) return null;
-                return <line key={`${node.id}-${id}`} x1={node.x} y1={node.y} x2={target.x} y2={target.y} />;
+              {spatialRegions.flatMap((region) => region.adjacentIds.map((id) => {
+                const target = spatialRegions.find((item) => item.id === id);
+                if (!target || region.id > target.id) return null;
+                return <line key={`${region.id}-${id}`} x1={region.x} y1={region.y} x2={target.x} y2={target.y} />;
               }))}
             </svg>
-            {worldNodes.map((node) => {
-              const label = displayNode(node);
-              const locked = node.unlockAt > save.worldLevel;
+            {spatialRegions.map((region) => {
+              const locked = region.unlockAt > save.worldLevel;
               return (
-                <button key={node.id} className={`wf-node ${locked ? 'locked' : ''} ${node.id === save.currentNodeId ? 'current' : ''}`} style={{ left: `${node.x}%`, top: `${node.y}%` }} onClick={() => onOpen(node)}>
-                  <strong>{label.name}</strong><small>{label.shortName}</small>{locked && <i>锁定</i>}
+                <button
+                  key={region.id}
+                  className={`wf-node ${locked ? 'locked' : ''} ${region.id === save.currentRegionId ? 'current' : ''}`}
+                  style={{ left: `${region.x}%`, top: `${region.y}%` }}
+                  onClick={() => onOpen(region)}
+                >
+                  <strong>{region.name}</strong><small>{region.shortName}</small>{locked && <i>锁定</i>}
                 </button>
               );
             })}
@@ -283,7 +323,21 @@ function WorldMap({ save, onOpen }) {
       </div>
       <aside className="wf-side">
         <TaskBook save={save} />
-        <div className="wf-panel"><h3>当前项目</h3><strong>{save.primaryProject.name}</strong><p>{save.primaryProject.question}</p><div>{save.primaryProject.methods.join(' / ')}</div></div>
+        <div className="wf-panel">
+          <h3>当前位置</h3>
+          <strong>{currentRegion.name}</strong>
+          <p>{currentRegion.description}</p>
+          <label>相邻区域</label>
+          <p>{adjacent.join(' / ') || '—'}</p>
+          <label>内部地点</label>
+          <p>{currentRegion.facilityIds.map((id) => facilityById.get(id)?.name).filter(Boolean).join(' / ')}</p>
+        </div>
+        <div className="wf-panel wf-inventory-count">
+          <h3>地点结构</h3>
+          <div><span>世界区域</span><strong>{spatialRegions.length}</strong></div>
+          <div><span>区域内地点</span><strong>{spatialFacilities.length}</strong></div>
+          <div><span>旧研究空间模板</span><strong>{legacyResearchSpaceTemplates.length}</strong></div>
+        </div>
       </aside>
     </section>
   );
@@ -295,78 +349,169 @@ function TaskBook({ save }) {
   );
 }
 
-function Frame({ title, onBack, children, side }) {
+function Projects({ save, onSpend }) {
+  const project = save.primaryProject;
   return (
-    <section className="wf-page"><div className="wf-page-head"><button onClick={onBack}>← 世界地图</button><h1>{title}</h1></div><div className={`wf-page-grid ${side ? 'has-side' : ''}`}><div>{children}</div>{side && <aside>{side}</aside>}</div></section>
+    <section className="wf-page">
+      <div className="wf-page-head"><h1>项目</h1><p>项目状态与任务书。这里不是地图。</p></div>
+      <div className="wf-project-layout">
+        <section className="wf-panel">
+          <h3>当前项目</h3>
+          <strong>{project.name}</strong>
+          <p>{project.question}</p>
+          <label>方法</label><p>{project.methods.join(' / ')}</p>
+          <table><tbody>
+            <tr><td>一致性</td><td>{project.coherence}/4</td></tr>
+            <tr><td>稳定性</td><td>{project.stability}/4</td></tr>
+            <tr><td>场地适配</td><td>{project.siteFit}/4</td></tr>
+            <tr><td>文档</td><td>{project.documentation}/4</td></tr>
+          </tbody></table>
+          <button onClick={() => onSpend(1, { type: '项目', title: '继续当前项目', text: '为当前项目投入一次注意力。' })}>继续制作 / 注意力 -1</button>
+        </section>
+        <TaskBook save={save} />
+        <section className="wf-panel wf-project-history"><h3>项目记录</h3>{project.history.map((entry, index) => <p key={`${entry}-${index}`}>{String(index + 1).padStart(2, '0')} / {entry}</p>)}</section>
+      </div>
+    </section>
   );
 }
 
-function Cafe({ save, onBack, onSpend }) {
+function Workbench({ save, practice, learnedSkills, setSave }) {
+  const tier = computeTiers[1];
+  const services = relevantSpecialistServices(save.practiceId);
   return (
-    <Frame title="咖啡馆" onBack={onBack} side={<TaskBook save={save} />}>
+    <section className="wf-page">
+      <div className="wf-page-head"><h1>工作台</h1><p>制作条件、能力和当前方向真正需要的专业服务。</p></div>
+      <div className="wf-workbench">
+        <section className="wf-panel">
+          <h3>制作设备</h3>
+          <strong>x86 Desktop / {tier.label}</strong>
+          <p>{tier.enables.join(' / ')}</p>
+          <button onClick={() => save.cash >= 900 && setSave((current) => ({
+            ...current,
+            cash: current.cash - 900,
+            primaryProject: { ...current.primaryProject, stability: Math.min(4, current.primaryProject.stability + 1) },
+            archive: [...current.archive, { type: '工作台', title: '输出链优化', text: '稳定性 +1。' }]
+          }))}>优化输出链 / ¥900</button>
+        </section>
+        <section className="wf-panel">
+          <h3>已掌握能力</h3>
+          <strong>{practice?.name.replace('实践', '')}</strong>
+          {learnedSkills.map((skill) => <div key={skill.id} className="wf-skill"><span>{skill.family}</span>{skill.name}</div>)}
+        </section>
+        <section className="wf-panel wf-services">
+          <h3>专业服务</h3>
+          {services.length ? services.map((service) => (
+            <article key={service.id}><strong>{service.name}</strong><p>{service.description}</p><small>{service.functions.join(' / ')}</small></article>
+          )) : <p>当前起始方向没有默认技术服务。需要时再由项目或事件解锁。</p>}
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function Relations({ save }) {
+  return (
+    <section className="wf-page">
+      <div className="wf-page-head"><h1>关系</h1><p>只记录发生过的关系状态，不显示爱心条。</p></div>
+      <div className="wf-relation-list">
+        {save.relations.map((relation) => (
+          <article key={relation.id}><small>{relation.state}</small><strong>{relation.label}</strong><p>{relation.note}</p></article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Location({ region, selectedFacilityId, setSelectedFacilityId, onBack, onSpend, onVenue }) {
+  const facilityIds = region.facilityIds;
+  const selected = facilityById.get(selectedFacilityId) || facilityById.get(facilityIds[0]);
+  const hasVenuePreview = selected?.functions.includes('venue-preview');
+  return (
+    <section className="wf-page">
+      <div className="wf-page-head"><button onClick={onBack}>← 世界</button><small>世界 / {region.name}</small><h1>{region.name}</h1><p>{region.description}</p></div>
+      <div className="wf-location-layout">
+        <nav>
+          {facilityIds.map((id) => {
+            const facility = facilityById.get(id);
+            return <button key={id} className={id === selected?.id ? 'active' : ''} onClick={() => setSelectedFacilityId(id)}><small>{facility?.kind}</small><strong>{facility?.name}</strong></button>;
+          })}
+        </nav>
+        <div className="wf-location-main">
+          <section className="wf-panel wf-facility-detail">
+            <small>{selected?.kind}</small><h2>{selected?.name}</h2><p>{selected?.description}</p>
+            <label>这里可以发生</label><p>{selected?.functions.join(' / ')}</p>
+            <div className="wf-location-actions">
+              <button onClick={() => onSpend(1, { type: '地点', title: selected?.name || '地点', text: `${region.name} / 第一次行动记录。` })}>在这里行动 / 注意力 -1</button>
+              {hasVenuePreview && <button onClick={onVenue}>场地预演 →</button>}
+            </div>
+          </section>
+          <ContextEvent facility={selected} onSpend={onSpend} />
+        </div>
+        <aside className="wf-panel wf-location-context">
+          <h3>区域关系</h3>
+          <label>区域</label><p>{region.name}</p>
+          <label>相邻</label><p>{region.adjacentIds.map((id) => spatialRegions.find((item) => item.id === id)?.name).filter(Boolean).join(' / ')}</p>
+          <label>地点标签</label><p>{region.tags.join(' / ')}</p>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function ContextEvent({ facility, onSpend }) {
+  if (!facility) return null;
+  if (facility.id === 'river-diner' || facility.id === 'border-cafe') {
+    return (
       <article className="wf-text-event">
-        <small>消息 / 周四 14:20</small>
-        <h2>“黑盒测试场周四晚上空两个小时。你要不要把那个系统带来跑一下？”</h2>
-        <p>场地提供主投影和基础声音。制作费 ¥1800。三天后要给技术单。</p>
+        <small>消息 / 14:20</small>
+        <h2>“有个场地空了两个小时。你那个项目要不要拿去跑一下？”</h2>
+        <p>没有正式展览。场地只提供基础设备，三天后要给技术单。</p>
         <div className="wf-decisions">
           <button onClick={() => onSpend(1, { type: '判断', title: '查看机会', text: '先判断它能不能推进当前项目。' })}><b>1</b><span>先判断值不值得去</span><small>注意力 -1</small></button>
-          <button onClick={() => onSpend(2, { type: '沟通', title: '确认测试', text: '先确认输出、声音和撤场条件。' })}><b>2</b><span>确认测试，先问清技术条件</span><small>注意力 -2</small></button>
+          <button onClick={() => onSpend(2, { type: '沟通', title: '确认测试', text: '先确认输出、声音和撤场条件。' })}><b>2</b><span>先问清技术条件</span><small>注意力 -2</small></button>
           <button onClick={() => onSpend(0, { type: '选择', title: '暂不接', text: '把这周留给当前项目。' })}><b>3</b><span>不接</span><small>注意力 0</small></button>
         </div>
       </article>
-    </Frame>
-  );
+    );
+  }
+  if (facility.id === 'open-call-office') {
+    return (
+      <article className="wf-text-event">
+        <small>公开征集 / 截止 5 天</small>
+        <h2>一个小型媒体艺术空间正在征集新项目。</h2>
+        <p>公开信息只有主题、三张参考图和一行制作支持。真正值得确认的是场地、制作预算和技术支持。</p>
+        <div className="wf-decisions">
+          <button onClick={() => onSpend(1, { type: '申请', title: '先读规则', text: '没有立即提交，先把支持条件查清楚。' })}><b>1</b><span>先查支持条件</span><small>注意力 -1</small></button>
+          <button onClick={() => onSpend(2, { type: '申请', title: '准备申请', text: '开始整理当前项目的申请版本。' })}><b>2</b><span>准备申请</span><small>注意力 -2</small></button>
+        </div>
+      </article>
+    );
+  }
+  return null;
 }
 
-function Workbench({ save, practice, learnedSkills, onBack, setSave }) {
-  const project = save.primaryProject;
-  const tier = computeTiers[1];
-  return (
-    <Frame title="工作台" onBack={onBack}>
-      <div className="wf-workbench">
-        <section className="wf-panel"><h3>项目</h3><label>名称</label><strong>{project.name}</strong><label>问题</label><p>{project.question}</p><label>方法</label><p>{project.methods.join(' / ')}</p></section>
-        <section className="wf-panel"><h3>制作状态</h3><table><tbody><tr><td>一致性</td><td>{project.coherence}/4</td></tr><tr><td>稳定性</td><td>{project.stability}/4</td></tr><tr><td>场地适配</td><td>{project.siteFit}/4</td></tr><tr><td>文档</td><td>{project.documentation}/4</td></tr></tbody></table></section>
-        <section className="wf-panel"><h3>当前设备能力</h3><strong>x86 Desktop / {tier.label}</strong><p>{tier.enables.join(' / ')}</p><button onClick={() => save.cash >= 900 && setSave((current) => ({ ...current, cash: current.cash - 900, primaryProject: { ...current.primaryProject, stability: Math.min(4, current.primaryProject.stability + 1) }, archive: [...current.archive, { type: '工作台', title: '输出链优化', text: '稳定性 +1。' }] }))}>优化输出链 / ¥900</button></section>
-        <section className="wf-panel"><h3>已掌握能力</h3><strong>{practice?.name.replace('实践', '')}</strong>{learnedSkills.map((skill) => <div key={skill.id} className="wf-skill"><span>{skill.family}</span>{skill.name}</div>)}</section>
-      </div>
-    </Frame>
-  );
-}
-
-function VenueTest({ save, onBack, onSpend, onComplete }) {
+function VenueTest({ save, facilityId, onBack, onSpend, onComplete }) {
+  const facility = facilityById.get(facilityId);
   function run(preset) {
-    if (!onSpend(2, { type: '预演', title: `${preset.name}测试`, text: `${preset.spec} / ${save.primaryProject.name}` })) return;
+    if (!onSpend(2, { type: '预演', title: `${preset.name}测试`, text: `${facility?.name || '场地'} / ${preset.spec}` })) return;
     onComplete();
   }
   return (
-    <Frame title="场地预演" onBack={onBack}>
-      <div className="wf-panel wf-venue-intro"><strong>{save.primaryProject.name}</strong><span>选择一个空间/屏幕规格，检查 mapping 与输出关系。</span></div>
+    <section className="wf-page">
+      <div className="wf-page-head"><button onClick={onBack}>← {facility?.name || '地点'}</button><small>场地 / 输出关系</small><h1>场地预演</h1><p>{facility?.name} / {save.primaryProject.name}</p></div>
       <div className="wf-venue-grid">{VENUE_PRESETS.map((preset) => <button key={preset.id} onClick={() => run(preset)}><small>{preset.spec}</small><strong>{preset.name}</strong><pre>{preset.diagram}</pre><p>{preset.note}</p><span>运行测试 / 注意力 -2</span></button>)}</div>
-    </Frame>
-  );
-}
-
-function Exchange({ onBack }) {
-  return (
-    <Frame title="设备交换" onBack={onBack}>
-      <div className="wf-panel"><p>这里先不做商店玩法。只保留能力分界。</p><table><tbody><tr><td>G50</td><td>基础实时图形</td></tr><tr><td>G60</td><td>标准制作</td></tr><tr><td>G70</td><td>复杂实时图形 / 多输出</td></tr><tr><td>G80</td><td>大型空间 / 高分辨率预演</td></tr></tbody></table></div>
-    </Frame>
-  );
-}
-
-function Location({ node, selected, setSelected, onBack, onSpend }) {
-  const list = node.facilities || [];
-  return (
-    <Frame title={node.name} onBack={onBack}>
-      <div className="wf-location-layout"><nav>{list.map((id, index) => <button key={id} className={index === selected ? 'active' : ''} onClick={() => setSelected(index)}>{FACILITY_NAMES[id] || id}</button>)}</nav><section className="wf-panel"><h3>{FACILITY_NAMES[list[selected]] || list[selected]}</h3><p>{node.description}</p><button onClick={() => onSpend(1, { type: '地点', title: FACILITY_NAMES[list[selected]] || list[selected], text: `${node.name} / 第一次记录。` })}>在这里行动 / 注意力 -1</button></section></div>
-    </Frame>
+    </section>
   );
 }
 
 function Archive({ save, practice, onClose }) {
   return (
     <div className="wf-overlay" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <aside className="wf-archive"><header><div><small>ARCHIVE</small><h2>档案</h2></div><button onClick={onClose}>关闭 [A]</button></header><div className="wf-archive-meta">第 {save.week} 周 / {practice?.name.replace('实践', '') || '未选择'} / {save.primaryProject.name}</div><div className="wf-archive-list">{save.archive.slice().reverse().map((entry, index) => <article key={`${entry.title}-${index}`}><small>{entry.type}</small><strong>{entry.title}</strong><p>{entry.text}</p></article>)}</div></aside>
+      <aside className="wf-archive">
+        <header><div><small>ARCHIVE</small><h2>档案</h2></div><button onClick={onClose}>关闭 [A]</button></header>
+        <div className="wf-archive-meta">第 {save.week} 周 / {practice?.name.replace('实践', '') || '未选择'} / {save.primaryProject.name}</div>
+        <div className="wf-archive-list">{save.archive.slice().reverse().map((entry, index) => <article key={`${entry.title}-${index}`}><small>{entry.type}</small><strong>{entry.title}</strong><p>{entry.text}</p></article>)}</div>
+      </aside>
     </div>
   );
 }
