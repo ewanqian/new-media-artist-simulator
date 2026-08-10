@@ -117,3 +117,16 @@ test('duplicate command id is idempotent', () => {
   assert.deepEqual(duplicate.state, first.state);
   assert.equal(duplicate.state.inventory.assetInstanceIds.length, 1);
 });
+
+test('invalid loadout slot is rejected at the command boundary', () => {
+  const { engine, state: initial } = createHarness();
+  const inherited = resolve(engine, initial, 1, 'event.01-inheritance', 'keep-it').state;
+  const malformed = engine.dispatch(inherited, {
+    id: 'cmd-invalid-slot',
+    type: 'loadout.equip',
+    payload: { slot: '__proto__', instanceId: 'asset-instance.hdmi-001' }
+  });
+  assert.equal(malformed.result.accepted, false);
+  assert.equal(malformed.result.reason, 'invalid-loadout-slot:__proto__');
+  assert.deepEqual(malformed.state, inherited);
+});
