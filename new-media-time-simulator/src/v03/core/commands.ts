@@ -1,4 +1,5 @@
 import { isChoiceAvailable, type EventChoiceTemplate } from './contentPack.ts';
+import { LOADOUT_SLOTS } from './state.ts';
 import type { CommandHandler } from './turnEngine.ts';
 import type { Effect, LoadoutSlot } from './types.ts';
 
@@ -13,6 +14,10 @@ export interface ContentRegistryLike {
 function payloadObject(payload: unknown): Record<string, unknown> {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Command payload must be an object.');
   return payload as Record<string, unknown>;
+}
+
+function isLoadoutSlot(value: string): value is LoadoutSlot {
+  return (LOADOUT_SLOTS as readonly string[]).includes(value);
 }
 
 export function createCoreCommandHandlers(registry: ContentRegistryLike): Record<string, CommandHandler> {
@@ -45,7 +50,9 @@ export function createCoreCommandHandlers(registry: ContentRegistryLike): Record
 
     'loadout.equip': ({ state, command }) => {
       const payload = payloadObject(command.payload);
-      const slot = String(payload.slot ?? '') as LoadoutSlot;
+      const slotValue = String(payload.slot ?? '');
+      if (!isLoadoutSlot(slotValue)) return { accepted: false, reason: `invalid-loadout-slot:${slotValue}` };
+      const slot: LoadoutSlot = slotValue;
       const instanceId = String(payload.instanceId ?? '');
       const asset = state.assets.byId[instanceId];
       if (!asset || asset.destroyedAt) return { accepted: false, reason: `missing-asset:${instanceId}` };
