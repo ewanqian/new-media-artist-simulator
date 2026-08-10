@@ -31,6 +31,11 @@ function advanceClock(state) {
   };
 }
 
+function defaultCreateId(prefix) {
+  const uuid = globalThis.crypto?.randomUUID?.();
+  return `${prefix}-${uuid || Date.now()}`;
+}
+
 export function createTurnEngine(options = {}) {
   const handlers = options.commandHandlers || {};
   const resolveAssetTemplate = options.resolveAssetTemplate || (() => null);
@@ -39,7 +44,7 @@ export function createTurnEngine(options = {}) {
   const evaluateWorldRules = options.evaluateWorldRules || (() => ({ effects: [], records: [] }));
   const advanceProjects = options.advanceProjects || (() => ({ effects: [], records: [] }));
   const now = options.now || (() => new Date().toISOString());
-  const createId = options.createId || ((prefix) => `${prefix}-${crypto?.randomUUID?.() || Date.now()}`);
+  const createId = options.createId || defaultCreateId;
 
   return {
     dispatch(inputState, rawCommand) {
