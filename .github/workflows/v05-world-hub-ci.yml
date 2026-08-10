@@ -1,0 +1,69 @@
+name: v0.5 World Hub CI
+
+on:
+  push:
+    branches:
+      - vnext/text-mud-ui-v04
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: new-media-time-simulator
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: new-media-time-simulator/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck core + v0.5 model, run deterministic tests, and build
+        run: npm run verify:v05
+
+      - name: Verify relative GitHub Pages artifact
+        run: |
+          test -f dist/index.html
+          grep -Eq '(src|href)="\./assets/' dist/index.html
+          test -s dist/index.html
+
+      - name: Install pinned browser test harness
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.60.0
+          npx playwright install --with-deps chromium
+
+      - name: Desktop and mobile v0.5 smoke tests
+        run: npx playwright test -c playwright.v05.config.mjs
+
+      - name: Publish v0.5 preview under /v05/
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: .
+        run: |
+          rm -rf /tmp/nmas-pages
+          git clone --quiet --branch gh-pages --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" /tmp/nmas-pages
+          rm -rf /tmp/nmas-pages/v05
+          mkdir -p /tmp/nmas-pages/v05
+          cp -R new-media-time-simulator/dist/. /tmp/nmas-pages/v05/
+          touch /tmp/nmas-pages/.nojekyll
+          cd /tmp/nmas-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v05 .nojekyll
+          if git diff --cached --quiet; then
+            echo "Preview already current."
+          else
+            git commit -m "deploy: update v0.5 world hub preview"
+            git push origin gh-pages
+          fi
