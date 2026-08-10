@@ -86,8 +86,8 @@ test('venue preview is entered through a real venue and nested local map', async
   await page.locator('.wf-map').getByRole('button', { name: /西岸 \/ 徐汇滨江/ }).click();
   await expect(page.getByRole('heading', { name: '西岸 / 徐汇滨江', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /多功能黑盒/ }).click();
-  const contextualPreview = page.getByRole('button', { name: '进入场地预演 →', exact: true });
-  await expect(contextualPreview).toBeVisible();
+  const contextualPreview = page.locator('.wf-text-event .wf-decisions button').first();
+  await expect(contextualPreview).toContainText('进入场地预演');
   await contextualPreview.click();
 
   await expect(page.getByRole('heading', { name: '场地预演', exact: true })).toBeVisible();
