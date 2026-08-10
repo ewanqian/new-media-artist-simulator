@@ -10,13 +10,19 @@ import {
   specialistServices
 } from '../locationGraph.ts';
 
-test('spatial map contains regions and facilities, not global system tools', () => {
-  assert.equal(spatialRegions.length, 5);
-  assert.equal(spatialFacilities.length, 15);
+test('spatial map is a rich place graph and global tools stay outside it', () => {
+  assert.equal(spatialRegions.length, 9);
+  assert.equal(spatialFacilities.length, 27);
   assert.equal(globalSystems.length, 5);
   assert.equal(legacyResearchSpaceTemplates.length, 13);
-  assert.equal(specialistServices.length, 3);
-  assert.equal(new Set(spatialFacilities.map((facility) => facility.kind)).size, 8);
+  assert.equal(specialistServices.length, 4);
+  assert.ok(new Set(spatialFacilities.map((facility) => facility.kind)).size >= 8);
+
+  const labels = globalSystems.map((system) => system.label);
+  assert.deepEqual(labels, ['地点', '项目', '工作台', '联络', '档案库']);
+  assert.ok(spatialRegions.some((region) => region.name === '苏河 / 普陀'));
+  assert.ok(spatialRegions.some((region) => region.name === '西岸 / 徐汇滨江'));
+  assert.ok(spatialRegions.some((region) => region.name === '杭州'));
 
   const spatialIds = new Set(spatialRegions.map((region) => region.id));
   for (const system of globalSystems) assert.equal(spatialIds.has(system.id), false);
@@ -26,6 +32,7 @@ test('spatial map contains regions and facilities, not global system tools', () 
 test('every region and nested facility has valid symmetric spatial relationships', () => {
   const regionById = new Map(spatialRegions.map((region) => [region.id, region]));
   for (const region of spatialRegions) {
+    assert.equal(region.facilityIds.length, 3);
     for (const facilityId of region.facilityIds) {
       const facility = facilityById.get(facilityId);
       assert.ok(facility, `${region.id} references missing facility ${facilityId}`);
@@ -47,8 +54,9 @@ test('every region and nested facility has valid symmetric spatial relationships
   }
 });
 
-test('specialist compute services appear only for practices that need them', () => {
+test('specialist services stay conditional instead of becoming universal map locations', () => {
   assert.equal(relevantSpecialistServices('research-critique').length, 0);
   assert.ok(relevantSpecialistServices('image-capture').some((service) => service.id === 'compute-rack'));
   assert.ok(relevantSpecialistServices('systems-generative').some((service) => service.id === 'preview-node'));
+  assert.ok(relevantSpecialistServices('live-performance').some((service) => service.id === 'mapping-support'));
 });
