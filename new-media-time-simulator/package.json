@@ -1,7 +1,7 @@
 {
   "name": "new-media-time-simulator",
   "private": true,
-  "version": "0.3.0-dev",
+  "version": "0.5.0-dev",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,9 @@
     "typecheck:v03": "npx --yes -p typescript@5.9.3 tsc -p tsconfig.v03.json",
     "test:v03": "node --experimental-strip-types --test src/v03/tests/*.test.mjs",
     "verify:v03": "npm run typecheck:v03 && npm run test:v03 && npm run build",
+    "typecheck:v05": "npx --yes -p typescript@5.9.3 tsc -p tsconfig.v05.json",
+    "test:v05": "node --experimental-strip-types --test src/v05/tests/*.test.mjs",
+    "verify:v05": "npm run typecheck:v03 && npm run test:v03 && npm run typecheck:v05 && npm run test:v05 && npm run build",
     "deploy:docs": "npm run build && node scripts/sync-docs.mjs",
     "deploy:gh-pages": "npm run build && gh-pages -d dist"
   },
