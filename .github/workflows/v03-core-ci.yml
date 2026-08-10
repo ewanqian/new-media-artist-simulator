@@ -1,0 +1,43 @@
+name: v0.3 Core Engine CI
+
+on:
+  push:
+    branches:
+      - vnext/systemic-gameplay-foundation
+  pull_request:
+    paths:
+      - 'new-media-time-simulator/**'
+      - '.github/workflows/v03-core-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: new-media-time-simulator
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: new-media-time-simulator/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck, deterministic core tests, and production build
+        run: npm run verify:v03
+
+      - name: Verify static GitHub Pages artifact
+        run: |
+          test -f dist/index.html
+          grep -Eq '(src|href)="\./assets/' dist/index.html
+          test -s dist/index.html
