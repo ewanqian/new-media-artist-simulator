@@ -11,79 +11,83 @@ async function enterWorld(page, direction = /现场 \/ 演出/) {
   await page.getByRole('button', { name: direction }).click();
 }
 
-test('v0.5 keeps the title and the map contains places rather than system tools', async ({ page }) => {
+test('v0.5 map uses a richer Shanghai place graph and keeps tools outside the map', async ({ page }) => {
   await reset(page);
   await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
-  await expect(page.getByText('NEW MEDIA ARTIST SIMULATOR')).toBeVisible();
-  await expect(page.getByText(/时间模拟器/)).toHaveCount(0);
   await enterWorld(page);
 
-  await expect(page.getByRole('heading', { name: '世界' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '地点' })).toBeVisible();
   const map = page.locator('.wf-map');
-  await expect(map.getByRole('button')).toHaveCount(5);
-  await expect(map.getByText('榕树湾工作区', { exact: true })).toBeVisible();
-  await expect(map.getByText('深港加速走廊', { exact: true })).toBeVisible();
+  await expect(map.getByRole('button')).toHaveCount(9);
+  await expect(map.getByText('苏河 / 普陀', { exact: true })).toBeVisible();
+  await expect(map.getByText('西岸 / 徐汇滨江', { exact: true })).toBeVisible();
+  await expect(map.getByText('杨浦滨江 / 大学路', { exact: true })).toBeVisible();
+  await expect(map.getByText('杭州', { exact: true })).toBeVisible();
   await expect(map.getByText('工作台', { exact: true })).toHaveCount(0);
-  await expect(map.getByText('档案', { exact: true })).toHaveCount(0);
+  await expect(map.getByText('档案库', { exact: true })).toHaveCount(0);
   await expect(map.getByText(/渲染农场/)).toHaveCount(0);
-  await expect(page.getByText(/场景铸造/)).toHaveCount(0);
-  await expect(page.getByText(/STAGE FORGE/)).toHaveCount(0);
 
-  await expect(page.getByRole('navigation', { name: '主要系统' }).getByText('工作台', { exact: true })).toBeVisible();
-  await expect(page.getByRole('navigation', { name: '主要系统' }).getByText('档案', { exact: true })).toBeVisible();
+  const nav = page.getByRole('navigation', { name: '主要系统' });
+  await expect(nav.getByText('工作台', { exact: true })).toBeVisible();
+  await expect(nav.getByText('联络', { exact: true })).toBeVisible();
+  await expect(nav.getByText('档案库', { exact: true })).toBeVisible();
 
   const noHorizontalPageOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalPageOverflow).toBe(true);
 });
 
-test('A opens archive globally and text decisions live inside a real social place', async ({ page }) => {
-  await reset(page);
-  await enterWorld(page, /系统 \/ 生成/);
-
-  await page.keyboard.press('a');
-  await expect(page.getByRole('heading', { name: '档案' })).toBeVisible();
-  await page.keyboard.press('a');
-  await expect(page.getByRole('heading', { name: '档案' })).toBeHidden();
-
-  await page.locator('.wf-map').getByRole('button', { name: /榕树湾工作区/ }).click();
-  await expect(page.getByRole('heading', { name: '榕树湾工作区' })).toBeVisible();
-  await page.getByRole('button', { name: /江边大排档/ }).click();
-  await expect(page.getByText(/有个场地空了两个小时/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /先判断值不值得去/ })).toBeVisible();
-
-  const flowIsNormal = await page.evaluate(() => {
-    const event = document.querySelector('.wf-text-event');
-    const decisions = document.querySelector('.wf-decisions');
-    if (!event || !decisions) return false;
-    const e = event.getBoundingClientRect();
-    const d = decisions.getBoundingClientRect();
-    return d.top > e.top && getComputedStyle(decisions).position === 'static';
-  });
-  expect(flowIsNormal).toBe(true);
-});
-
-test('workbench is global and specialist compute services are practice-dependent', async ({ page }) => {
+test('archive is a readable encyclopedia and activity log is separate', async ({ page }) => {
   await reset(page);
   await enterWorld(page, /研究 \/ 批评/);
-  await page.getByRole('navigation', { name: '主要系统' }).getByRole('button', { name: /工作台/ }).click();
+
+  await page.keyboard.press('k');
+  await expect(page.getByRole('heading', { name: '档案库' })).toBeVisible();
+  await page.getByRole('button', { name: /技术单 \/ Technical Rider/ }).click();
+  await expect(page.getByRole('heading', { name: '技术单 / Technical Rider' })).toBeVisible();
+  await expect(page.getByText(/不是“设备愿望清单”/)).toBeVisible();
+  await expect(page.getByRole('heading', { name: '相关词条' })).toBeVisible();
+
+  await page.keyboard.press('l');
+  await expect(page.getByRole('heading', { name: '行动记录' })).toBeVisible();
+  await expect(page.getByText(/这里只记录“你做过什么”/)).toBeVisible();
+  await page.keyboard.press('l');
+  await expect(page.getByRole('heading', { name: '行动记录' })).toBeHidden();
+});
+
+test('contacts are actionable threads rather than relationship bars', async ({ page }) => {
+  await reset(page);
+  await enterWorld(page, /系统 \/ 生成/);
+  await page.keyboard.press('c');
+  await expect(page.getByRole('heading', { name: '联络' })).toBeVisible();
+  await page.getByRole('button', { name: /李工/ }).click();
+  await expect(page.getByRole('heading', { name: '李工' })).toBeVisible();
+  await expect(page.getByText(/等你补一版技术单/)).toBeVisible();
+  await expect(page.getByRole('button', { name: /确认信号链/ })).toBeVisible();
+});
+
+test('workbench specialist services are practice-dependent', async ({ page }) => {
+  await reset(page);
+  await enterWorld(page, /研究 \/ 批评/);
+  await page.keyboard.press('w');
   await expect(page.getByRole('heading', { name: '工作台' })).toBeVisible();
-  await expect(page.getByText('远程算力节点', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('远程算力', { exact: true })).toHaveCount(0);
 
   await reset(page);
   await enterWorld(page, /影像 \/ 扫描/);
-  await page.getByRole('navigation', { name: '主要系统' }).getByRole('button', { name: /工作台/ }).click();
-  await expect(page.getByText('远程算力节点', { exact: true })).toBeVisible();
-  await expect(page.getByText('离线预演节点', { exact: true })).toBeVisible();
+  await page.keyboard.press('w');
+  await expect(page.getByText('远程算力', { exact: true })).toBeVisible();
+  await expect(page.getByText('离线预演', { exact: true })).toBeVisible();
 });
 
-test('venue preview is entered through a real venue rather than from the world map', async ({ page }) => {
+test('venue preview is entered through a real venue and nested local map', async ({ page }) => {
   await reset(page);
   await enterWorld(page, /空间 \/ 装置/);
 
-  await page.locator('.wf-map').getByRole('button', { name: /深港加速走廊/ }).click();
-  await page.getByRole('button', { name: /黑盒测试场/ }).click();
+  await page.locator('.wf-map').getByRole('button', { name: /西岸 \/ 徐汇滨江/ }).click();
+  await expect(page.getByRole('heading', { name: '西岸 / 徐汇滨江' })).toBeVisible();
+  await page.getByRole('button', { name: /多功能黑盒/ }).click();
   await expect(page.getByRole('button', { name: /场地预演/ })).toBeVisible();
-  await page.getByRole('button', { name: /场地预演/ }).click();
+  await page.getByRole('button', { name: /场地预演/ }).first().click();
 
   await expect(page.getByRole('heading', { name: '场地预演' })).toBeVisible();
   await expect(page.getByRole('button', { name: /平面屏/ })).toBeVisible();
