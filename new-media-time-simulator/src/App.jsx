@@ -21,7 +21,9 @@ const V05WorldHub = lazy(() => import('./v05/web/V05WorldHub.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
-  const preview = new URLSearchParams(window.location.search).get('core');
+  const params = new URLSearchParams(window.location.search);
+  const pathPreview = window.location.pathname.includes('/v05/') ? 'v05' : window.location.pathname.includes('/v03/') ? 'v03' : null;
+  const preview = params.get('core') || pathPreview;
   if (preview === 'v05') {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入 v0.5 World Hub…</section></main>}>
