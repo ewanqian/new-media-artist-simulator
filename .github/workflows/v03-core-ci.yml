@@ -1,0 +1,74 @@
+name: v0.3 Core Engine CI
+
+on:
+  push:
+    branches:
+      - vnext/systemic-gameplay-foundation
+  pull_request:
+    paths:
+      - 'new-media-time-simulator/**'
+      - '.github/workflows/v03-core-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: new-media-time-simulator
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: new-media-time-simulator/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck, deterministic core tests, and production build
+        run: npm run verify:v03
+
+      - name: Verify static GitHub Pages artifact
+        run: |
+          test -f dist/index.html
+          grep -Eq '(src|href)="\./assets/' dist/index.html
+          test -s dist/index.html
+
+      - name: Install pinned browser smoke-test harness
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.60.0
+          npx playwright install --with-deps chromium
+
+      - name: Desktop and mobile browser smoke tests
+        run: npx playwright test -c playwright.v03.config.mjs
+
+      - name: Publish v0.3 branch preview under /v03/
+        if: github.event_name == 'push' && github.ref == 'refs/heads/vnext/systemic-gameplay-foundation'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf /tmp/nmas-pages
+          git clone --quiet --branch gh-pages --single-branch "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" /tmp/nmas-pages
+          rm -rf /tmp/nmas-pages/v03
+          mkdir -p /tmp/nmas-pages/v03
+          cp -R new-media-time-simulator/dist/. /tmp/nmas-pages/v03/
+          touch /tmp/nmas-pages/.nojekyll
+          cd /tmp/nmas-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v03 .nojekyll
+          if git diff --cached --quiet; then
+            echo "Preview already current."
+          else
+            git commit -m "deploy: update v0.3 branch preview"
+            git push origin gh-pages
+          fi
