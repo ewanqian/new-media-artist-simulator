@@ -17,11 +17,19 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
+const V05WorldHub = lazy(() => import('./v05/web/V05WorldHub.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
-  const isV03CorePreview = new URLSearchParams(window.location.search).get('core') === 'v03';
-  if (isV03CorePreview) {
+  const preview = new URLSearchParams(window.location.search).get('core');
+  if (preview === 'v05') {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入 v0.5 World Hub…</section></main>}>
+        <V05WorldHub />
+      </Suspense>
+    );
+  }
+  if (preview === 'v03') {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入 v0.3 Core Engine…</section></main>}>
         <V03CorePreview />
