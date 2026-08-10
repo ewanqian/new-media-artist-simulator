@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import Assessment from './components/Assessment.jsx';
 import ArchetypePicker from './components/ArchetypePicker.jsx';
 import Dashboard from './components/Dashboard.jsx';
@@ -16,9 +16,22 @@ import {
   startProject
 } from './engine/gameEngine.js';
 
+const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
+  const isV03CorePreview = new URLSearchParams(window.location.search).get('core') === 'v03';
+  if (isV03CorePreview) {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入 v0.3 Core Engine…</section></main>}>
+        <V03CorePreview />
+      </Suspense>
+    );
+  }
+  return <LegacySimulator />;
+}
+
+function LegacySimulator() {
   const [state, setState] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
