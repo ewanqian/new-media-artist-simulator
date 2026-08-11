@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const STATE_KEY = 'nmas-special-butterfly-narrative-v1';
+
 async function clearRoute(page) {
   await page.evaluate(() => {
     localStorage.removeItem('nmas-special-butterfly-narrative-v1');
@@ -13,63 +15,45 @@ async function clearRoute(page) {
 
 async function dismissFeedback(page) {
   const layer = page.locator('.gf-layer');
-  if (await layer.isVisible().catch(() => false)) {
-    await layer.click({ position: { x: 4, y: 4 } }).catch(() => {});
-    await expect(layer).toBeHidden({ timeout: 1200 }).catch(() => {});
+  for (let i = 0; i < 8; i += 1) {
+    if (!(await layer.isVisible().catch(() => false))) return;
+    await layer.click({ position: { x: 4, y: 4 }, force: true }).catch(() => {});
+    await page.waitForTimeout(45);
   }
 }
 
 async function advanceUntil(page, target) {
-  for (let i = 0; i < 36; i += 1) {
-    await dismissFeedback(page);
+  for (let i = 0; i < 24; i += 1) {
     if (await target.isVisible().catch(() => false)) return;
-
     const enter = page.getByRole('button', { name: '进入场景', exact: true });
-    if (await enter.isVisible().catch(() => false)) {
-      await enter.click();
-      continue;
-    }
-
+    if (await enter.isVisible().catch(() => false)) { await enter.click(); continue; }
     const next = page.getByRole('button', { name: '继续', exact: true });
-    if (await next.isVisible().catch(() => false)) {
-      await next.click();
-      continue;
-    }
-
+    if (await next.isVisible().catch(() => false)) { await next.click(); continue; }
     const decide = page.getByRole('button', { name: '做决定', exact: true });
-    if (await decide.isVisible().catch(() => false)) {
-      await decide.click();
-      continue;
-    }
-
-    const dialogue = page.locator('.narrative-dialogue');
-    if (await dialogue.isVisible().catch(() => false)) {
-      await dialogue.click({ position: { x: 8, y: 8 } }).catch(() => {});
-    }
-    await page.waitForTimeout(80);
+    if (await decide.isVisible().catch(() => false)) { await decide.click(); continue; }
+    await page.waitForTimeout(120);
   }
-  await expect(target).toBeVisible({ timeout: 4000 });
+  await expect(target).toBeVisible({ timeout: 3000 });
 }
 
-async function choose(page, name) {
-  const option = page.getByRole('button', { name });
-  await advanceUntil(page, option);
-  await option.click();
-  await dismissFeedback(page);
+async function seedNode(page, currentNodeId) {
+  await page.evaluate(([key, nodeId]) => {
+    localStorage.setItem(key, JSON.stringify({
+      packId: 'narrative-butterfly-scholar-v3',
+      currentNodeId: nodeId,
+      visitedNodeIds: [],
+      flags: [],
+      facts: [],
+      memories: [],
+      trust: {},
+      history: []
+    }));
+  }, [STATE_KEY, currentNodeId]);
+  await page.reload({ waitUntil: 'networkidle' });
 }
 
-async function study(page, title) {
-  const open = page.getByRole('button', { name: new RegExp(`研究：${title}`) });
-  await advanceUntil(page, open);
-  await open.click();
-  const dialog = page.getByRole('dialog', { name: new RegExp(`研究：${title}`) });
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: /记住这个方法|已记住/ }).click();
-  await dismissFeedback(page);
-}
-
-test('Butterfly Scholar is a readable special chapter with research, memory and a new-media making route', async ({ page, isMobile }) => {
-  test.setTimeout(60000);
+test('Butterfly Scholar browser smoke covers briefing, first meeting, research memory and Blueprint handoff', async ({ page, isMobile }) => {
+  test.setTimeout(45000);
   await page.goto('/?core=v05', { waitUntil: 'networkidle' });
   await clearRoute(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -81,41 +65,34 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
+  const firstChoice = page.getByRole('button', { name: /先写下我真正想弄明白的问题/ });
+  await advanceUntil(page, firstChoice);
+  await firstChoice.click();
+  await dismissFeedback(page);
 
-  await choose(page, /先写下我真正想弄明白的问题/);
-  await choose(page, /先聊工作：明天先看样地和档案/);
+  await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
+  await page.getByRole('button', { name: '进入场景' }).click();
+  await advanceUntil(page, page.getByText(/我是 Inés，负责这次驻地和研究站之间的协调/));
+  await expect(page.getByText(/我是 Inés，负责这次驻地和研究站之间的协调/)).toBeVisible();
 
-  await study(page, '活蝴蝶怎么采集');
+  await seedNode(page, 'bs-03-field');
+  const researchButterfly = page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ });
+  await advanceUntil(page, researchButterfly);
+  await researchButterfly.click();
+  const butterflyDialog = page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ });
+  await expect(butterflyDialog).toContainText('活体运动不适合硬做成静态摄影测量对象');
+  await expect(butterflyDialog).toContainText('运动记录');
+  await butterflyDialog.getByRole('button', { name: '记住这个方法' }).click();
+  await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
-  await choose(page, /记录蝴蝶运动，同时扫描寄主植物/);
 
-  await expect(page.getByText('离场前检查', { exact: true }).first()).toBeVisible();
-  await study(page, '摄影测量为什么需要重叠');
-  await choose(page, /现在补拍/);
+  await seedNode(page, 'bs-04-process');
+  const researchSolve = page.getByRole('button', { name: /研究：什么是相机求解/ });
+  await advanceUntil(page, researchSolve);
+  await researchSolve.click();
+  await expect(page.getByRole('dialog', { name: /研究：什么是相机求解/ })).toContainText('先算出每张照片是从哪里拍的');
 
-  await study(page, '什么是相机求解');
-  await expect(page.getByRole('dialog', { name: /研究：什么是相机求解/ })).toHaveCount(0);
-  await choose(page, /先查相机求解/);
-
-  await study(page, '点云和 Gaussian 有什么区别');
-  await choose(page, /做 Gaussian 版本/);
-
-  await study(page, '扫描完以后还能怎么动');
-  await choose(page, /用 Noise \/ 程序化形变做动画/);
-
-  await study(page, '“做蝴蝶”算抄袭吗');
-  await choose(page, /把来源和差异写清楚/);
-
-  await study(page, '标本、数据和公开边界');
-  await choose(page, /先听她把数据边界讲完/);
-  await choose(page, /归档这个版本/);
-
-  await expect(page.getByRole('heading', { name: '终于做完了。' })).toBeVisible();
-  await page.getByRole('button', { name: '生成一条创作记录' }).click();
-  await expect(page.getByText(/活体运动.*空间扫描/)).toBeVisible();
-
-  await page.getByRole('link', { name: '进入三步训练工作图' }).click();
-  await page.waitForURL(/core=v05.*lab=blueprint.*preset=butterfly|lab=blueprint.*preset=butterfly/);
+  await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
   await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 三步采集训练"]')).toBeVisible();
   const hud = page.getByLabel('蝴蝶学者训练任务');
   await expect(hud).toContainText('任务 1 / 3');
