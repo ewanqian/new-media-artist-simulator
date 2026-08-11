@@ -1,7 +1,24 @@
 import { useEffect } from 'react';
+import { buildButterflyScholarPreset } from '../blueprintEditorCatalog.ts';
 import V05BlueprintEditorV2 from './V05BlueprintEditorV2.jsx';
 
+const AUTOSAVE_KEY = 'nmas-blueprint-editor-autosave-v2';
+
+function loadRequestedPreset() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('preset') !== 'butterfly') return;
+  try {
+    const current = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
+    if (current?.id === 'bp-butterfly-scholar-field-capture') return;
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarPreset()));
+  } catch {
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarPreset()));
+  }
+}
+
 export default function V05BlueprintEditor() {
+  loadRequestedPreset();
+
   useEffect(() => {
     let nodePointerActive = false;
     let releaseTimer = null;
@@ -30,9 +47,6 @@ export default function V05BlueprintEditor() {
       const target = event.target instanceof Element ? event.target : null;
       if (target?.closest('.be-node')) return;
       if (target?.closest('.be-viewport')) {
-        // Pointer capture can retarget the synthetic click to the viewport after
-        // a node click/drag. The node already selected itself on pointerdown;
-        // do not let the viewport immediately clear that selection.
         event.stopPropagation();
       }
     };
