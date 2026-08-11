@@ -17,14 +17,13 @@ function loadSave() {
 }
 
 function choiceDisabled(choice, save) {
-  // Resource truth belongs to the command runtime. UI copy such as
-  // “注意力 -1 · 恢复方法” is descriptive text and must never become logic.
-  // Structured requirements can opt into pre-disabling later; otherwise a
-  // command remains clickable and the runtime returns the authoritative notice.
+  // Only positive requirements can block an action. A negative cash balance is
+  // debt, not a reason to disable an otherwise ¥0 action.
   const requirements = choice?.requirements || {};
   const attention = Number(requirements.attention || 0);
   const cash = Number(requirements.cash || 0);
-  return Number(save?.attention || 0) < attention || Number(save?.cash || 0) < cash;
+  return (attention > 0 && Number(save?.attention || 0) < attention)
+    || (cash > 0 && Number(save?.cash || 0) < cash);
 }
 
 function progressFor(stageId, save) {
