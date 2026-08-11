@@ -38,7 +38,7 @@ test('Butterfly Scholar special route is reachable from home, completes narrativ
   await expect(page.getByRole('heading', { name: '花园第一次被别人进入' })).toBeVisible();
   await page.getByRole('button', { name: /归档：保留分歧和关系/ }).click();
   await expect(page.getByText('ROUTE COMPLETE', { exact: true })).toBeVisible();
-  await expect(page.getByText(/人物记忆/)).toBeVisible();
+  await expect(page.getByText(/Inés 信任：\d+ · 人物记忆：\d+/)).toBeVisible();
 
   await page.getByRole('link', { name: '打开最终工作图' }).click();
   await page.waitForURL(/core=v05.*lab=blueprint.*preset=butterfly|lab=blueprint.*preset=butterfly/);
