@@ -12,8 +12,9 @@ async function start(page) {
 
 async function doMinimumSystem(page) {
   await page.getByRole('button', { name: /做一个最小系统/ }).click();
-  await expect(page.getByRole('heading', { name: '做一个最小系统' })).toBeVisible();
-  await page.getByRole('button', { name: '执行这张卡' }).click();
+  const sheet = page.locator('.vx-sheet');
+  await expect(sheet.getByRole('heading', { name: '做一个最小系统' })).toBeVisible();
+  await sheet.getByRole('button', { name: '执行这张卡' }).click();
 }
 
 test('new game starts with studio and archive only', async ({ page }) => {
@@ -63,10 +64,11 @@ test('visiting a readable place unlocks a project grown from prior actions', asy
   await page.getByRole('navigation', { name: '主要系统' }).getByRole('button', { name: '探索', exact: true }).click();
 
   await page.getByRole('button', { name: /基础工作室/ }).click();
-  await expect(page.getByRole('heading', { name: '基础工作室' })).toBeVisible();
-  await expect(page.getByText('费用低', { exact: true })).toBeVisible();
-  await expect(page.getByText('适合长期试错', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: '去一次' }).click();
+  const placeSheet = page.locator('.vx-sheet');
+  await expect(placeSheet.getByRole('heading', { name: '基础工作室' })).toBeVisible();
+  await expect(placeSheet.getByText('费用低', { exact: true })).toBeVisible();
+  await expect(placeSheet.getByText('适合长期试错', { exact: true })).toBeVisible();
+  await placeSheet.getByRole('button', { name: '去一次' }).click();
 
   await expect(page.getByRole('heading', { name: '最小反馈系统' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: '主要系统' });
@@ -81,10 +83,10 @@ test('project work reveals only contacts the player actually met', async ({ page
   const nav = page.getByRole('navigation', { name: '主要系统' });
   await nav.getByRole('button', { name: '探索', exact: true }).click();
   await page.getByRole('button', { name: /基础工作室/ }).click();
-  await page.getByRole('button', { name: '去一次' }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
 
   await page.getByRole('button', { name: /做一个一页项目版本/ }).click();
-  await page.getByRole('button', { name: '执行这张卡' }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '执行这张卡' }).click();
 
   await expect(nav.getByRole('button', { name: '联络', exact: true })).toBeVisible();
   await nav.getByRole('button', { name: '联络', exact: true }).click();
@@ -102,9 +104,9 @@ test('contact chat creates a delayed reply and then unlocks workbench', async ({
   const nav = page.getByRole('navigation', { name: '主要系统' });
   await nav.getByRole('button', { name: '探索', exact: true }).click();
   await page.getByRole('button', { name: /基础工作室/ }).click();
-  await page.getByRole('button', { name: '去一次' }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
   await page.getByRole('button', { name: /做一个一页项目版本/ }).click();
-  await page.getByRole('button', { name: '执行这张卡' }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '执行这张卡' }).click();
   await nav.getByRole('button', { name: '联络', exact: true }).click();
 
   await page.getByRole('button', { name: /看一个当前版本/ }).click();
@@ -127,10 +129,12 @@ test('archive is large readable reference content and activity log remains separ
   await page.getByPlaceholder('搜索词条').fill('媒体考古');
   await expect(page.getByRole('button', { name: /媒体考古实验室/ })).toBeVisible();
   await page.getByRole('button', { name: /媒体考古实验室/ }).click();
-  await expect(page.getByRole('heading', { name: '媒体考古实验室' })).toBeVisible();
+  await expect(page.locator('.vx-reader').getByRole('heading', { name: '媒体考古实验室' })).toBeVisible();
   await expect(page.locator('.vx-reader').getByText(/复古滤镜/)).toBeVisible();
 
   await page.getByRole('button', { name: '记录', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '行动记录' })).toBeVisible();
-  await expect(page.getByText('媒体考古实验室', { exact: true })).toHaveCount(1);
+  const log = page.locator('.vx-log');
+  await expect(log.getByRole('heading', { name: '行动记录' })).toBeVisible();
+  await expect(log.getByText('媒体考古实验室', { exact: true })).toHaveCount(0);
+  await expect(log.getByText(/复古滤镜/)).toHaveCount(0);
 });
