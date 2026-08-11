@@ -6,6 +6,7 @@ import {
   narrativeKnownFacts,
   narrativeNodeById
 } from '../narrativeEngine.ts';
+import { editorNodeDefinitions } from '../blueprintEditorCatalog.ts';
 import {
   butterflyScholarIdentity,
   butterflyScholarNarrativePack,
@@ -21,6 +22,7 @@ const emptyWorld = () => ({
   unlockNodeIds: [], evidenceIds: [], methodIds: [], threadIds: [], archiveEntryIds: [], projectTags: []
 });
 const unique = (values) => [...new Set(values.filter(Boolean))];
+const nodeLabels = new Map(editorNodeDefinitions.map((item) => [item.id, item.label]));
 
 function v05Href(query = '') {
   const params = new URLSearchParams(window.location.search);
@@ -99,10 +101,10 @@ export default function V05ButterflyScholarRoute() {
 
         <aside className="bs-context">
           <section className="bs-profile"><small>YOU ARE</small><strong>{butterflyScholarIdentity.role}</strong><p>{butterflyScholarIdentity.practice}</p><blockquote>{butterflyScholarIdentity.currentQuestion}</blockquote></section>
-          <section><small>BLUEPRINT / UNLOCKED</small><strong>{world.unlockNodeIds.length} 个路线节点</strong><div className="bs-tags">{world.unlockNodeIds.slice(-8).map((id) => <span key={id}>{id}</span>)}</div><a className="bs-inline-link" href={blueprintHref}>打开工作图 →</a></section>
+          <section><small>BLUEPRINT / UNLOCKED</small><strong>{world.unlockNodeIds.length} 个路线节点</strong><div className="bs-tags">{world.unlockNodeIds.slice(-8).map((id) => <span key={id}>{nodeLabels.get(id) || id}</span>)}</div><a className="bs-inline-link" href={blueprintHref}>打开工作图 →</a></section>
           <section><small>RECORDS</small><strong>{world.evidenceIds.length} Evidence · {world.methodIds.length} Method</strong><p>{world.threadIds.length} 个未决 Thread · {world.archiveEntryIds.length} 个 Archive 条目</p></section>
           <section className={contradictions.length ? 'bs-alert' : ''}><small>NARRATIVE STATE</small><strong>{knownFacts.length} 条已知信息</strong><p>{contradictions.length ? `${contradictions.length} 条说法当前互相冲突。` : '目前没有显式矛盾。'}</p><p>Inés 信任：{state.trust.ines || 0} · 人物记忆：{state.memories.length}</p></section>
-          <section><small>FIELD TRAINING</small><strong>7 个采集到作品的动作</strong><ol>{butterflyScholarTraining.map((step) => <li key={step.id}><b>{step.title}</b><span>{step.plain}</span></li>)}</ol></section>
+          <section className="bs-training"><small>FIELD TRAINING / 7 STEPS</small><strong>采集 → 重建 → 作品</strong><ol>{butterflyScholarTraining.map((step) => <li key={step.id}><b>{step.title}</b><span>{step.plain}</span>{step.operation && <em>{step.operation}</em>}{step.reference && <small>{step.reference}</small>}</li>)}</ol></section>
         </aside>
       </div>
     </main>
