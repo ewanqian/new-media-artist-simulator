@@ -32,6 +32,7 @@ test('new game starts with studio and archive only', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: '今天在工作室做什么' })).toBeVisible();
   await expect(page.locator('.vx-card')).toHaveCount(3);
+  await expect(page.getByRole('heading', { name: '工作室之外', exact: true })).toHaveCount(0);
   await expect(page.getByText('苏河 / 普陀', { exact: true })).toHaveCount(0);
   await expect(page.getByText(/浦东|徐汇滨江|杨浦滨江/)).toHaveCount(0);
 });
@@ -55,6 +56,26 @@ test('first concrete action unlocks exploration without dumping the whole game',
   expect(fontSize).toBeGreaterThanOrEqual(15);
   const noHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalOverflow).toBe(true);
+});
+
+test('text ecology appears after action and deepens inside a place', async ({ page }) => {
+  await reset(page);
+  await start(page);
+  await expect(page.locator('.vx-fragment')).toHaveCount(0);
+  await doMinimumSystem(page);
+
+  await expect(page.getByRole('heading', { name: '工作室之外', exact: true })).toBeVisible();
+  expect(await page.locator('.vx-fragment').count()).toBeGreaterThanOrEqual(1);
+
+  const nav = page.getByRole('navigation', { name: '主要系统' });
+  await nav.getByRole('button', { name: '探索', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '今天看到 / 听到', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /基础工作室/ }).click();
+  const sheet = page.locator('.vx-sheet');
+  await expect(sheet.getByText('这个地方的文本不会完全一致', { exact: true })).toBeVisible();
+  expect(await sheet.locator('.vx-fragment').count()).toBeGreaterThanOrEqual(2);
+  const layers = await sheet.locator('.vx-fragment').evaluateAll((nodes) => [...new Set(nodes.map((node) => node.dataset.layer))]);
+  expect(layers.length).toBeGreaterThanOrEqual(2);
 });
 
 test('visiting a readable place unlocks a project grown from prior actions', async ({ page }) => {
@@ -94,6 +115,8 @@ test('project work reveals only contacts the player actually met', async ({ page
   await expect(page.getByText(/做实时影像和小型装置/)).toBeVisible();
   await expect(page.getByText(/在基础工作室测试时认识/)).toBeVisible();
   await expect(page.getByText(/先别做 PPT/)).toBeVisible();
+  await expect(page.getByRole('heading', { name: '这张关系网里', exact: true })).toBeVisible();
+  await expect(page.getByText(/↔ 李工/)).toBeVisible();
   await expect(page.getByRole('button', { name: /李工/ })).toHaveCount(0);
 });
 
@@ -137,4 +160,24 @@ test('archive is large readable reference content and activity log remains separ
   await expect(log.getByRole('heading', { name: '行动记录' })).toBeVisible();
   await expect(log.getByText('媒体考古实验室', { exact: true })).toHaveCount(0);
   await expect(log.getByText(/复古滤镜/)).toHaveCount(0);
+});
+
+test('dark interactions keep explicit light text in light color scheme', async ({ page }) => {
+  await reset(page);
+  const startButton = page.getByRole('button', { name: '开始新的实践' });
+  const titleColors = await startButton.evaluate((node) => ({
+    color: getComputedStyle(node).color,
+    background: getComputedStyle(node).backgroundColor,
+    scheme: getComputedStyle(document.documentElement).colorScheme
+  }));
+  expect(titleColors.color).toBe('rgb(255, 255, 255)');
+  expect(titleColors.background).toBe('rgb(23, 23, 25)');
+  expect(titleColors.scheme).toContain('light');
+
+  await start(page);
+  await doMinimumSystem(page);
+  const nav = page.getByRole('navigation', { name: '主要系统' });
+  await nav.getByRole('button', { name: '探索', exact: true }).click();
+  const activeFilter = page.getByRole('button', { name: '全部', exact: true });
+  expect(await activeFilter.evaluate((node) => getComputedStyle(node).color)).toBe('rgb(255, 255, 255)');
 });
