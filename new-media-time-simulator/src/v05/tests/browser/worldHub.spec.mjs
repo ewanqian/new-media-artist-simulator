@@ -151,7 +151,7 @@ test('main quest line is playable across environment action contact diagnosis an
 
   await openPrimary(page, '工作台');
   await openSub(page, '工作台', '工作');
-  await page.getByRole('button', { name: /诊断/ }).click();
+  await page.locator('.tri-action-grid').getByRole('button', { name: /诊断/ }).click();
 
   await openSub(page, '工作台', '项目');
   await page.getByRole('button', { name: /收缩到当前能力可可靠完成的版本/ }).click();
