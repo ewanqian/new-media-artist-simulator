@@ -1,6 +1,7 @@
 import { contactSeeds } from '../legacyDeck.ts';
 import { deriveProjectStage } from '../gameLoop.ts';
 import {
+  contextualFragments,
   fragmentsForKnowledge,
   relationshipEdgesFor,
   sourceLayerLabels,
@@ -62,7 +63,7 @@ export function PlaceTextFragments({ placeId, week }) {
 
 export function ContactNetworkPanel({ contact, week }) {
   const edges = relationshipEdgesFor(contact.id);
-  const direct = experienceStream(week, [], [], undefined, 6).filter((fragment) => fragment.contactIds?.includes(contact.id)).slice(0, 1);
+  const direct = contextualFragments({ week, contactId: contact.id, limit: 1 });
   return (
     <section className="vx-contact-network">
       <div className="vx-section-title"><h2>这张关系网里</h2><span>不是好感度</span></div>
