@@ -43,7 +43,7 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
 
-  await choose(page, /去。先写下我真正想弄明白的问题/);
+  await choose(page, /接受。先写下我真正想弄明白的问题/);
   await choose(page, /先聊工作：明天先看样地和档案/);
 
   await revealNode(page);
