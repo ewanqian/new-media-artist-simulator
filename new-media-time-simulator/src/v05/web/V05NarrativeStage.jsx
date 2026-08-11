@@ -37,15 +37,6 @@ export default function V05NarrativeStage({
   }, [phase, visibleCount, paragraphs.length, meta.pacing]);
 
   const done = visibleCount >= paragraphs.length;
-
-  useEffect(() => {
-    if (!done || !node?.choices?.length) return;
-    const baseDelay = instrument || minorActions.length ? 650 : 300;
-    const delay = meta.holdChoices ? Math.max(baseDelay, 850) : baseDelay;
-    const timer = window.setTimeout(() => setChoicesVisible(true), delay);
-    return () => window.clearTimeout(timer);
-  }, [done, instrument, minorActions.length, meta.holdChoices, node?.choices?.length]);
-
   const locationLine = useMemo(() => [meta.time, scene?.location].filter(Boolean).join(' · '), [meta.time, scene?.location]);
 
   function revealNext() {
@@ -53,11 +44,7 @@ export default function V05NarrativeStage({
       setPhase('dialogue');
       return;
     }
-    if (!done) {
-      setVisibleCount((value) => Math.min(value + 1, paragraphs.length));
-      return;
-    }
-    setChoicesVisible(true);
+    if (!done) setVisibleCount((value) => Math.min(value + 1, paragraphs.length));
   }
 
   if (phase === 'loading') {
