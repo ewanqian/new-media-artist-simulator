@@ -68,6 +68,30 @@ test('node palette creates nodes and desktop output-to-input clicks create a lin
   }
 });
 
+test('camera controls auto-layout and lightweight groups work without making Space a create shortcut', async ({ page, isMobile }) => {
+  await openEditor(page);
+  await clearEditorStorage(page);
+  await page.reload({ waitUntil: 'networkidle' });
+  if (isMobile) return;
+
+  const canvas = page.getByLabel('节点编辑画布');
+  await expect(canvas.getByRole('button', { name: /适配/ })).toBeVisible();
+  await expect(canvas.getByRole('button', { name: /居中/ })).toBeVisible();
+  await canvas.getByRole('button', { name: /自动排序/ }).click();
+  await canvas.getByRole('button', { name: /适配/ }).click();
+
+  await page.locator('.be-node[data-node-id="p2"]').click();
+  await canvas.getByRole('button', { name: /连接成组/ }).click();
+  await expect(page.locator('.be-group-frame')).toHaveCount(1);
+  await page.locator('.be-group-frame').getByRole('button', { name: '简化' }).click();
+  await expect(page.locator('.be-group-frame')).toHaveClass(/compact/);
+
+  await page.keyboard.press('Space');
+  await expect(page.locator('.be-palette')).toHaveCount(0);
+  await page.keyboard.press('Shift+A');
+  await expect(page.locator('.be-palette')).toBeVisible();
+});
+
 test('LED parameters and Notes are editable and autosave survives reload', async ({ page, isMobile }) => {
   await openEditor(page);
   await clearEditorStorage(page);
@@ -135,7 +159,7 @@ test('free mode starts blank and mobile switches library canvas inspector', asyn
   await clearEditorStorage(page);
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.locator('.be-node')).toHaveCount(0);
-  await expect(page.getByText(/Shift\+A 或 Space 新建节点/)).toBeVisible();
+  await expect(page.getByText(/Shift\+A 新建节点 · Space 拖动画布/)).toBeVisible();
 
   if (isMobile) {
     const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
