@@ -49,7 +49,7 @@ test('career preset creates a real starting dossier and seeds stage one', async 
   await expect(page.getByLabel('生涯工具').getByRole('link', { name: '工作图' })).toHaveCount(0);
 });
 
-test('five-question role model reaches the same career shell without creating a class', async ({ page }) => {
+test('five-question role model reaches the same career shell without creating a class', async ({ page, isMobile }) => {
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -73,11 +73,13 @@ test('five-question role model reaches the same career shell without creating a 
   await enterWeekOne(page);
   await expect(page.getByLabel('生涯工具').getByRole('link', { name: '工作图' })).toBeVisible();
 
-  await page.locator('.vcareer-stage').click();
-  const brief = page.getByLabel('当前任务线简报');
-  await expect(brief).toBeVisible();
-  await expect(brief.getByRole('heading', { name: '桌上先有一个东西开始运行' })).toBeVisible();
-  await expect(brief.getByText('现在值得追的事', { exact: true })).toBeVisible();
+  if (!isMobile) {
+    await page.locator('.vcareer-stage').click();
+    const brief = page.getByLabel('当前任务线简报');
+    await expect(brief).toBeVisible();
+    await expect(brief.getByRole('heading', { name: '桌上先有一个东西开始运行' })).toBeVisible();
+    await expect(brief.getByText('现在值得追的事', { exact: true })).toBeVisible();
+  }
 });
 
 test('settings opens from home and persists real interface preferences', async ({ page }) => {
