@@ -40,8 +40,10 @@ function message(save: CareerState, id: string, text: string) {
   return next;
 }
 function spend(save: CareerState, attention = 0, cash = 0): CareerState | null {
-  if (Number(save.attention || 0) < attention || Number(save.cash || 0) < cash) return null;
-  return { ...save, attention: Number(save.attention || 0) - attention, cash: Number(save.cash || 0) - cash };
+  const currentAttention = Number(save.attention || 0);
+  const currentCash = Number(save.cash || 0);
+  if ((attention > 0 && currentAttention < attention) || (cash > 0 && currentCash < cash)) return null;
+  return { ...save, attention: currentAttention - attention, cash: currentCash - cash };
 }
 function metric(save: CareerState, key: 'coherence' | 'stability' | 'siteFit' | 'documentation', delta: number) {
   const current = Number(save.projectMetrics?.[key] || 0);
@@ -157,7 +159,7 @@ export function careerStageFourScene(save: CareerState): CareerScene {
         choices: [
           { id: 'story:stage4:parent-feedback', title: 'Parent：最小反馈系统', detail: '保留“输入改变规则，规则改变反馈”的核心关系。', cost: '注意力 -1 · System rule', kind: 'build' },
           { id: 'story:stage4:parent-recovery', title: 'Parent：现场恢复链', detail: '保留“基线 → 故障 → 证据 → 恢复”的时间结构。', cost: '注意力 -1 · Field method', kind: 'build' },
-          { id: 'story:stage4:parent-handoff', title: 'Parent：一页项目 / 交接接口', detail: '保留“让另一个人能理解并接手”的传递结构。', cost: '注意力 -1 · Handoff', kind: 'build' }
+          { id: 'story:stage4:parent-handoff', title: 'Parent：一页项目 / 交接接口', detail: '保留“让另一个人理解和接手”的传递结构。', cost: '注意力 -1 · Handoff', kind: 'build' }
         ]
       };
     }
