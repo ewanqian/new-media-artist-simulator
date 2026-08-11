@@ -94,7 +94,7 @@ test('map is a spatial layer with regions, connections, facilities and enterable
   expect(noHorizontalOverflow).toBe(true);
 });
 
-test('visiting a real place forms the project and advances episode two', async ({ page }) => {
+test('visiting a real work place forms the project and advances episode two without pretending it is venue testing', async ({ page }) => {
   await reset(page);
   await start(page);
   await doMinimumSystem(page);
@@ -102,7 +102,7 @@ test('visiting a real place forms the project and advances episode two', async (
 
   await openNav(page, '项目');
   await expect(page.getByRole('heading', { name: '最小反馈系统' })).toBeVisible();
-  await expect(page.getByText('没进场地', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('没进场地', { exact: true })).toBeVisible();
 
   await openNav(page, 'EPISODE');
   await expect(page.getByText('3. 形成项目', { exact: true })).toBeVisible();
@@ -122,13 +122,12 @@ test('episode three requires both project articulation and learning', async ({ p
   await expect(page.getByText('3. 形成项目', { exact: true })).toBeVisible();
 
   await openNav(page, '档案');
-  const firstEntry = page.locator('.vx-entry-list button').first();
-  await firstEntry.click();
+  await page.locator('.vx-entry-list button').first().click();
   await openNav(page, 'EPISODE');
   await expect(page.getByText('4. 建立协作', { exact: true })).toBeVisible();
 });
 
-test('contact, workbench upgrade and blackbox visit complete the five-part opening episode', async ({ page }) => {
+test('contact, weekly reset, workbench upgrade and blackbox visit complete the five-part opening episode', async ({ page }) => {
   await reset(page);
   await start(page);
   await doMinimumSystem(page);
@@ -143,6 +142,8 @@ test('contact, workbench upgrade and blackbox visit complete the five-part openi
   await openNav(page, '联络');
   await expect(page.getByRole('heading', { name: '林', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /看一个当前版本/ }).click();
+  await page.getByRole('button', { name: '结束本周' }).click();
+  await expect(page.getByText(/发我一个能跑的版本/)).toBeVisible();
 
   await openNav(page, '工作台');
   const outputCard = page.locator('.vx-capability').filter({ hasText: '输出 / Output' });
@@ -150,9 +151,9 @@ test('contact, workbench upgrade and blackbox visit complete the five-part openi
   await outputCard.getByRole('button', { name: '升级 · ¥800' }).click();
 
   await openNav(page, '地图');
-  const westbund = page.locator('.gh-world-map > button').filter({ hasText: '西岸' }).first();
-  await westbund.click();
+  await page.locator('.gh-world-map > button').filter({ hasText: '西岸' }).first().click();
   await page.getByRole('button', { name: /黑盒 \/ 演出空间/ }).click();
+  await expect(page.locator('.vx-sheet').getByRole('button', { name: '去一次' })).toBeEnabled();
   await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
 
   await openNav(page, 'EPISODE');
