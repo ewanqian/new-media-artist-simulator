@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { editorNodeById } from '../blueprintEditorCatalog.ts';
 import { BUTTERFLY_TRAINING_OBJECTIVES } from '../butterflyScholarTrainingPreset.ts';
 import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-training-hud.css';
 
 const AUTOSAVE_KEY = 'nmas-blueprint-editor-autosave-v2';
-const COMPLETE_KEY = 'nmas-butterfly-training-complete-v1';
+const COMPLETE_KEY = 'nmas-butterfly-training-complete-v2';
 
 function readBlueprint() {
   try { return JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null'); } catch { return null; }
@@ -28,7 +27,7 @@ export default function V05ButterflyTrainingHUD() {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    const id = window.setInterval(() => setBlueprint(readBlueprint()), 250);
+    const id = window.setInterval(() => setBlueprint(readBlueprint()), 220);
     return () => window.clearInterval(id);
   }, []);
 
@@ -40,15 +39,15 @@ export default function V05ButterflyTrainingHUD() {
   useEffect(() => {
     if (!complete || localStorage.getItem(COMPLETE_KEY) === '1') return;
     localStorage.setItem(COMPLETE_KEY, '1');
-    emitGlobalFeedback({ kind: 'achievement', code: 'TRAINING COMPLETE', title: '采集 → 检查 → 求解 → 表示', detail: '你完成了蝴蝶学者的第一组工作图训练。这个方法组可以进入后续项目。' });
+    emitGlobalFeedback({ kind: 'achievement', code: 'TRAINING COMPLETE', title: '第一次扫描工作流', detail: '你已经知道：先采集，再检查，再求相机位置，最后才选点云或 Gaussian。' });
   }, [complete]);
 
   return <aside className={`bt-hud ${collapsed ? 'collapsed' : ''}`} aria-label="蝴蝶学者训练任务">
-    <header><div><small>TRAINING / BLUEPRINT 01</small><strong>{complete ? '训练完成' : `任务 ${doneCount + 1} / ${status.length}`}</strong></div><button onClick={() => setCollapsed((value) => !value)}>{collapsed ? '展开' : '收起'}</button></header>
+    <header><div><small>SPECIAL 01 / TRAINING</small><strong>{complete ? '完成' : `${doneCount} / ${status.length}`}</strong></div><button onClick={() => setCollapsed((value) => !value)}>{collapsed ? '展开任务' : '收起'}</button></header>
     {!collapsed && <>
-      {!complete && current && <section className="bt-current"><small>CURRENT OBJECTIVE</small><h2>{current.title}</h2><p>{current.why}</p></section>}
+      {!complete && current && <section className="bt-current"><small>现在只做这一件事</small><h2>{current.title}</h2><p>{current.why}</p><em>{current.hint}</em></section>}
       <ol>{status.map((item, index) => <li key={item.id} className={item.done ? 'done' : current?.id === item.id ? 'current' : ''}><i>{item.done ? '✓' : index + 1}</i><span>{item.title}</span></li>)}</ol>
-      <footer>{complete ? <a href={chapterHref()}>完成 · 返回章节选择 →</a> : <p>操作：点击一个节点的输出端口，再点击目标节点的输入端口。这里只考三条核心关系。</p>}</footer>
+      <footer>{complete ? <><strong>你已经把工作流接通。</strong><p>下一次项目里，这三个节点组不会再强制提示。</p><a href={chapterHref()}>返回章节选择 →</a></> : <p>连线方法：点上游节点右侧输出端口，再点下游节点左侧输入端口。只需要完成任务条，不需要把所有端口都接满。</p>}</footer>
     </>}
   </aside>;
 }
