@@ -78,13 +78,13 @@ export const butterflyScholarNarrativePack: NarrativePack = {
   id: 'narrative-butterfly-scholar-v3',
   title: '哥斯达黎加的蝴蝶学者',
   actors: [
+    { id: 'field-lab', name: 'Bosque Field Lab', publicRole: '驻地合作项目', motives: ['邀请艺术家把长期观察资料转成可体验作品', '保留研究资料的上下文和使用边界'], remembers: [] },
     { id: 'player-butterfly-scholar', name: '你', publicRole: '新媒体艺术家 / 蝴蝶研究者', motives: ['完成一件真正来自现场的新作品', '把扫描变成可复用的方法', '弄清蝴蝶题材如何变成自己的系统'], remembers: [] },
-    { id: 'advisor-rui', name: '睿', publicRole: '工作室艺术顾问', motives: ['让你离开旧素材', '让项目从真实现场开始'], remembers: ['你出发前把任务理解成什么'] },
     { id: 'ines', name: 'Inés', publicRole: '驻地项目现场协调', coverStory: '负责研究站、驻地艺术家和植物档案之间的协调。', hiddenRole: '她也参与另一个研究网络的数据合作评估，但最初没有主动说明。', motives: ['保护研究站的数据边界', '判断你会不会把现场只当视觉素材库', '完成合作评估', '在合作中逐渐形成私人感情'], remembers: ['你第一次怎么跟她说话', '你如何处理来源和公开边界', '你面对蝴蝶题材争议时怎么回应', '身份揭示后你是否愿意继续听她说'] },
     { id: 'rojas', name: 'Rojas', publicRole: '研究站技术员', motives: ['保护长期样地', '让采集方法可复现'], remembers: ['你有没有离场前检查', '你是否诚实记录失败数据'] }
   ],
   facts: [
-    { id: 'fact-invite', subjectId: 'route', label: '研究站希望把蝴蝶观察、寄主植物档案和部分空间记录转成一件可进入的数字作品。', state: 'verified', sourceIds: ['advisor-rui'] },
+    { id: 'fact-invite', subjectId: 'route', label: '研究站希望把蝴蝶观察、寄主植物档案和部分空间记录转成一件可进入的数字作品。', state: 'verified', sourceIds: ['field-lab'] },
     { id: 'fact-live-not-static', subjectId: 'project', label: '活蝴蝶的运动和静态植物/空间需要不同采集方式。', state: 'unknown', sourceIds: [] },
     { id: 'fact-ines-role-public', subjectId: 'ines', label: 'Inés 负责驻地和研究站之间的现场协调。', state: 'claimed', sourceIds: ['ines'], contradicts: ['fact-ines-network'] },
     { id: 'fact-ines-network', subjectId: 'ines', label: 'Inés 同时参与另一个艺术研究网络的数据合作评估。', state: 'unknown', sourceIds: [], contradicts: ['fact-ines-role-public'] },
@@ -93,18 +93,18 @@ export const butterflyScholarNarrativePack: NarrativePack = {
     { id: 'fact-butterfly-authorship', subjectId: 'project', label: '蝴蝶题材本身不属于某个艺术家；具体形式、方法与直接引用仍需要说明来源。', state: 'unknown', sourceIds: [] }
   ],
   scenes: [
-    { id: 'scene-studio', title: '一条合作语音', location: '你的工作室', entryNodeId: 'bs-01-invite', actorIds: ['player-butterfly-scholar', 'advisor-rui'], tags: ['briefing'] },
+    { id: 'scene-studio', title: '合作邀请', location: '你的工作室', entryNodeId: 'bs-01-invite', actorIds: ['player-butterfly-scholar', 'field-lab'], tags: ['briefing'] },
     { id: 'scene-arrival', title: '到达研究站', location: '哥斯达黎加 · 山地研究站', entryNodeId: 'bs-02-arrival', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['arrival', 'relationship'] },
     { id: 'scene-field', title: '第一次现场采集', location: '云雾林样地', entryNodeId: 'bs-03-field', actorIds: ['player-butterfly-scholar', 'ines', 'rojas'], tags: ['capture', 'training'] },
     { id: 'scene-night', title: '晚上的临时工作台', location: '研究站临时工作室', entryNodeId: 'bs-04-process', actorIds: ['player-butterfly-scholar', 'ines', 'rojas'], tags: ['processing', 'creation'] },
     { id: 'scene-public', title: '第一次公开版本', location: '研究站临时展厅', entryNodeId: 'bs-05-public', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['public', 'archive'] }
   ],
   nodes: [
-    { id: 'bs-01-invite', sceneId: 'scene-studio', speakerId: 'advisor-rui', channel: 'message', text: ['睿发来一段 23 秒的语音。', '“有个研究站想找艺术家合作。他们长期记录蝴蝶和寄主植物，也留了一些空间资料。不是让你拍宣传片，他们想试着把这些东西做成一个观众能进入的数字作品。”', '“你先去一周。别急着定最后长什么样，先看看真实现场到底给你什么。”'], choices: [
-      { id: 'bs-go-question', label: '去。先写下我真正想弄明白的问题', subtext: '蝴蝶一直在动，现场一直在变——数字化到底保存什么？', effects: { setFlags: ['accepted-field-trip', 'question-before-trip'], memories: [{ actorId: 'advisor-rui', about: 'departure', value: '带着保存什么的问题出发', weight: 3 }] }, nextNodeId: 'bs-02-arrival' },
-      { id: 'bs-go-open', label: '去。先看现场，不提前规定作品形式', subtext: '把最终媒介留到采集之后再决定。', effects: { setFlags: ['accepted-field-trip', 'open-medium'], memories: [{ actorId: 'advisor-rui', about: 'departure', value: '没有先把作品锁成某一种媒介', weight: 2 }] }, nextNodeId: 'bs-02-arrival' }
+    { id: 'bs-01-invite', sceneId: 'scene-studio', speakerId: 'field-lab', channel: 'message', text: ['你收到 Bosque Field Lab 发来的合作语音和一页 Brief。', '他们长期记录当地蝴蝶、寄主植物和样地变化，也积累了一些影像与空间资料。现在想邀请一位做空间影像的艺术家驻留一周，把其中一部分发展成观众可以进入或浏览的数字作品。', '形式没有预设。研究站会提供住宿、样地权限和现场协助；涉及研究数据和个人记录的部分，需要在公开前一起确认。'], choices: [
+      { id: 'bs-go-question', label: '接受。先写下我真正想弄明白的问题', subtext: '蝴蝶一直在动，现场一直在变——数字化到底保存什么？', effects: { setFlags: ['accepted-field-trip', 'question-before-trip'] }, nextNodeId: 'bs-02-arrival' },
+      { id: 'bs-go-open', label: '接受。先看现场，不提前规定作品形式', subtext: '把最终媒介留到采集之后再决定。', effects: { setFlags: ['accepted-field-trip', 'open-medium'] }, nextNodeId: 'bs-02-arrival' }
     ] },
-    { id: 'bs-02-arrival', sceneId: 'scene-arrival', speakerId: 'ines', channel: 'dialogue', text: ['Inés 在研究站门口接你。', '“我是 Inés，负责这次驻地和研究站之间的协调。交通、样地、植物档案，还有哪些数据能公开，都可以先找我。”', '她又补了一句：“我看过你两年前那件城市边缘植物扫描。那件东西最后没有把缺口修干净，我挺喜欢。”'], choices: [
+    { id: 'bs-02-arrival', sceneId: 'scene-arrival', speakerId: 'ines', channel: 'dialogue', text: ['Inés 在研究站门口接你。', '“我是 Inés，负责这次驻地和研究站之间的协调。交通、样地、植物档案，还有哪些数据能公开，都可以先找我。”', '她翻到申请资料最后一页，笑了一下：“Butterfly scholar？这是你自己写的？”你说：“差不多。蝴蝶我会记录，真正扫描的是它周围的世界。”'], choices: [
       { id: 'bs-arrival-work', label: '先聊工作：明天先看样地和档案', subtext: '把关系从一次正常合作开始。', effects: { setFlags: ['ines-first-work'], trustDelta: { ines: 1 }, memories: [{ actorId: 'ines', about: 'first-meeting', value: '玩家先把注意力放在共同工作上', weight: 2 }] }, nextNodeId: 'bs-03-field' },
       { id: 'bs-arrival-prior', label: '问她怎么会看到那件很少公开的旧作品', subtext: '不是审问，只是自然地追问来源。', effects: { setFlags: ['ines-knows-prior-work'], trustDelta: { ines: 0 }, memories: [{ actorId: 'ines', about: 'first-meeting', value: '玩家注意到她对自己的旧项目异常熟悉', weight: 2 }] }, nextNodeId: 'bs-03-field' }
     ] },
