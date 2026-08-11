@@ -93,8 +93,12 @@ export function describeAttention(trace: AttentionTrace): AttentionProfile {
   };
 }
 
+export function opportunityDomainsFor(opportunityId: string): AttentionDomain[] {
+  return [...(opportunityDomains[opportunityId] || [])];
+}
+
 export function opportunityAttentionScore(opportunityId: string, trace: AttentionTrace): number {
-  const domains = opportunityDomains[opportunityId] || [];
+  const domains = opportunityDomainsFor(opportunityId);
   if (!domains.length) return 0;
   const focused = domains.reduce((sum, domain) => sum + trace[domain].weight, 0) / domains.length;
   const profile = describeAttention(trace);
