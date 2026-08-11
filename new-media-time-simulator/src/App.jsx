@@ -64,7 +64,7 @@ export default function App() {
       </Suspense>
     );
   }
-  if (preview === 'v05' && (mode === 'story' || (corePreview === 'v05' && !mode && !lab))) {
+  if (preview === 'v05' && mode === 'story') {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
         <V05Experience />
