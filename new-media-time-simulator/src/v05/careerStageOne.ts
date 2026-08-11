@@ -35,11 +35,12 @@ export function careerStageOneScene(save: Record<string, any>, workMode: 'story'
       id: 'stage1-complete', kicker: 'STAGE 1 / ARCHIVED', title: '第一份生涯档案已经成立。',
       body: [
         '你没有因为“完成了五个任务”而升级。真正留下来的是一条因果链：一个原型离开桌面，被别人看见，在真实环境里坏掉，然后被你用某种方法重新带回来。',
-        '从现在开始，旧版本、失败、关系和现场条件都可以在后面的项目里重新出现。'
+        '接下来问题会反过来：当场地只给你两小时、六小时，或者故障发生在所有人都以为已经结束以后，这套方法到底还靠不靠谱？'
       ],
-      note: 'Stage 2 的完整剧情仍在内容制作中；当前版本已经把五阶段和三组 Episode 骨架接入，但不会假装后四阶段已经填满。',
-      choices: [],
-      optionalWorkbench: '你仍然可以回到 FIELD / WORKBENCH / RECORDS 继续整理第一阶段留下的项目和档案。'
+      choices: [
+        { id: 'story:stage2:enter', title: '进入第二阶段：现场', detail: '李技术发来一条很短的消息：今晚撤场后有两小时空档。不是演出，只够验证一个真正重要的问题。', cost: '时间推进 · FIELD 解锁更严格的现场条件', kind: 'route' }
+      ],
+      optionalWorkbench: '第一阶段的 Project / Evidence / People memory 不会重置。第二阶段会直接继续使用这些历史。'
     };
   }
 
