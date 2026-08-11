@@ -26,25 +26,30 @@ async function revealNode(page) {
 
   const decide = page.getByRole('button', { name: '做决定', exact: true });
   const next = page.getByRole('button', { name: '继续', exact: true });
-  for (let i = 0; i < 20; i += 1) {
+  const decisions = page.locator('.narrative-decisions');
+  for (let i = 0; i < 24; i += 1) {
     await dismissFeedback(page);
+    if (await decisions.isVisible().catch(() => false)) return;
     if (await decide.isVisible().catch(() => false)) return;
     if (await next.isVisible().catch(() => false)) {
       await next.click();
-      await page.waitForTimeout(70);
+      await page.waitForTimeout(80);
       continue;
     }
-    await page.waitForTimeout(120);
+    await page.waitForTimeout(160);
   }
-  await expect(decide).toBeVisible({ timeout: 5000 });
+  expect((await decisions.isVisible().catch(() => false)) || (await decide.isVisible().catch(() => false))).toBeTruthy();
+}
+
+async function exposeChoices(page) {
+  const decide = page.getByRole('button', { name: '做决定', exact: true });
+  if (await decide.isVisible().catch(() => false)) await decide.click();
 }
 
 async function choose(page, name) {
   await dismissFeedback(page);
   await revealNode(page);
-  const decide = page.getByRole('button', { name: '做决定', exact: true });
-  await expect(decide).toBeVisible();
-  await decide.click();
+  await exposeChoices(page);
   const option = page.getByRole('button', { name });
   await expect(option).toBeVisible({ timeout: 5000 });
   await option.click();
@@ -73,13 +78,13 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
   await page.getByRole('button', { name: '记住这个方法' }).click();
   await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
-  await page.getByRole('button', { name: '做决定', exact: true }).click();
+  await exposeChoices(page);
   await page.getByRole('button', { name: /记录蝴蝶运动，同时扫描寄主植物/ }).click();
   await dismissFeedback(page);
 
   await revealNode(page);
   await expect(page.getByText('离场前检查', { exact: true }).first()).toBeVisible();
-  await page.getByRole('button', { name: '做决定', exact: true }).click();
+  await exposeChoices(page);
   await page.getByRole('button', { name: /现在补拍/ }).click();
   await dismissFeedback(page);
 
@@ -89,7 +94,7 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
   await expect(page.getByRole('dialog', { name: /研究：什么是相机求解/ })).toContainText('先算出每张照片是从哪里拍的');
   await page.getByRole('button', { name: '记住这个方法' }).click();
   await dismissFeedback(page);
-  await page.getByRole('button', { name: '做决定', exact: true }).click();
+  await exposeChoices(page);
   await page.getByRole('button', { name: /先查相机求解/ }).click();
   await dismissFeedback(page);
 
@@ -141,6 +146,6 @@ test('desktop Butterfly lesson completes three real graph connections with expli
   await page.getByLabel('离场前检查 输出 可继续的数据').click();
   await page.getByLabel('Metashape · 相机求解 输入 照片').click();
   await expect(hud).toContainText('三步完成');
-  await expect(hud).toContainText(/点云、Gaussian 或 Blender/);
+  await expect(hud).toContainText(/点云 \/ Gaussian \/ Blender/);
   await expect(hud.getByRole('link', { name: /返回章节选择/ })).toBeVisible();
 });
