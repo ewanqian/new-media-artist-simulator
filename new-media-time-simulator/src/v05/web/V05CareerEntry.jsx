@@ -77,15 +77,15 @@ export default function V05CareerEntry() {
 
   if (phase === 'chapters') {
     return <main className="vc-shell"><section className="vc-panel vc-chapter-select">
-      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>主线生涯保存长期状态；特殊章节独立运行，用来学习新的方法、节点组和叙事机制。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
+      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>主线生涯保存长期状态；特殊章节是独立训练与故事，目前不会自动修改主线存档。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
       <section className="vc-chapter-main">
         <div><small>MAIN CAREER</small><h2>新媒体艺术家生涯</h2><p>从第一个能运行的版本开始，经过现场、网络、方法沉淀与长期实践。当前主线从 Episode 01 开始。</p><div className="vc-tags"><span>EPISODE 01</span><span>第一个能被别人看见的版本</span></div></div>
         <div className="vc-chapter-actions">{existing.profile && existing.save ? <><a className="primary-link" href={v05Href('story')}>继续生涯 · 第 {existing.save.week || 1} 周</a><button onClick={() => setPhase('origin')}>新建生涯</button></> : <button className="primary" onClick={() => setPhase('origin')}>开始生涯</button>}</div>
       </section>
-      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>独立于主线存档。完成后可把方法和节点组迁移进正式生涯。</p></div>
+      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩，不影响当前主线进度。</p></div>
       <div className="vc-chapters">
-        <a href={v05Href('butterfly')} className="vc-chapter-card featured"><small>SPECIAL 01 · TRAINING / NARRATIVE</small><strong>哥斯达黎加的蝴蝶学者</strong><p>扮演一位以蝴蝶、植物与空间扫描工作的艺术家。学习采集、摄影测量、点云 / Gaussian 表达，同时经历一条人物关系与身份隐情线。</p><span>进入章节 →</span></a>
-        <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续特殊章节继续复用同一套叙事、节点解锁、成就与档案系统。</p></article>
+        <a href={v05Href('butterfly')} className="vc-chapter-card featured"><small>SPECIAL 01 · TRAINING / NARRATIVE</small><strong>哥斯达黎加的蝴蝶学者</strong><p>从真实蝴蝶与寄主植物观察开始，练习摄影测量、相机求解、点云 / Gaussian 与 Blender 动画，并处理来源、署名和研究数据的公开边界。</p><span>进入章节 →</span></a>
+        <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续章节继续复用同一套叙事演出、知识获取、节点训练、成就与档案系统。</p></article>
       </div>
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </section></main>;
