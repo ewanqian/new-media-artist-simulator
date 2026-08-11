@@ -43,8 +43,7 @@ export default function V05NarrativeStage({ contentKey, scene, speaker, node, me
         <div className="narrative-load-inner">
           <small>{meta.kicker || 'EPISODE'}</small>
           <span>{locationLine}</span>
-          <h1>{scene?.title || '载入中'}</h1>
-          {meta.objective && <p>{meta.objective}</p>}
+          <h1>{meta.objective || '进入场景'}</h1>
           <i>点击跳过</i>
         </div>
       </section>
@@ -55,7 +54,6 @@ export default function V05NarrativeStage({ contentKey, scene, speaker, node, me
     <section className="narrative-stage" onClick={revealNow}>
       <div className="narrative-stage-meta">
         <small>{meta.kicker || 'EPISODE'}</small>
-        <span>{scene?.title || 'SCENE'}</span>
         <span>{locationLine}</span>
         {meta.objective && <b>{meta.objective}</b>}
       </div>
