@@ -20,7 +20,8 @@ import {
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
 const V05Experience = lazy(() => import('./v05/web/V05TriadExperience.jsx'));
-const V05BlueprintLab = lazy(() => import('./v05/web/V05BlueprintLab.jsx'));
+const V05BlueprintEditor = lazy(() => import('./v05/web/V05BlueprintEditor.jsx'));
+const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -28,17 +29,26 @@ export default function App() {
   const pathPreview = window.location.pathname.includes('/v05/') ? 'v05' : window.location.pathname.includes('/v03/') ? 'v03' : null;
   const preview = params.get('core') || pathPreview;
   const lab = params.get('lab');
+  const mode = params.get('mode');
+
   if (preview === 'v05' && lab === 'blueprint') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入创作基因实验台…</section></main>}>
-        <V05BlueprintLab />
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}>
+        <V05BlueprintEditor />
+      </Suspense>
+    );
+  }
+  if (preview === 'v05' && mode === 'story') {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
+        <V05Experience />
       </Suspense>
     );
   }
   if (preview === 'v05') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
-        <V05Experience />
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入…</section></main>}>
+        <V05Home />
       </Suspense>
     );
   }
