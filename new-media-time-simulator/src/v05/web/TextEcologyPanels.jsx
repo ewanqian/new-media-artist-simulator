@@ -1,75 +1,73 @@
-import { contactSeeds } from '../contentFrame.ts';
+import { contactSeeds } from '../legacyDeck.ts';
 import { deriveProjectStage } from '../gameLoop.ts';
 import {
-  contextualFragments,
   fragmentsForKnowledge,
   relationshipEdgesFor,
   sourceLayerLabels,
   textKindLabel
 } from '../textEcology.ts';
+import {
+  experienceStream,
+  fragmentsForActionCard,
+  fragmentsForPlaceCard
+} from '../textEcologyExperience.ts';
 
 function Fragment({ fragment, compact = false }) {
   return (
-    <article className={`wf-fragment ${compact ? 'compact' : ''}`} data-layer={fragment.layer}>
+    <article className={`vx-fragment ${compact ? 'compact' : ''}`} data-layer={fragment.layer}>
       <header>
         <small>{sourceLayerLabels[fragment.layer]} · {textKindLabel(fragment.kind)}</small>
         <strong>{fragment.source}</strong>
       </header>
       <p>{fragment.text}</p>
       {!compact && fragment.tags?.length > 0 && (
-        <div className="wf-fragment-tags">{fragment.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <div className="vx-fragment-tags">{fragment.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}</div>
       )}
     </article>
   );
 }
 
-export function WorldTextPanel({ save, region }) {
-  const stage = deriveProjectStage(save.primaryProject);
-  const fragments = contextualFragments({
-    week: save.week,
-    regionId: region.id,
-    projectStageId: stage.id,
-    limit: 3
-  });
+export function ExperienceTextStream({ save, title = '今天的信息流', limit = 4 }) {
+  const stage = deriveProjectStage(save.projectMetrics);
+  const fragments = experienceStream(save.week, save.completedCardIds, save.visitedPlaceIds, stage.id, limit);
   return (
-    <section className="wf-panel wf-text-ecology" aria-label="现场文本">
-      <small>TEXT ECOLOGY</small>
-      <h3>现场文本</h3>
-      <p className="wf-ecology-note">公开信息、亲历、二手消息和传闻不会自动合成一个“正确答案”。</p>
-      <div className="wf-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}</div>
+    <section className="vx-ecology-block" aria-label="现场文本">
+      <div className="vx-section-title vx-ecology-title"><h2>{title}</h2><span>亲历 / 公开 / 二手 / 传闻</span></div>
+      <div className="vx-fragment-grid">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} />)}</div>
     </section>
   );
 }
 
-export function LocationTextPanel({ week, region, facility, project }) {
-  if (!facility) return null;
-  const stage = deriveProjectStage(project);
-  const fragments = contextualFragments({
-    week,
-    regionId: region.id,
-    facilityId: facility.id,
-    projectStageId: stage.id,
-    limit: 2
-  });
+export function CardTextFragments({ cardId, week }) {
+  const fragments = fragmentsForActionCard(cardId, week, 2);
   if (!fragments.length) return null;
   return (
-    <section className="wf-panel wf-text-ecology" aria-label="此地文本">
-      <small>AT THIS PLACE</small>
-      <h3>此地正在留下什么</h3>
-      <div className="wf-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} />)}</div>
+    <section className="vx-ecology-inline">
+      <small>相关碎片</small>
+      <div className="vx-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}</div>
+    </section>
+  );
+}
+
+export function PlaceTextFragments({ placeId, week }) {
+  const fragments = fragmentsForPlaceCard(placeId, week, 3);
+  if (!fragments.length) return null;
+  return (
+    <section className="vx-ecology-inline">
+      <small>这个地方的文本不会完全一致</small>
+      <div className="vx-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} />)}</div>
     </section>
   );
 }
 
 export function ContactNetworkPanel({ contact, week }) {
   const edges = relationshipEdgesFor(contact.id);
-  const fragments = contextualFragments({ week, contactId: contact.id, regionId: contact.regionId, limit: 1 });
+  const direct = experienceStream(week, [], [], undefined, 6).filter((fragment) => fragment.contactIds?.includes(contact.id)).slice(0, 1);
   return (
-    <aside className="wf-panel wf-contact-network">
-      <small>NETWORK</small>
-      <h3>他不只连接你</h3>
-      {fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}
-      <div className="wf-network-edges">
+    <section className="vx-contact-network">
+      <div className="vx-section-title"><h2>这张关系网里</h2><span>不是好感度</span></div>
+      {direct.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}
+      <div className="vx-network-grid">
         {edges.length ? edges.map((edge) => {
           const otherId = edge.fromContactId === contact.id ? edge.toContactId : edge.fromContactId;
           const other = contactSeeds.find((item) => item.id === otherId);
@@ -80,9 +78,9 @@ export function ContactNetworkPanel({ contact, week }) {
               <p>{edge.note}</p>
             </article>
           );
-        }) : <p>当前还没有进入其他人的关系线。</p>}
+        }) : <p>你还不知道他和谁有更具体的工作关系。</p>}
       </div>
-    </aside>
+    </section>
   );
 }
 
@@ -90,10 +88,9 @@ export function KnowledgeSourcesPanel({ knowledgeId, week }) {
   const fragments = fragmentsForKnowledge(knowledgeId, week, 4);
   if (!fragments.length) return null;
   return (
-    <section className="wf-related wf-knowledge-sources">
-      <h3>来源材料</h3>
-      <p className="wf-ecology-note">词条是整理后的知识；这些是游戏世界里让它被你理解的碎片。</p>
-      <div className="wf-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}</div>
+    <section className="vx-knowledge-sources">
+      <div className="vx-section-title"><h2>来源材料</h2><span>词条是整理后的版本</span></div>
+      <div className="vx-fragment-stack">{fragments.map((fragment) => <Fragment key={fragment.id} fragment={fragment} compact />)}</div>
     </section>
   );
 }
