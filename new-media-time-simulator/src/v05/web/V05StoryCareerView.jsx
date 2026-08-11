@@ -99,7 +99,7 @@ export default function V05StoryCareerView({ profile }) {
           <section><small>RESOURCES</small><strong>{pack.title}</strong><div className="vstory-tags">{pack.assets.slice(0, 5).map((asset) => <span key={asset}>{asset}</span>)}</div></section>
           <section><small>PEOPLE</small><strong>{knownPeople.length ? `${knownPeople.length} 个已进入生涯的人` : '还没有真正认识的人'}</strong>{knownPeople.map((npc) => <p key={npc.id}><b>{npc.name}</b> · {npc.role}</p>)}{Number(save.pendingReplies?.length || 0) > 0 && <em>{save.pendingReplies.length} 条回复还在未来。</em>}</section>
           <section><small>EVIDENCE / THREADS</small><strong>{save.evidenceIds?.length || 0} 条证据</strong><p>未解决问题：{openIssues.length}</p><p>方法：{save.methodIds?.length || 0}</p><p>特殊事件：{save.seenEventIds?.length || 0}</p></section>
-          {Array.isArray(save.careerKnownFor) && save.careerKnownFor.length > 0 && <section><small>KNOWN FOR</small><strong>别人现在因为什么找你</strong>{save.careerKnownFor.map((item) => <p key={item}>{item}</p>)}</section>}
+          {Array.isArray(save.careerKnownFor) && save.careerKnownFor.length > 0 && <section className="vstory-knownfor"><small>KNOWN FOR</small><strong>别人现在因为什么找你</strong>{save.careerKnownFor.map((item) => <p key={item}>{item}</p>)}</section>}
           {progress.complete && <section className="vstory-next"><small>NEXT</small><strong>{nextStage.title}</strong><p>{nextStage.text}</p></section>}
         </aside>
       </div>
