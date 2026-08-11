@@ -10,6 +10,7 @@ import {
 import V05TriadExperience from './V05TriadExperience.jsx';
 import V05StoryCareerView from './V05StoryCareerView.jsx';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
+import V05AutomationOverlay from './V05AutomationOverlay.jsx';
 import './v05-career-shell.css';
 
 function readCareer() {
@@ -134,6 +135,7 @@ export default function V05CareerExperienceShell() {
         <div className="vcareer-goals"><small>现在值得追的事</small>{episode.goals.map((goal, index) => <div key={goal}><i>{String(index + 1).padStart(2, '0')}</i><span>{goal}</span></div>)}</div>
         {episode.blueprintMoment && career.profile?.workMode !== 'story' && <aside><small>工作图入口</small><p>{episode.blueprintMoment}</p><a href={v05Href('lab=blueprint')}>打开工作图 →</a></aside>}
       </section>}
+      {showBlueprint && career.save?.screen === 'play' && !introOpen && <V05AutomationOverlay save={career.save}/>} 
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </div>
   );
