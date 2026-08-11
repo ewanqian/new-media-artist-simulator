@@ -20,7 +20,7 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
-const V05Experience = lazy(() => import('./v05/web/V05TriadExperience.jsx'));
+const V05Experience = lazy(() => import('./v05/web/V05CareerExperienceShell.jsx'));
 const V05BlueprintEditor = lazy(() => import('./v05/web/V05BlueprintEditor.jsx'));
 const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
 const V05CareerEntry = lazy(() => import('./v05/web/V05CareerEntry.jsx'));
