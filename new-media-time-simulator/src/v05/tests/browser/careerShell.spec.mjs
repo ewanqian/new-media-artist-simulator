@@ -13,6 +13,12 @@ async function clearCareer(page) {
   });
 }
 
+async function openNewCareer(page) {
+  await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
+  await page.getByRole('button', { name: '开始生涯' }).click();
+  await expect(page.getByRole('heading', { name: '建立起步档案' })).toBeVisible();
+}
+
 async function enterWeekOne(page) {
   await expect(page.getByLabel('第一周开场')).toBeVisible();
   await expect(page.getByRole('heading', { name: '先让一个东西存在。' })).toBeVisible();
@@ -26,12 +32,12 @@ test('career preset creates a real starting dossier and seeds stage one', async 
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByRole('heading', { name: '建立你的起步档案' })).toBeVisible();
+  await openNewCareer(page);
 
   await page.getByRole('button', { name: /从自己的桌面开始/ }).click();
-  await expect(page.getByRole('heading', { name: '你想怎么完成制作环节？' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '制作环节怎么操作？' })).toBeVisible();
   await page.getByRole('button', { name: /纯叙事/ }).click();
-  await page.getByRole('button', { name: /继续：查看起步档案/ }).click();
+  await page.getByRole('button', { name: '查看起步档案' }).click();
   await expect(page.getByText('自己的桌面', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '进入第一周' }).click();
   await page.waitForURL(/mode=story/);
@@ -53,16 +59,16 @@ test('five-question role model reaches the same career shell without creating a 
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.reload({ waitUntil: 'networkidle' });
+  await openNewCareer(page);
   await page.getByRole('button', { name: /开始 5 题建模/ }).click();
 
   for (let index = 1; index <= 5; index += 1) {
     await expect(page.getByText(`ROLE MODEL / ${index} OF 5`, { exact: true })).toBeVisible();
     await page.locator('.vc-options button').first().click();
   }
-  await expect(page.getByRole('heading', { name: '你想怎么完成制作环节？' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '制作环节怎么操作？' })).toBeVisible();
   await page.getByRole('button', { name: /混合/ }).click();
-  await page.getByRole('button', { name: /继续：查看起步档案/ }).click();
-  await expect(page.getByText('这是当前入口，不是固定身份。')).toBeVisible();
+  await page.getByRole('button', { name: '查看起步档案' }).click();
   await page.getByRole('button', { name: '进入第一周' }).click();
   await page.waitForURL(/mode=story/);
 
