@@ -60,7 +60,7 @@ test('salvage keeps source lineage and can become method fragment or archive wit
   assert.equal('rarity' in archived, false);
 });
 
-test('remix branch records parent mutation and test instead of a generic new-version label', () => {
+test('remix branch records parent mutation and an internal test token instead of a generic version level', () => {
   let save = run(matureSave(), 'story:stage4:enter');
   save = run(save, 'story:stage4:source-recovery');
   save = run(save, 'story:stage4:salvage-method');
@@ -71,7 +71,7 @@ test('remix branch records parent mutation and test instead of a generic new-ver
   assert.equal(save.careerRemixBranches.length, 1);
   assert.deepEqual(
     { parent: save.careerRemixBranches[0].parent, mutation: save.careerRemixBranches[0].mutation, test: save.careerRemixBranches[0].test },
-    { parent: 'field-recovery', mutation: 'failure-as-trigger', test: 'archive' }
+    { parent: 'field-recovery', mutation: 'failure-as-trigger', test: 'remix-test-archive' }
   );
   assert.ok(save.methodIds.includes('method-explicit-project-lineage'));
   assert.equal('versionLevel' in save.careerRemixBranches[0], false);
