@@ -25,6 +25,7 @@ const V05BlueprintEditor = lazy(() => import('./v05/web/V05BlueprintEditor.jsx')
 const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
 const V05CareerEntry = lazy(() => import('./v05/web/V05CareerEntry.jsx'));
 const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
+const V05ButterflyScholarRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -39,6 +40,13 @@ export default function App() {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}>
         <V05BlueprintEditor />
+      </Suspense>
+    );
+  }
+  if (preview === 'v05' && mode === 'butterfly') {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入《哥斯达黎加的蝴蝶学者》…</section></main>}>
+        <V05ButterflyScholarRoute />
       </Suspense>
     );
   }
