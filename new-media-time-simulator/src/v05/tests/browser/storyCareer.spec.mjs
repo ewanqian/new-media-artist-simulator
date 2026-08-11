@@ -8,7 +8,7 @@ async function clear(page) {
   });
 }
 
-test('pure story career can finish origin field and network stages without opening workbench or node editor', async ({ page }) => {
+test('pure story career can finish origin field network and method stages without opening workbench or node editor', async ({ page }) => {
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clear(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -57,48 +57,64 @@ test('pure story career can finish origin field and network stages without openi
   await scene.getByRole('button', { name: /完整保留：测试目标 \+ 安装 \+ 故障 \+ 恢复/ }).click();
 
   await expect(scene.getByRole('heading', { name: '现在你知道“现场经验”不是去过多少场地。' })).toBeVisible();
-  await expect(page.getByText('网络：别人开始因为一件事找你', { exact: true })).toBeVisible();
   await scene.getByRole('button', { name: /进入第三阶段：网络/ }).click();
   await expect(page.getByText(/CAREER 3\/5/)).toBeVisible();
-
   await expect(scene.getByRole('heading', { name: '第一个小委托来了。先别把“有人找你”误认为“事情已经说清楚”。' })).toBeVisible();
   await scene.getByRole('button', { name: /把需求拆成：内容 \/ 输出 \/ 现场 \/ 记录 \/ 不包含/ }).click();
   await expect(scene.getByRole('heading', { name: '现在决定你真正承诺哪一部分。' })).toBeVisible();
   await scene.getByRole('button', { name: /只交可测试的视觉包与技术说明/ }).click();
   await expect(scene.getByRole('heading', { name: /同一句“顺便再加一个”又回来了，但这次你认识它/ })).toBeVisible();
   await scene.getByRole('button', { name: /直接复用旧的 Scope 边界方法/ }).click();
-
   await expect(scene.getByRole('heading', { name: '陈发来一份 Open Call。第一页只能先证明一件事。' })).toBeVisible();
   await scene.getByRole('button', { name: /先放真实现场/ }).click();
   await expect(scene.getByRole('heading', { name: '一页版本不是把十页缩成小字。你必须真的删东西。' })).toBeVisible();
   await scene.getByRole('button', { name: /删掉泛泛开场，只留五个具体块/ }).click();
   await expect(scene.getByRole('heading', { name: '现在这页已经能发。提交不是默认正确答案。' })).toBeVisible();
   await scene.getByRole('button', { name: /先问陈：这个空间真正不能改的条件是什么/ }).click();
-
   await expect(scene.getByRole('heading', { name: '帖子把事情解释歪了' })).toBeVisible();
   await scene.getByRole('button', { name: /只发原始现场证据和项目一页版本/ }).click();
   await expect(scene.getByRole('heading', { name: '愿意邀请，但不完全放心' })).toBeVisible();
   await scene.getByRole('button', { name: /先让对方把限制写清楚/ }).click();
 
   await expect(scene.getByRole('heading', { name: '你没有得到一个“声望等级”，但世界已经开始用几句话记住你。' })).toBeVisible();
-  await expect(page.getByText('方法：你不再每次从零开始', { exact: true })).toBeVisible();
   await expect(page.getByText('别人现在因为什么找你', { exact: true })).toBeVisible();
+  await scene.getByRole('button', { name: /进入第四阶段：方法/ }).click();
+  await expect(page.getByText(/CAREER 4\/5/)).toBeVisible();
+
+  await expect(scene.getByRole('heading', { name: '失败项目可以拆' })).toBeVisible();
+  await scene.getByRole('button', { name: /拆黑盒里的故障与恢复/ }).click();
+  await expect(scene.getByRole('heading', { name: /从「黑盒故障与恢复历史」里，你到底要留下什么/ })).toBeVisible();
+  await scene.getByRole('button', { name: /提取一条方法/ }).click();
+
+  await expect(scene.getByRole('heading', { name: 'Remix 自己之前，先承认哪些东西已经是你的旧项目。' })).toBeVisible();
+  await scene.getByRole('button', { name: /Parent：现场恢复链/ }).click();
+  await expect(scene.getByRole('heading', { name: /Parent 是「现场恢复链」。现在只允许改一个核心变量/ })).toBeVisible();
+  await scene.getByRole('button', { name: /把原来的“故障条件”反过来当成触发规则/ }).click();
+  await expect(scene.getByRole('heading', { name: '新分支不能只存在在“想法上”。把它放进一个不同条件里。' })).toBeVisible();
+  await scene.getByRole('button', { name: /用旧 Evidence 回放 parent，再对照 branch/ }).click();
+
+  await expect(scene.getByRole('heading', { name: '第一次教方法时，你会发现自己其实省略了很多步骤。' })).toBeVisible();
+  await scene.getByRole('button', { name: /教“先留基线，再练一次恢复”/ }).click();
+  await expect(scene.getByRole('heading', { name: '对方照着你的步骤做，还是失败了。问题出在你没写出来的那一层。' })).toBeVisible();
+  await scene.getByRole('button', { name: /把环境前提写进方法/ }).click();
+
+  await expect(scene.getByRole('heading', { name: '你第一次拥有的不是“更高等级”，而是一套能被复用、修改、教给别人的方法。' })).toBeVisible();
+  await expect(page.getByText('从现场回来以后', { exact: true })).toBeVisible();
+  await expect(page.getByText('基础设施：你开始维护一套自己的世界', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: '工作图' })).toHaveCount(0);
 
   const state = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05-world-hub-preview') || '{}'));
-  expect(state.careerStageId).toBe('stage-3');
-  expect(state.receivedFeedbackCount).toBe(1);
-  expect(state.publicOutputCount).toBe(1);
+  expect(state.careerStageId).toBe('stage-4');
   expect(state.evidenceIds).toContain('career:stage-1:complete');
   expect(state.evidenceIds).toContain('career:stage-2:complete');
   expect(state.evidenceIds).toContain('career:stage-3:complete');
-  expect(state.evidenceIds).toContain('relationship:qiao:commitment-matched-delivery');
-  expect(state.evidenceIds).toContain('stage3:ep8:result:shortlist');
-  expect(state.seenEventIds).toContain('evt-social-misread');
-  expect(state.seenEventIds).toContain('evt-institution-cautious-invite');
-  expect(state.methodIds).toContain('method-source-evidence-response');
-  expect(state.methodIds).toContain('method-institution-constraint-verification');
-  expect(state.careerKnownFor.length).toBeGreaterThanOrEqual(2);
+  expect(state.evidenceIds).toContain('career:stage-4:complete');
+  expect(state.seenEventIds).toContain('evt-project-salvage');
+  expect(state.careerRemixBranches.length).toBeGreaterThanOrEqual(1);
+  expect(state.careerMethodSet.title).toBe('从现场回来以后');
+  expect(state.methodIds).toContain('method-document-prerequisites');
   expect(state.fame).toBeUndefined();
   expect(state.reputation).toBeUndefined();
+  expect(state.level).toBeUndefined();
+  expect(state.skillPoints).toBeUndefined();
 });
