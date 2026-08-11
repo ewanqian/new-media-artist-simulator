@@ -17,9 +17,14 @@ function loadSave() {
 }
 
 function choiceDisabled(choice, save) {
-  const attention = Number(choice.cost.match(/注意力\s*-\s*(\d+)/)?.[1] || 0);
-  const explicitCash = Number(choice.cost.match(/(?:押金|成本|合作成本)?\s*¥\s*(\d+)/)?.[1] || 0);
-  return Number(save?.attention || 0) < attention || Number(save?.cash || 0) < explicitCash;
+  // Resource truth belongs to the command runtime. UI copy such as
+  // “注意力 -1 · 恢复方法” is descriptive text and must never become logic.
+  // Structured requirements can opt into pre-disabling later; otherwise a
+  // command remains clickable and the runtime returns the authoritative notice.
+  const requirements = choice?.requirements || {};
+  const attention = Number(requirements.attention || 0);
+  const cash = Number(requirements.cash || 0);
+  return Number(save?.attention || 0) < attention || Number(save?.cash || 0) < cash;
 }
 
 function progressFor(stageId, save) {
