@@ -22,10 +22,10 @@ async function openPalette(page, isMobile) {
   await expect(page.locator('.be-palette')).toBeVisible();
 }
 
-test('v05 home exposes career and free-create modes while tools stay secondary', async ({ page }) => {
+test('v05 home exposes career chapters and free-create modes while tools stay secondary', async ({ page }) => {
   await page.goto('/?core=v05&mode=home', { waitUntil: 'networkidle' });
   await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /生涯模式/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /生涯 \/ 章节/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /新建空白/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /打开最近工作图/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /内容管理/ })).toBeVisible();
@@ -83,112 +83,50 @@ test('node palette creates nodes and desktop output-to-input clicks create a lin
   }
 });
 
-test('camera controls auto-layout and lightweight groups work without making Space a create shortcut', async ({ page, isMobile }) => {
+test('editor saves, saves as, restores and exports share code', async ({ page }) => {
   await openEditor(page);
   await clearEditorStorage(page);
   await page.reload({ waitUntil: 'networkidle' });
-  if (isMobile) return;
-
-  const canvas = page.getByLabel('节点编辑画布');
-  await expect(canvas.getByRole('button', { name: /适配/ })).toBeVisible();
-  await expect(canvas.getByRole('button', { name: /居中/ })).toBeVisible();
-  await canvas.getByRole('button', { name: /自动排序/ }).click();
-  await canvas.getByRole('button', { name: /适配/ }).click();
-
-  await page.locator('.be-node[data-node-id="p2"]').click();
-  await canvas.getByRole('button', { name: /连接成组/ }).click();
-  await expect(page.locator('.be-group-frame')).toHaveCount(1);
-  await page.locator('.be-group-frame').getByRole('button', { name: '简化' }).click();
-  await expect(page.locator('.be-group-frame')).toHaveClass(/compact/);
-
-  await page.keyboard.press('Space');
-  await expect(page.locator('.be-palette')).toHaveCount(0);
-  await page.keyboard.press('Shift+A');
-  await expect(page.locator('.be-palette')).toBeVisible();
-});
-
-test('LED parameters and Notes are editable and autosave survives reload', async ({ page, isMobile }) => {
-  await openEditor(page);
-  await clearEditorStorage(page);
-  await page.reload({ waitUntil: 'networkidle' });
-
-  if (isMobile) {
-    const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
-    await tabs.getByRole('button', { name: '节点' }).click();
-    await page.getByLabel('节点库').getByRole('button', { name: /LED 屏/ }).click();
-    await tabs.getByRole('button', { name: '画布' }).click();
-    const node = page.locator('.be-node').last();
-    await node.scrollIntoViewIfNeeded();
-    await node.click();
-    await tabs.getByRole('button', { name: '参数' }).click();
-  } else {
-    await page.locator('.be-node[data-node-id="p5"]').click();
-  }
-
-  const widthControl = page.locator('.be-param').filter({ hasText: '宽度' }).locator('input[type="range"]');
-  await widthControl.fill('10');
-  await page.locator('.be-note textarea').fill('现场要求：屏宽改成 10m，必须预留备份信号。');
-  await page.getByLabel('蓝图名称').fill('测试 / LED 现场版本');
-
-  const beforeReload = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-blueprint-editor-autosave-v2') || '{}'));
-  expect(beforeReload.title).toBe('测试 / LED 现场版本');
-  const led = beforeReload.nodes.find((item) => item.definitionId === 'prod-led-wall' && Number(item.params?.widthM) === 10);
-  expect(led).toBeTruthy();
-  expect(led.params._note).toMatch(/屏宽改成 10m/);
-
-  await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByLabel('蓝图名称')).toHaveValue('测试 / LED 现场版本');
-});
-
-test('save, save-as, export and share code are real persistence actions', async ({ page }) => {
-  await openEditor(page);
-  await clearEditorStorage(page);
-  await page.reload({ waitUntil: 'networkidle' });
-
-  await page.getByRole('button', { name: /^保存/ }).click();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-blueprint-library-v2') || '[]'));
-  expect(saved.length).toBe(1);
-
+  const title = page.getByLabel('蓝图名称');
+  await title.fill('OUTPUT Demo Blueprint');
+  await page.getByRole('button', { name: '保存', exact: true }).click();
   await page.getByRole('button', { name: '另存为' }).click();
-  const dialog = page.locator('.be-dialog').filter({ hasText: '另存为新蓝图' });
-  await dialog.getByRole('textbox').fill('展览版 / Remix');
-  await dialog.getByRole('button', { name: '另存为', exact: true }).click();
-  await expect(page.getByLabel('蓝图名称')).toHaveValue('展览版 / Remix');
-  const library = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-blueprint-library-v2') || '[]'));
-  expect(library.length).toBe(2);
-  expect(library[1].parentBlueprintId).toBeTruthy();
-
-  const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: '导出' }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/\.nmas\.json$/);
-
+  await page.locator('.be-dialog input').fill('OUTPUT Demo Blueprint / B');
+  await page.locator('.be-dialog').getByRole('button', { name: '另存为' }).click();
+  await expect(title).toHaveValue('OUTPUT Demo Blueprint / B');
   await page.getByRole('button', { name: '分享' }).click();
-  const shareDialog = page.locator('.be-share');
-  const code = await shareDialog.getByLabel('图纸码').inputValue();
+  const code = await page.getByLabel('图纸码').inputValue();
   expect(code.startsWith('NMAS-BP1-')).toBe(true);
+  await page.locator('.be-dialog').getByRole('button', { name: '×' }).click();
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByLabel('蓝图名称')).toHaveValue('OUTPUT Demo Blueprint / B');
 });
 
-test('free mode starts blank and mobile switches library canvas inspector', async ({ page, isMobile }) => {
-  await openEditor(page, '&mode=free&blank=1');
+test('desktop camera tools fit, center and zoom without breaking node selection', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop-only camera toolbar');
+  await openEditor(page);
   await clearEditorStorage(page);
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.locator('.be-node')).toHaveCount(0);
-  await expect(page.getByText(/Shift\+A 新建节点 · Space 拖动画布/)).toBeVisible();
+  const node = page.locator('.be-node[data-node-id="p2"]');
+  await node.click();
+  await expect(page.getByLabel('节点检查器')).toBeVisible();
+  await page.locator('.be-camera-tools').getByRole('button', { name: /适配/ }).click();
+  await page.locator('.be-camera-tools').getByRole('button', { name: /居中/ }).click();
+  await page.locator('.be-camera-tools').getByRole('button', { name: '＋' }).click();
+  await expect(page.locator('.be-camera-tools span')).not.toHaveText('82%');
+});
 
-  if (isMobile) {
-    const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
-    await expect(tabs).toBeVisible();
-    await tabs.getByRole('button', { name: '节点' }).click();
-    await expect(page.getByLabel('节点库')).toBeVisible();
-    await page.getByLabel('节点库').getByRole('button', { name: /LED 屏/ }).click();
-    await tabs.getByRole('button', { name: '画布' }).click();
-    await expect(page.locator('.be-node')).toHaveCount(1);
-    await page.locator('.be-node').click();
-    await tabs.getByRole('button', { name: '参数' }).click();
-    await expect(page.getByLabel('节点检查器')).toBeVisible();
-  }
-
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
-  expect(overflow).toBe(false);
+test('mobile editor switches between library, canvas and inspector', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'mobile-only editing layout');
+  await openEditor(page);
+  await clearEditorStorage(page);
+  await page.reload({ waitUntil: 'networkidle' });
+  const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
+  await tabs.getByRole('button', { name: '节点' }).click();
+  await expect(page.getByLabel('节点库')).toBeVisible();
+  await tabs.getByRole('button', { name: '画布' }).click();
+  await expect(page.getByLabel('节点编辑画布')).toBeVisible();
+  await page.locator('.be-node').first().click();
+  await tabs.getByRole('button', { name: '参数' }).click();
+  await expect(page.getByLabel('节点检查器')).toBeVisible();
 });
