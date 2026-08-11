@@ -39,7 +39,10 @@ export type ConsequenceState = {
   generatedArchive: GeneratedArchiveEntry[];
 };
 
-const contactOutcomeSeeds: Record<string, Omit<ScheduledCallback, 'id' | 'sourceType' | 'sourceId' | 'createdWeek' | 'dueWeek'>> = {
+type OutcomeSeed = Omit<ScheduledCallback, 'id' | 'sourceType' | 'sourceId' | 'createdWeek' | 'dueWeek'>;
+type OpportunityOutcomeSeed = OutcomeSeed & { delay?: number };
+
+const contactOutcomeSeeds: Record<string, OutcomeSeed> = {
   'contact-lin': {
     title: '林看完了当前版本',
     waitingText: '他说先别讲概念，把能跑的版本带来。',
@@ -90,7 +93,7 @@ const contactOutcomeSeeds: Record<string, Omit<ScheduledCallback, 'id' | 'source
   }
 };
 
-const opportunityOutcomeSeeds: Record<string, Omit<ScheduledCallback, 'id' | 'sourceType' | 'sourceId' | 'createdWeek' | 'dueWeek'>> & { delay?: number }> = {
+const opportunityOutcomeSeeds: Record<string, OpportunityOutcomeSeed> = {
   'opp-blackbox-two-hours': {
     title: '黑盒测试结果回来',
     waitingText: '两小时场地已经排进日程。',
