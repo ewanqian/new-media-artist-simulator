@@ -3,29 +3,30 @@ import './v05-narrative-stage.css';
 
 const DEFAULT_META = { kicker: 'EPISODE', time: '', objective: '' };
 
-export default function V05NarrativeStage({ sceneKey, scene, speaker, node, meta = DEFAULT_META, onChoose }) {
+export default function V05NarrativeStage({ contentKey, scene, speaker, node, meta = DEFAULT_META, onChoose, showLoad = false, instrument = null }) {
   const paragraphs = node?.text || [];
-  const [phase, setPhase] = useState('loading');
+  const [phase, setPhase] = useState(showLoad ? 'loading' : 'dialogue');
   const [visibleCount, setVisibleCount] = useState(0);
   const [choicesVisible, setChoicesVisible] = useState(false);
 
   useEffect(() => {
-    setPhase('loading');
+    setPhase(showLoad ? 'loading' : 'dialogue');
     setVisibleCount(0);
     setChoicesVisible(false);
-    const loadTimer = window.setTimeout(() => setPhase('dialogue'), 900);
+    if (!showLoad) return;
+    const loadTimer = window.setTimeout(() => setPhase('dialogue'), 950);
     return () => window.clearTimeout(loadTimer);
-  }, [sceneKey]);
+  }, [contentKey, showLoad]);
 
   useEffect(() => {
     if (phase !== 'dialogue') return;
     if (visibleCount < paragraphs.length) {
-      const timer = window.setTimeout(() => setVisibleCount((value) => value + 1), visibleCount === 0 ? 180 : 620);
+      const timer = window.setTimeout(() => setVisibleCount((value) => value + 1), visibleCount === 0 ? 170 : 560);
       return () => window.clearTimeout(timer);
     }
-    const timer = window.setTimeout(() => setChoicesVisible(true), 360);
+    const timer = window.setTimeout(() => setChoicesVisible(true), instrument ? 620 : 320);
     return () => window.clearTimeout(timer);
-  }, [phase, visibleCount, paragraphs.length]);
+  }, [phase, visibleCount, paragraphs.length, instrument]);
 
   const done = visibleCount >= paragraphs.length;
   const locationLine = useMemo(() => [meta.time, scene?.location].filter(Boolean).join(' · '), [meta.time, scene?.location]);
@@ -54,6 +55,7 @@ export default function V05NarrativeStage({ sceneKey, scene, speaker, node, meta
     <section className="narrative-stage" onClick={revealNow}>
       <div className="narrative-stage-meta">
         <small>{meta.kicker || 'EPISODE'}</small>
+        <span>{scene?.title || 'SCENE'}</span>
         <span>{locationLine}</span>
         {meta.objective && <b>{meta.objective}</b>}
       </div>
@@ -61,10 +63,12 @@ export default function V05NarrativeStage({ sceneKey, scene, speaker, node, meta
       <div className="narrative-dialogue">
         {speaker ? <header><strong>{speaker.name}</strong><span>{speaker.publicRole}</span></header> : <header><strong>SYSTEM</strong><span>RECORD</span></header>}
         <div className="narrative-lines">
-          {paragraphs.slice(0, visibleCount).map((paragraph, index) => <p key={`${sceneKey}-${index}`}>{paragraph}</p>)}
+          {paragraphs.slice(0, visibleCount).map((paragraph, index) => <p key={`${contentKey}-${index}`}>{paragraph}</p>)}
           {!done && <span className="narrative-cursor" aria-hidden="true" />}
         </div>
       </div>
+
+      {done && instrument && <div className="narrative-instrument" onClick={(event) => event.stopPropagation()}>{instrument}</div>}
 
       {choicesVisible && node.choices.length > 0 && <div className="narrative-decisions" onClick={(event) => event.stopPropagation()}>
         {node.choices.map((choice, index) => (
