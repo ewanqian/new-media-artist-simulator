@@ -4,7 +4,8 @@ import {
   CAREER_SAVE_KEY,
   careerEpisodes,
   careerNpcArcs,
-  careerStageById
+  careerStageById,
+  resourcePackById
 } from '../careerContent.ts';
 import V05TriadExperience from './V05TriadExperience.jsx';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
@@ -37,10 +38,24 @@ function currentCareerEpisode(save) {
     || careerEpisodes[0];
 }
 
+const firstMessages = {
+  'contact-lin': '林：别发完整提案。今晚先给我一个能跑的版本，顺便告诉我你最不确定哪一块。',
+  'contact-li-tech': '李技术：先画最简单的信号链。分辨率、刷新率、接口、备份，别等到现场再想。',
+  'contact-m': 'M：开始前也留一张。最后画面最容易拍，真正会丢的是失败和改动顺序。',
+  'contact-qiao': '乔：先别急着把它包装成服务。把你自己的东西做出一个能被别人看到的版本。',
+  'contact-chen': '陈：以后要进空间，你得能用一页说清楚。但今晚先证明它真的存在。',
+  'contact-dai': '戴：还没到做结构的时候。先把尺寸、输入输出和你实际有的东西写下来。'
+};
+
 export default function V05CareerExperienceShell() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [briefOpen, setBriefOpen] = useState(false);
   const [career, setCareer] = useState(readCareer);
+  const introKey = career.profile?.id ? `nmas-career-intro-seen:${career.profile.id}` : null;
+  const [introOpen, setIntroOpen] = useState(() => {
+    const initial = readCareer();
+    return Boolean(initial.profile?.id && !localStorage.getItem(`nmas-career-intro-seen:${initial.profile.id}`));
+  });
 
   useEffect(() => {
     let previous = JSON.stringify(career.save || null);
@@ -78,6 +93,14 @@ export default function V05CareerExperienceShell() {
   const episode = useMemo(() => currentCareerEpisode(career.save), [career.save]);
   const showBlueprint = career.profile?.workMode !== 'story';
   const episodePeople = (episode?.primaryNpcIds || []).map((id) => careerNpcArcs.find((npc) => npc.id === id)).filter(Boolean);
+  const pack = resourcePackById(career.profile?.resourcePackId);
+  const firstNpcId = career.profile?.knownNpcIds?.[0];
+  const firstMessage = firstMessages[firstNpcId] || '没有人催你。第一件事只需要回答：现在到底有什么东西能够真的运行？';
+
+  function closeIntro() {
+    if (introKey) localStorage.setItem(introKey, '1');
+    setIntroOpen(false);
+  }
 
   return (
     <div className="vcareer-wrap">
@@ -90,6 +113,16 @@ export default function V05CareerExperienceShell() {
         <button onClick={() => setSettingsOpen(true)}>设置</button>
         <a href={v05Href()}>首页</a>
       </aside>
+
+      {introOpen && career.profile && <section className="vcareer-intro" aria-label="第一周开场">
+        <div className="vcareer-intro-card">
+          <header><small>WEEK 01 · 23:48 · 自己的工作位</small><h1>先让一个东西存在。</h1></header>
+          <p>你现在没有一个需要证明的职业称号。桌上只有这些东西：<b>{pack.assets.slice(0, 4).join('、')}</b>。现金 ¥{pack.cash}，注意力 6。</p>
+          <blockquote>{firstMessage}</blockquote>
+          <div className="vcareer-first-prompt"><small>今晚的问题</small><strong>{career.profile.firstProjectPrompt}</strong><span>完整提案、职业定位和长期规划都可以晚一点。先留下第一个可运行证据。</span></div>
+          <footer><button className="primary" onClick={closeIntro}>开始第一周</button>{showBlueprint && <a href={v05Href('lab=blueprint')}>先看工作图</a>}</footer>
+        </div>
+      </section>}
 
       {briefOpen && episode && <section className="vcareer-brief" aria-label="当前任务线简报">
         <header><div><small>{stage.code} / CURRENT LINE</small><h2>{episode.title}</h2></div><button aria-label="关闭任务线简报" onClick={() => setBriefOpen(false)}>×</button></header>
