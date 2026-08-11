@@ -18,15 +18,16 @@ const STATE_KEY = 'nmas-special-butterfly-narrative-v1';
 const WORLD_KEY = 'nmas-special-butterfly-world-v1';
 
 const emptyWorld = () => ({
-  unlockNodeIds: [],
-  evidenceIds: [],
-  methodIds: [],
-  threadIds: [],
-  archiveEntryIds: [],
-  projectTags: []
+  unlockNodeIds: [], evidenceIds: [], methodIds: [], threadIds: [], archiveEntryIds: [], projectTags: []
 });
-
 const unique = (values) => [...new Set(values.filter(Boolean))];
+
+function v05Href(query = '') {
+  const params = new URLSearchParams(window.location.search);
+  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/');
+  if (!query) return rootPreview ? './?core=v05' : './';
+  return rootPreview ? `./?core=v05&${query}` : `./?${query}`;
+}
 
 function readJson(key, fallback) {
   try {
@@ -57,6 +58,7 @@ export default function V05ButterflyScholarRoute() {
   const contradictions = useMemo(() => narrativeContradictions(state), [state]);
   const visitedCount = new Set(state.visitedNodeIds).size;
   const progress = Math.min(100, Math.round((visitedCount / Math.max(1, butterflyScholarNarrativePack.nodes.length - 1)) * 100));
+  const blueprintHref = v05Href('lab=blueprint&preset=butterfly');
 
   function choose(choice) {
     const nextState = applyNarrativeChoice(butterflyScholarNarrativePack, state, choice.id);
@@ -85,76 +87,22 @@ export default function V05ButterflyScholarRoute() {
       <header className="bs-topbar">
         <div className="bs-brand"><small>SPECIAL ROUTE / NARRATIVE PACK 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div>
         <div className="bs-progress"><span style={{ width: `${progress}%` }} /></div>
-        <nav>
-          <a href="./?lab=blueprint&preset=butterfly">采集工作图</a>
-          <a href="./">首页</a>
-          <button onClick={reset}>重置</button>
-        </nav>
+        <nav><a href={blueprintHref}>采集工作图</a><a href={v05Href()}>首页</a><button onClick={reset}>重置</button></nav>
       </header>
 
       <div className="bs-layout">
         <article className="bs-scene">
-          <header>
-            <small>{scene?.location || 'FIELD'} · {node.channel.toUpperCase()}</small>
-            <h1>{scene?.title || butterflyScholarIdentity.title}</h1>
-            {speaker && <div className="bs-speaker"><span>{speaker.name}</span><i>{speaker.publicRole}</i></div>}
-          </header>
-
+          <header><small>{scene?.location || 'FIELD'} · {node.channel.toUpperCase()}</small><h1>{scene?.title || butterflyScholarIdentity.title}</h1>{speaker && <div className="bs-speaker"><span>{speaker.name}</span><i>{speaker.publicRole}</i></div>}</header>
           <section className="bs-copy">{node.text.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>
-
-          {node.choices.length > 0 ? (
-            <div className="bs-choices">
-              {node.choices.map((choice, index) => (
-                <button key={choice.id} onClick={() => choose(choice)}>
-                  <small>{String(index + 1).padStart(2, '0')} / DECISION</small>
-                  <strong>{choice.label}</strong>
-                  {choice.subtext && <span>{choice.subtext}</span>}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <section className="bs-complete">
-              <small>ROUTE COMPLETE</small>
-              <strong>这次旅行已经形成一份可继续打开的实践档案。</strong>
-              <p>人物记忆、采集方法、重建节点、数据边界和公开版本都保留在本地状态里。</p>
-              <div><a href="./?lab=blueprint&preset=butterfly">打开最终工作图</a><button onClick={reset}>重新开始</button></div>
-            </section>
-          )}
+          {node.choices.length > 0 ? <div className="bs-choices">{node.choices.map((choice, index) => <button key={choice.id} onClick={() => choose(choice)}><small>{String(index + 1).padStart(2, '0')} / DECISION</small><strong>{choice.label}</strong>{choice.subtext && <span>{choice.subtext}</span>}</button>)}</div> : <section className="bs-complete"><small>ROUTE COMPLETE</small><strong>这次旅行已经形成一份可继续打开的实践档案。</strong><p>人物记忆、采集方法、重建节点、数据边界和公开版本都保留在本地状态里。</p><div><a href={blueprintHref}>打开最终工作图</a><button onClick={reset}>重新开始</button></div></section>}
         </article>
 
         <aside className="bs-context">
-          <section className="bs-profile">
-            <small>YOU ARE</small>
-            <strong>{butterflyScholarIdentity.role}</strong>
-            <p>{butterflyScholarIdentity.practice}</p>
-            <blockquote>{butterflyScholarIdentity.currentQuestion}</blockquote>
-          </section>
-
-          <section>
-            <small>BLUEPRINT / UNLOCKED</small>
-            <strong>{world.unlockNodeIds.length} 个路线节点</strong>
-            <div className="bs-tags">{world.unlockNodeIds.slice(-8).map((id) => <span key={id}>{id}</span>)}</div>
-            <a className="bs-inline-link" href="./?lab=blueprint&preset=butterfly">打开工作图 →</a>
-          </section>
-
-          <section>
-            <small>RECORDS</small>
-            <strong>{world.evidenceIds.length} Evidence · {world.methodIds.length} Method</strong>
-            <p>{world.threadIds.length} 个未决 Thread · {world.archiveEntryIds.length} 个 Archive 条目</p>
-          </section>
-
-          <section className={contradictions.length ? 'bs-alert' : ''}>
-            <small>NARRATIVE STATE</small>
-            <strong>{knownFacts.length} 条已知信息</strong>
-            <p>{contradictions.length ? `${contradictions.length} 条说法当前互相冲突。` : '目前没有显式矛盾。'}</p>
-            <p>Inés 信任：{state.trust.ines || 0} · 人物记忆：{state.memories.length}</p>
-          </section>
-
-          <section>
-            <small>FIELD TRAINING</small>
-            <strong>7 个采集到作品的动作</strong>
-            <ol>{butterflyScholarTraining.map((step) => <li key={step.id}><b>{step.title}</b><span>{step.plain}</span></li>)}</ol>
-          </section>
+          <section className="bs-profile"><small>YOU ARE</small><strong>{butterflyScholarIdentity.role}</strong><p>{butterflyScholarIdentity.practice}</p><blockquote>{butterflyScholarIdentity.currentQuestion}</blockquote></section>
+          <section><small>BLUEPRINT / UNLOCKED</small><strong>{world.unlockNodeIds.length} 个路线节点</strong><div className="bs-tags">{world.unlockNodeIds.slice(-8).map((id) => <span key={id}>{id}</span>)}</div><a className="bs-inline-link" href={blueprintHref}>打开工作图 →</a></section>
+          <section><small>RECORDS</small><strong>{world.evidenceIds.length} Evidence · {world.methodIds.length} Method</strong><p>{world.threadIds.length} 个未决 Thread · {world.archiveEntryIds.length} 个 Archive 条目</p></section>
+          <section className={contradictions.length ? 'bs-alert' : ''}><small>NARRATIVE STATE</small><strong>{knownFacts.length} 条已知信息</strong><p>{contradictions.length ? `${contradictions.length} 条说法当前互相冲突。` : '目前没有显式矛盾。'}</p><p>Inés 信任：{state.trust.ines || 0} · 人物记忆：{state.memories.length}</p></section>
+          <section><small>FIELD TRAINING</small><strong>7 个采集到作品的动作</strong><ol>{butterflyScholarTraining.map((step) => <li key={step.id}><b>{step.title}</b><span>{step.plain}</span></li>)}</ol></section>
         </aside>
       </div>
     </main>
