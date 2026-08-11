@@ -16,7 +16,7 @@ async function clearCareer(page) {
 async function enterWeekOne(page) {
   await expect(page.getByLabel('第一周开场')).toBeVisible();
   await expect(page.getByRole('heading', { name: '先让一个东西存在。' })).toBeVisible();
-  await page.getByRole('button', { name: '开始第一周' }).click();
+  await page.getByRole('button', { name: '进入第一周' }).click();
   await expect(page.getByLabel('第一周开场')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '开始新的实践' })).toHaveCount(0);
   await expect(page.getByLabel('生涯工具')).toBeVisible();
@@ -78,7 +78,7 @@ test('five-question role model reaches the same career shell without creating a 
     const brief = page.getByLabel('当前任务线简报');
     await expect(brief).toBeVisible();
     await expect(brief.getByRole('heading', { name: '桌上先有一个东西开始运行' })).toBeVisible();
-    await expect(brief.getByText('现在值得追的事', { exact: true })).toBeVisible();
+    await expect(brief.getByText('现在真正需要决定的事', { exact: true })).toBeVisible();
   }
 });
 
