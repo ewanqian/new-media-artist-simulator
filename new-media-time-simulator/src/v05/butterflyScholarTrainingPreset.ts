@@ -5,14 +5,8 @@ export const BUTTERFLY_TRAINING_ALLOWED_NODES = [
   'capture-photo-sequence',
   'capture-quality-check',
   'process-metashape-align',
-  'process-colmap-sfm',
   'process-dense-reconstruction',
-  'process-gaussian-splat',
-  'process-point-clean',
-  'process-blender-procedural',
-  'process-physics-motion',
-  'process-butterfly-behavior',
-  'output-web-scene'
+  'process-gaussian-splat'
 ] as const;
 
 export const BUTTERFLY_TRAINING_OBJECTIVES = [
@@ -43,7 +37,7 @@ export const BUTTERFLY_TRAINING_OBJECTIVES = [
     title: '把可用照片送进相机求解',
     why: 'Metashape 先算出每张照片从哪里拍的。相机关系可靠以后，才轮到点云或 Gaussian。',
     from: ['capture-quality-check'],
-    to: ['process-metashape-align', 'process-colmap-sfm'],
+    to: ['process-metashape-align'],
     fromLabel: '离场前检查',
     fromPort: '可继续的数据',
     toLabel: 'Metashape · 相机求解',
@@ -62,14 +56,12 @@ export function buildButterflyScholarTrainingPreset() {
       { id: 'bt0', definitionId: 'field-capture-session', x: 60, y: 160, params: { location: '云雾林样地 A', question: '先扫描寄主植物和它周围的小片空间', weather: '风小 / 散射光' } },
       { id: 'bt1', definitionId: 'capture-photo-sequence', x: 330, y: 160, params: { photos: 80, overlap: '高', lighting: '较小', viewpoints: '充分' } },
       { id: 'bt2', definitionId: 'capture-quality-check', x: 600, y: 160, params: { blur: false, missing: true, specular: false, lightingShift: true } },
-      { id: 'bt3', definitionId: 'process-metashape-align', x: 870, y: 90, params: { accuracy: '中', aligned: 76 } },
-      { id: 'bt4', definitionId: 'process-colmap-sfm', x: 870, y: 300, params: { matching: '顺序照片', registered: 76 } },
-      { id: 'bt5', definitionId: 'process-dense-reconstruction', x: 1140, y: 70, params: { detail: '中', millions: 8 } },
-      { id: 'bt6', definitionId: 'process-gaussian-splat', x: 1140, y: 300, params: { iterations: 30, goal: '预览速度' } },
-      { id: 'bt7', definitionId: 'process-blender-procedural', x: 1410, y: 180, params: { driver: 'Noise', strength: 25, speed: 20 } }
+      { id: 'bt3', definitionId: 'process-metashape-align', x: 870, y: 160, params: { accuracy: '中', aligned: 76 } },
+      { id: 'bt4', definitionId: 'process-dense-reconstruction', x: 1140, y: 70, params: { detail: '中', millions: 8 } },
+      { id: 'bt5', definitionId: 'process-gaussian-splat', x: 1140, y: 290, params: { iterations: 30, goal: '预览速度' } }
     ],
     edges: [],
     groups: [],
-    notes: ['只完成三条线：现场调查 → 摄影测量采集 → 离场前检查 → 相机求解。完成以后，点云 / Gaussian / Blender 作为下一组自由节点开放。']
+    notes: ['只完成三条线：现场调查 → 摄影测量采集 → 离场前检查 → 相机求解。完成以后，再自由选择点云或 Gaussian；Blender 等创作节点在后续内容里解锁。']
   };
 }
