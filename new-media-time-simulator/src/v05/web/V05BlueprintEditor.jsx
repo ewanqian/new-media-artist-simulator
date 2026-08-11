@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { buildButterflyScholarPreset } from '../blueprintEditorCatalog.ts';
+import { buildButterflyScholarTrainingPreset, BUTTERFLY_TRAINING_BLUEPRINT_ID } from '../butterflyScholarTrainingPreset.ts';
 import V05BlueprintEditorV2 from './V05BlueprintEditorV2.jsx';
 
 const AUTOSAVE_KEY = 'nmas-blueprint-editor-autosave-v2';
@@ -9,10 +9,10 @@ function loadRequestedPreset() {
   if (params.get('preset') !== 'butterfly') return;
   try {
     const current = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
-    if (current?.id === 'bp-butterfly-scholar-field-capture') return;
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarPreset()));
+    if (current?.id === BUTTERFLY_TRAINING_BLUEPRINT_ID) return;
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
   } catch {
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarPreset()));
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
   }
 }
 
@@ -22,9 +22,7 @@ export default function V05BlueprintEditor() {
   useEffect(() => {
     let nodePointerActive = false;
     let releaseTimer = null;
-
     const mobileTabs = () => document.querySelector('.be-mobile-tabs');
-
     const relabelShareImport = () => {
       const input = document.getElementById('be-import-code');
       if (!input) return;
@@ -33,7 +31,6 @@ export default function V05BlueprintEditor() {
       const caption = label?.querySelector('span');
       if (caption && caption.textContent !== '导入代码') caption.textContent = '导入代码';
     };
-
     const onPointerDownCapture = (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target?.closest('.be-node')) return;
@@ -41,16 +38,12 @@ export default function V05BlueprintEditor() {
       if (releaseTimer) window.clearTimeout(releaseTimer);
       mobileTabs()?.style.setProperty('pointer-events', 'none', 'important');
     };
-
     const onClickCapture = (event) => {
       if (!nodePointerActive) return;
       const target = event.target instanceof Element ? event.target : null;
       if (target?.closest('.be-node')) return;
-      if (target?.closest('.be-viewport')) {
-        event.stopPropagation();
-      }
+      if (target?.closest('.be-viewport')) event.stopPropagation();
     };
-
     const releaseNodePointer = () => {
       if (releaseTimer) window.clearTimeout(releaseTimer);
       releaseTimer = window.setTimeout(() => {
@@ -58,16 +51,13 @@ export default function V05BlueprintEditor() {
         mobileTabs()?.style.removeProperty('pointer-events');
       }, 0);
     };
-
     const observer = new MutationObserver(relabelShareImport);
     observer.observe(document.body, { childList: true, subtree: true });
     relabelShareImport();
-
     document.addEventListener('pointerdown', onPointerDownCapture, true);
     document.addEventListener('click', onClickCapture, true);
     window.addEventListener('pointerup', releaseNodePointer, true);
     window.addEventListener('pointercancel', releaseNodePointer, true);
-
     return () => {
       observer.disconnect();
       if (releaseTimer) window.clearTimeout(releaseTimer);
