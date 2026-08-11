@@ -3,18 +3,20 @@ import { openingQuestProgress } from './questRuntime.ts';
 
 export const CAREER_STORY_EVENT = 'nmas-career-story-choice';
 
+type CareerState = Record<string, any>;
+
 export type CareerStoryCommandResult = {
-  save: Record<string, any>;
+  save: CareerState;
   notice: { title: string; text: string };
 };
 
 function clamp(value: number) { return Math.max(0, Math.min(4, value)); }
 
-function withLog(save: Record<string, any>, title: string, text: string, type = '生涯') {
+function withLog(save: CareerState, title: string, text: string, type = '生涯'): CareerState {
   return { ...save, actionLog: [...(save.actionLog || []), { week: save.week || 1, type, title, text }] };
 }
 
-function discover(save: Record<string, any>, contactId: string) {
+function discover(save: CareerState, contactId: string): CareerState {
   const discovered = [...(save.discoveredContactIds || [])];
   const threads = { ...(save.contactThreads || {}) };
   if (!discovered.includes(contactId)) discovered.push(contactId);
@@ -22,12 +24,12 @@ function discover(save: Record<string, any>, contactId: string) {
   return { ...save, discoveredContactIds: discovered, contactThreads: threads };
 }
 
-function applyStarterCard(save: Record<string, any>, cardId: string) {
+function applyStarterCard(save: CareerState, cardId: string): CareerState {
   const card = actionCards.find((item) => item.id === cardId);
   if (!card || Number(save.attention || 0) < card.cost) return save;
   const effect = card.effect || {};
   const seed = !save.primaryProject && card.projectSeed ? card.projectSeed : save.primaryProject;
-  let next = {
+  let next: CareerState = {
     ...save,
     attention: save.attention - card.cost,
     completedCardIds: (save.completedCardIds || []).includes(card.id) ? save.completedCardIds : [...(save.completedCardIds || []), card.id],
@@ -43,7 +45,7 @@ function applyStarterCard(save: Record<string, any>, cardId: string) {
   return withLog(next, card.title, card.plain, '工作');
 }
 
-function contextAction(save: Record<string, any>, options: {
+function contextAction(save: CareerState, options: {
   placeId: string;
   placeTitle: string;
   verb: string;
@@ -55,9 +57,9 @@ function contextAction(save: Record<string, any>, options: {
   stability?: number;
   siteFit?: number;
   documentation?: number;
-}) {
+}): CareerState {
   if (!save.primaryProject || Number(save.attention || 0) < options.cost) return save;
-  let next = { ...save };
+  let next: CareerState = { ...save };
   if (options.discoverContactId) next = discover(next, options.discoverContactId);
   const visited = [...(next.visitedPlaceIds || [])];
   if (!visited.includes(options.placeId)) visited.push(options.placeId);
@@ -81,9 +83,9 @@ function contextAction(save: Record<string, any>, options: {
   return withLog(next, `${options.placeTitle} / ${options.verb}`, `通过叙事路径完成一次真实环境动作：${options.evidence}。`, '场域');
 }
 
-function sendWitness(save: Record<string, any>, contactId: string, text: string) {
+function sendWitness(save: CareerState, contactId: string, text: string): CareerState {
   if (Number(save.attention || 0) < 1) return save;
-  let next = discover(save, contactId);
+  let next: CareerState = discover(save, contactId);
   const contact = contactById(contactId);
   const thread = next.contactThreads?.[contactId] || contact?.openingMessages || [];
   const replyText = contactId === 'contact-lin'
@@ -100,7 +102,7 @@ function sendWitness(save: Record<string, any>, contactId: string, text: string)
   return withLog(next, `把当前版本发给 ${contact?.name || contactId}`, text, '人物');
 }
 
-function advanceWeek(save: Record<string, any>) {
+function advanceWeek(save: CareerState): CareerState {
   const nextWeek = Number(save.week || 1) + 1;
   const due = (save.pendingReplies || []).filter((item: any) => item.dueWeek <= nextWeek);
   const waiting = (save.pendingReplies || []).filter((item: any) => item.dueWeek > nextWeek);
@@ -123,7 +125,7 @@ function advanceWeek(save: Record<string, any>) {
   }, `第 ${nextWeek} 周`, due.length ? `${due.length} 条回复回来。固定支出 -450。` : '没有重要回复。固定支出 -450。', '时间');
 }
 
-function diagnose(save: Record<string, any>, methodId: string, evidenceId: string, label: string, scopeAdapted = false) {
+function diagnose(save: CareerState, methodId: string, evidenceId: string, label: string, scopeAdapted = false): CareerState {
   if (Number(save.attention || 0) < 1) return save;
   const revealed = [...(save.revealedIssueIds || [])];
   if (!revealed.length) revealed.push('issue-context-friction');
@@ -132,7 +134,7 @@ function diagnose(save: Record<string, any>, methodId: string, evidenceId: strin
   if (target) resolved.push(target);
   const methods = [...(save.methodIds || [])];
   if (!methods.includes(methodId)) methods.push(methodId);
-  let next = {
+  let next: CareerState = {
     ...save,
     attention: save.attention - 1,
     revealedIssueIds: revealed,
@@ -151,7 +153,7 @@ function diagnose(save: Record<string, any>, methodId: string, evidenceId: strin
   return withLog(next, label, `问题被转化为方法：${methodId}。`, '工作');
 }
 
-function publicOutput(save: Record<string, any>, options: {
+function publicOutput(save: CareerState, options: {
   placeId: string;
   placeTitle: string;
   cashDelta: number;
@@ -161,9 +163,9 @@ function publicOutput(save: Record<string, any>, options: {
   contactId: string;
   evidence: string;
   note: string;
-}) {
+}): CareerState {
   if (Number(save.attention || 0) < options.attentionCost || Number(save.cash || 0) + options.cashDelta < 0) return save;
-  let next = discover(save, options.contactId);
+  let next: CareerState = discover(save, options.contactId);
   const visited = [...(next.visitedPlaceIds || [])];
   if (!visited.includes(options.placeId)) visited.push(options.placeId);
   const contextActions = [...(next.contextActionIds || []), `${options.placeId}:run:${next.week}:public-story`];
@@ -198,8 +200,8 @@ function publicOutput(save: Record<string, any>, options: {
   return next;
 }
 
-export function applyCareerStoryCommand(save: Record<string, any>, commandId: string): CareerStoryCommandResult {
-  let next = save;
+export function applyCareerStoryCommand(save: CareerState, commandId: string): CareerStoryCommandResult {
+  let next: CareerState = save;
   let notice = { title: '没有发生', text: '当前条件不允许这个选择。' };
 
   switch (commandId) {
