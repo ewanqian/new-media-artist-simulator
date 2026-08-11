@@ -58,7 +58,7 @@ test('Butterfly Scholar stages dialogue, research, capture, creation and archive
   await page.getByRole('link', { name: /哥斯达黎加的蝴蝶学者/ }).click();
   await page.waitForURL(/core=v05.*mode=butterfly|mode=butterfly/);
 
-  await choose(page, /去。先写下我真正想弄明白的问题/);
+  await choose(page, /接受。先写下我真正想弄明白的问题/);
   await choose(page, /先聊工作：明天先看样地和档案/);
 
   await study(page, '活蝴蝶怎么采集');
