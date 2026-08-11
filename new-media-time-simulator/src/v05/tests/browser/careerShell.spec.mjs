@@ -9,7 +9,17 @@ async function clearCareer(page) {
       'nmas-blueprint-library-v2',
       'nmas-blueprint-editor-autosave-v2'
     ]) localStorage.removeItem(key);
+    for (const key of Object.keys(localStorage)) if (key.startsWith('nmas-career-intro-seen:')) localStorage.removeItem(key);
   });
+}
+
+async function enterWeekOne(page) {
+  await expect(page.getByLabel('第一周开场')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '先让一个东西存在。' })).toBeVisible();
+  await page.getByRole('button', { name: '开始第一周' }).click();
+  await expect(page.getByLabel('第一周开场')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '开始新的实践' })).toHaveCount(0);
+  await expect(page.getByLabel('生涯工具')).toBeVisible();
 }
 
 test('career preset creates a real starting dossier and seeds stage one', async ({ page }) => {
@@ -35,7 +45,7 @@ test('career preset creates a real starting dossier and seeds stage one', async 
   expect(local.save.careerStageId).toBe('stage-1');
   expect(local.save.careerEpisodeId).toBe('ep-01-runnable');
   expect(local.save.cash).toBe(3200);
-  await expect(page.getByLabel('生涯工具')).toBeVisible();
+  await enterWeekOne(page);
   await expect(page.getByLabel('生涯工具').getByRole('link', { name: '工作图' })).toHaveCount(0);
 });
 
@@ -60,7 +70,14 @@ test('five-question role model reaches the same career shell without creating a 
   expect(profile.source).toBe('assessment');
   expect(profile.workMode).toBe('hybrid');
   expect(profile.classId).toBeUndefined();
+  await enterWeekOne(page);
   await expect(page.getByLabel('生涯工具').getByRole('link', { name: '工作图' })).toBeVisible();
+
+  await page.locator('.vcareer-stage').click();
+  const brief = page.getByLabel('当前任务线简报');
+  await expect(brief).toBeVisible();
+  await expect(brief.getByRole('heading', { name: '桌上先有一个东西开始运行' })).toBeVisible();
+  await expect(brief.getByText('现在值得追的事', { exact: true })).toBeVisible();
 });
 
 test('settings opens from home and persists real interface preferences', async ({ page }) => {
