@@ -116,9 +116,9 @@ test('venue preview is entered through a real venue and feeds project site fit',
   await expect(page.getByRole('heading', { name: '场地预演', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /平面屏/ }).click();
   await page.keyboard.press('p');
-  const metricRow = page.locator('.wf-metric-row');
-  await expect(metricRow.getByText('场地适配')).toBeVisible();
-  await expect(metricRow.getByText('1/4', { exact: true })).toBeVisible();
+  const siteFitMetric = page.locator('.wf-metric-row > div').filter({ hasText: '场地适配' });
+  await expect(siteFitMetric.getByText('场地适配', { exact: true })).toBeVisible();
+  await expect(siteFitMetric.getByText('1/4', { exact: true })).toBeVisible();
 
   const noHorizontalPageOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalPageOverflow).toBe(true);
