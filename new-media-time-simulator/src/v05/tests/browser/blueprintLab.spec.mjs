@@ -33,7 +33,7 @@ test('v05 home exposes career and free-create modes while tools stay secondary',
   await expect(page.getByRole('link', { name: /节点编辑器/ })).toHaveCount(0);
 });
 
-test('editor opens a production graph and nodes really drag', async ({ page }) => {
+test('editor opens a production graph and nodes really drag', async ({ page, isMobile }) => {
   await openEditor(page);
   await clearEditorStorage(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -43,7 +43,22 @@ test('editor opens a production graph and nodes really drag', async ({ page }) =
   const node = page.locator('.be-node[data-node-id="p2"]');
   const before = await node.boundingBox();
   expect(before).toBeTruthy();
-  await node.dragTo(page.locator('.be-world'), { targetPosition: { x: 700, y: 600 } });
+
+  if (isMobile) {
+    const viewport = await page.locator('.be-viewport').boundingBox();
+    expect(viewport).toBeTruthy();
+    const startX = before.x + before.width / 2;
+    const startY = before.y + Math.min(28, before.height / 2);
+    const endX = Math.min(viewport.x + viewport.width - 35, startX + 85);
+    const endY = Math.min(viewport.y + viewport.height - 90, startY + 70);
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(endX, endY, { steps: 8 });
+    await page.mouse.up();
+  } else {
+    await node.dragTo(page.locator('.be-world'), { targetPosition: { x: 700, y: 600 } });
+  }
+
   const after = await node.boundingBox();
   expect(after).toBeTruthy();
   expect(Math.abs(after.x - before.x) + Math.abs(after.y - before.y)).toBeGreaterThan(50);
