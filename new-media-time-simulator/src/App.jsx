@@ -17,7 +17,7 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
-const V05Wireframe = lazy(() => import('./v05/web/V05Wireframe.jsx'));
+const V05Experience = lazy(() => import('./v05/web/V05Experience.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -27,7 +27,7 @@ export default function App() {
   if (preview === 'v05') {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
-        <V05Wireframe />
+        <V05Experience />
       </Suspense>
     );
   }
