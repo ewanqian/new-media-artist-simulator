@@ -48,7 +48,7 @@ export default function V05ButterflyTrainingHUD() {
       <div className="bt-legend"><span><b>右侧 ●</b> 输出</span><span><b>左侧 ○</b> 输入</span><span>先点输出，再点输入</span></div>
       {!complete && current && <section className="bt-current"><small>现在只做这一条线</small><h2>{current.title}</h2><div className="bt-wire-instruction"><span>①【{current.fromLabel}】右侧 ● <b>{current.fromPort}</b></span><i>→</i><span>②【{current.toLabel}】左侧 ○ <b>{current.toPort}</b></span></div><p>{current.why}</p></section>}
       <ol>{status.map((item, index) => <li key={item.id} className={item.done ? 'done' : current?.id === item.id ? 'current' : ''}><i>{item.done ? '✓' : index + 1}</i><span>{item.title}</span></li>)}</ol>
-      <footer>{complete ? <><strong>第一条采集链已经接通。</strong><p>现在可以继续试点云、Gaussian 或 Blender；这些不再是教程必选答案。</p><a href={chapterHref()}>完成 · 返回章节选择 →</a></> : <p>不需要把所有端口都接满。这里只学三件事：先定义现场对象、离场前检查、先求解相机。</p>}</footer>
+      <footer>{complete ? <><strong>第一条采集链已经接通。</strong><p>现在可以继续试：点云 / Gaussian / Blender；这些不再是教程必选答案。</p><a href={chapterHref()}>完成 · 返回章节选择 →</a></> : <p>不需要把所有端口都接满。这里只学三件事：先定义现场对象、离场前检查、先求解相机。</p>}</footer>
     </>}
   </aside>;
 }
