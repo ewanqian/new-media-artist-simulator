@@ -84,7 +84,7 @@ test('entering an environment changes the workbench verbs instead of opening a g
   const compose = page.getByRole('button', { name: /编排/ });
   await expect(preview).toBeEnabled();
   await expect(compose).toBeDisabled();
-  await expect(page.getByText('当前环境无意义', { exact: true })).toBeVisible();
+  await expect(page.getByText('当前环境无意义', { exact: true }).first()).toBeVisible();
 });
 
 test('workbench contains projects capabilities and actions with 3 by 3 capability grammar', async ({ page }) => {
@@ -140,7 +140,7 @@ test('main quest line is playable across environment action contact diagnosis an
   await page.getByRole('button', { name: /运行/ }).click();
 
   await openPrimary(page, '记录');
-  await expect(page.getByText('别人怎么理解它', { exact: true })).toBeVisible();
+  await expect(page.locator('.tri-quest-dialogue').getByRole('heading', { name: '别人怎么理解它' })).toBeVisible();
 
   await openPrimary(page, '场域');
   await openSub(page, '场域', '人物');
@@ -168,7 +168,7 @@ test('main quest line is playable across environment action contact diagnosis an
   await openSub(page, '记录', '成就');
   const title = page.locator('.tri-triumph-list article').filter({ hasText: '现场生物' });
   await expect(title).toHaveClass(/done/);
-  await expect(page.locator('.tri-triumph-list article.done').count()).resolves.toBeGreaterThanOrEqual(4);
+  expect(await page.locator('.tri-triumph-list article.done').count()).toBeGreaterThanOrEqual(4);
 });
 
 test('light reading mode and mobile triad navigation do not overflow', async ({ page }) => {
