@@ -4,6 +4,7 @@ import ArchetypePicker from './components/ArchetypePicker.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import './v05/onboardingPolicy.ts';
 import './v05/web/v05-mobile-fix.css';
+import './v05/web/v05-blueprint-editor-fixes.css';
 import {
   createInitialState,
   equipSkill,
