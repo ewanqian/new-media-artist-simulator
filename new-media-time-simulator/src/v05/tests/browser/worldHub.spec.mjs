@@ -57,6 +57,34 @@ test('project actions visibly change stage and opportunity readiness', async ({ 
   await expect(publicScreen.getByText('条件不足', { exact: true })).toBeVisible();
 });
 
+test('reviewed opportunity enters a delayed line, returns next week, and writes an archive trace', async ({ page }) => {
+  await reset(page);
+  await enterWorld(page, /系统 \/ 生成/);
+  await page.keyboard.press('p');
+
+  await page.getByRole('button', { name: '收缩问题 / -1', exact: true }).click();
+  await page.getByRole('button', { name: '跑完整版本 / -2', exact: true }).click();
+
+  const blackbox = page.locator('.wf-opportunity').filter({ hasText: '两小时黑盒空档' });
+  await blackbox.getByRole('button', { name: '花 1 注意力判断', exact: true }).click();
+  await expect(blackbox.getByRole('button', { name: '进入这条线 / -1', exact: true })).toBeVisible();
+  await blackbox.getByRole('button', { name: '进入这条线 / -1', exact: true }).click();
+  await expect(blackbox.getByRole('button', { name: '等待第 2 周', exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: '结束本周', exact: true }).click();
+  await expect(blackbox.getByRole('button', { name: '已形成后果', exact: true })).toBeVisible();
+
+  const stabilityMetric = page.locator('.wf-metric-row > div').filter({ hasText: '稳定性' });
+  const siteFitMetric = page.locator('.wf-metric-row > div').filter({ hasText: '场地适配' });
+  await expect(stabilityMetric.getByText('3/4', { exact: true })).toBeVisible();
+  await expect(siteFitMetric.getByText('1/4', { exact: true })).toBeVisible();
+
+  await page.keyboard.press('k');
+  await expect(page.getByText('1', { exact: true }).filter({ visible: true })).toBeTruthy();
+  await expect(page.getByRole('heading', { name: '本轮生成档案', exact: true })).toBeVisible();
+  await expect(page.getByText('场地记录 / 黑盒两小时', { exact: true })).toBeVisible();
+});
+
 test('archive is a readable encyclopedia and activity log is separate', async ({ page }) => {
   await reset(page);
   await enterWorld(page, /研究 \/ 批评/);
