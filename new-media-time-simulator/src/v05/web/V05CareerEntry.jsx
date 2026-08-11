@@ -18,6 +18,13 @@ const workModes = [
   { id: 'blueprint', code: 'BLUEPRINT', title: '工作图优先', note: '项目关键节点默认使用可视化工作图，但仍然共享同一套剧情和后果。' }
 ];
 
+function v05Href(mode) {
+  const params = new URLSearchParams(window.location.search);
+  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/');
+  if (rootPreview) return `./?core=v05&mode=${mode}`;
+  return mode === 'home' ? './' : `./?mode=${mode}`;
+}
+
 function seedCareerSave(profile) {
   const pack = resourcePackById(profile.resourcePackId);
   return {
@@ -102,7 +109,7 @@ export default function V05CareerEntry() {
     const profile = entryType === 'assessment' ? buildAssessmentCareerProfile(answers, workMode) : profileFromPreset(presetId, workMode);
     localStorage.setItem(CAREER_PROFILE_KEY, JSON.stringify(profile));
     localStorage.setItem(CAREER_SAVE_KEY, JSON.stringify(seedCareerSave(profile)));
-    window.location.href = './?mode=story';
+    window.location.href = v05Href('story');
   }
 
   if (phase === 'assessment') {
@@ -123,9 +130,9 @@ export default function V05CareerEntry() {
       <section className="vc-panel">
         <header className="vc-head">
           <div><small>NEW MEDIA ARTIST SIMULATOR / CAREER</small><h1>建立你的起步档案</h1><p>不是选职业。先决定你从什么资源、关系和习惯开始，然后让这份档案在五个阶段里被不断改写。</p></div>
-          <div className="vc-head-actions"><a href="./">返回首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div>
+          <div className="vc-head-actions"><a href={v05Href('home')}>返回首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div>
         </header>
-        {existingProfile && <section className="vc-existing"><div><small>LOCAL CAREER FOUND</small><strong>{existingProfile.title}</strong><span>{existingProfile.workMode || 'hybrid'} · {existingProfile.signalTags?.join(' / ')}</span></div><a className="primary-link" href="./?mode=story">继续当前生涯</a></section>}
+        {existingProfile && <section className="vc-existing"><div><small>LOCAL CAREER FOUND</small><strong>{existingProfile.title}</strong><span>{existingProfile.workMode || 'hybrid'} · {existingProfile.signalTags?.join(' / ')}</span></div><a className="primary-link" href={v05Href('story')}>继续当前生涯</a></section>}
         <div className="vc-section-head"><small>QUICK START</small><h2>预置起点</h2><p>它们描述的是“你现在处于什么状态”，不是永久职业。</p></div>
         <div className="vc-presets">{careerPresets.map((preset) => { const presetPack = careerResourcePacks.find((item) => item.id === preset.resourcePackId); return <button key={preset.id} onClick={() => startPreset(preset.id)}><small>{preset.signalTags.join(' / ')}</small><strong>{preset.title}</strong><p>{preset.summary}</p><span>{presetPack?.title}</span></button>; })}</div>
         <div className="vc-assessment-call"><div><small>ROLE MODEL</small><strong>或者，用 5 题建模自己的起点</strong><p>问你手上有什么、别人因为什么找你、你怕什么失败、想先进哪个环境、希望第一个版本怎么证明自己。</p></div><button onClick={startAssessment}>开始 5 题建模 →</button></div>
