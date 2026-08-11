@@ -1,4 +1,5 @@
 import { blueprintNodeDefinitions } from './blueprintSystem.ts';
+import { butterflyScholarNodeDefinitions, buildButterflyScholarPreset } from './butterflyScholarNodes.ts';
 
 export type EditorPortType = 'video' | 'audio' | 'data' | 'trigger' | 'control' | 'resource' | 'space' | 'concept' | 'power';
 export type EditorParamKind = 'number' | 'range' | 'text' | 'select' | 'toggle';
@@ -153,7 +154,7 @@ const productionDefinitions: EditorNodeDefinition[] = [
   }
 ];
 
-export const editorNodeDefinitions: EditorNodeDefinition[] = [...legacyDefinitions, ...productionDefinitions];
+export const editorNodeDefinitions: EditorNodeDefinition[] = [...legacyDefinitions, ...productionDefinitions, ...butterflyScholarNodeDefinitions];
 export const editorNodeById = new Map(editorNodeDefinitions.map((item) => [item.id, item]));
 
 export const editorGroups: EditorNodeDefinition['group'][] = ['输入', '处理', '输出', '制作', '资源', '场域', '方法', '注释'];
@@ -197,3 +198,5 @@ export function buildProductionPreset() {
     notes: ['这张图不是报价单替代品，而是用来读懂上下游和风险触点。']
   };
 }
+
+export { buildButterflyScholarPreset };
