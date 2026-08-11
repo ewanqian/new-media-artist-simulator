@@ -10,174 +10,183 @@ async function start(page) {
   await page.getByRole('button', { name: '开始新的实践' }).click();
 }
 
+async function openNav(page, name) {
+  await page.getByRole('navigation', { name: '主要系统' }).getByRole('button', { name, exact: true }).click();
+}
+
 async function doMinimumSystem(page) {
+  await openNav(page, '工作室');
   await page.getByRole('button', { name: /做一个最小系统/ }).click();
   const sheet = page.locator('.vx-sheet');
   await expect(sheet.getByRole('heading', { name: '做一个最小系统' })).toBeVisible();
   await sheet.getByRole('button', { name: '执行这张卡' }).click();
 }
 
-test('new game starts with studio and archive only', async ({ page }) => {
+async function visitBasicStudio(page) {
+  await openNav(page, '地图');
+  await page.getByRole('button', { name: /基础工作室/ }).click();
+  const sheet = page.locator('.vx-sheet');
+  await expect(sheet.getByRole('heading', { name: '基础工作室' })).toBeVisible();
+  await sheet.getByRole('button', { name: '去一次' }).click();
+}
+
+test('new game opens as a complete simulator hub with all major systems visible', async ({ page }) => {
   await reset(page);
   await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
   await start(page);
 
+  await expect(page.getByRole('heading', { name: '当前实践' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /EP.01 · 0\/5/ })).toBeVisible();
   const nav = page.getByRole('navigation', { name: '主要系统' });
-  await expect(nav.getByRole('button', { name: '工作室', exact: true })).toBeVisible();
-  await expect(nav.getByRole('button', { name: '档案', exact: true })).toBeVisible();
-  await expect(nav.getByRole('button', { name: '探索', exact: true })).toHaveCount(0);
-  await expect(nav.getByRole('button', { name: '项目', exact: true })).toHaveCount(0);
-  await expect(nav.getByRole('button', { name: '联络', exact: true })).toHaveCount(0);
-  await expect(nav.getByRole('button', { name: '工作台', exact: true })).toHaveCount(0);
-
-  await expect(page.getByRole('heading', { name: '今天在工作室做什么' })).toBeVisible();
-  await expect(page.locator('.vx-card')).toHaveCount(3);
-  await expect(page.getByRole('heading', { name: '工作室之外', exact: true })).toHaveCount(0);
-  await expect(page.getByText('苏河 / 普陀', { exact: true })).toHaveCount(0);
-  await expect(page.getByText(/浦东|徐汇滨江|杨浦滨江/)).toHaveCount(0);
+  for (const name of ['首页', 'EPISODE', '地图', '工作室', '项目', '联络', '工作台', '档案']) {
+    await expect(nav.getByRole('button', { name, exact: true })).toBeVisible();
+  }
+  await expect(page.locator('.gh-module')).toHaveCount(6);
+  await expect(page.locator('.gh-mini-map')).toBeVisible();
+  await expect(page.locator('.vx-fragment')).toHaveCount(0);
 });
 
-test('first concrete action unlocks exploration without dumping the whole game', async ({ page }) => {
+test('systems are visible before they are usable instead of disappearing from navigation', async ({ page }) => {
+  await reset(page);
+  await start(page);
+
+  await openNav(page, '项目');
+  await expect(page.getByRole('heading', { name: '项目', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '先做出一个东西' })).toBeVisible();
+
+  await openNav(page, '联络');
+  await expect(page.getByRole('heading', { name: '还没有真正认识的人' })).toBeVisible();
+
+  await openNav(page, '工作台');
+  await expect(page.getByText('可查看，暂不可升级', { exact: true })).toBeVisible();
+  const upgradeButtons = page.getByRole('button', { name: /升级 · ¥800/ });
+  expect(await upgradeButtons.count()).toBe(4);
+  for (let i = 0; i < 4; i += 1) await expect(upgradeButtons.nth(i)).toBeDisabled();
+});
+
+test('episode one advances from a real studio action and keeps text ecology secondary', async ({ page }) => {
   await reset(page);
   await start(page);
   await doMinimumSystem(page);
 
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await expect(nav.getByRole('button', { name: '探索', exact: true })).toBeVisible();
-  await expect(nav.getByRole('button', { name: '项目', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '工作室之外' })).toBeVisible();
+  expect(await page.locator('.vx-fragment').count()).toBeGreaterThanOrEqual(1);
 
-  await nav.getByRole('button', { name: '探索', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '去哪里' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '工作', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '展示', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '学习', exact: true })).toBeVisible();
+  await openNav(page, 'EPISODE');
+  await expect(page.getByRole('heading', { name: '第一个能被别人看见的版本' })).toBeVisible();
+  await expect(page.getByText('2. 离开桌面', { exact: true })).toBeVisible();
+  await expect(page.getByText('01', { exact: true }).first()).toBeVisible();
+});
 
-  const fontSize = await page.locator('.vx-place-card > p').first().evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
-  expect(fontSize).toBeGreaterThanOrEqual(15);
+test('map is a spatial layer with regions, connections, facilities and enterable places', async ({ page }) => {
+  await reset(page);
+  await start(page);
+  await doMinimumSystem(page);
+  await openNav(page, '地图');
+
+  await expect(page.getByRole('heading', { name: '地图', exact: true })).toBeVisible();
+  await expect(page.locator('.gh-world-map')).toBeVisible();
+  expect(await page.locator('.gh-world-map > button').count()).toBeGreaterThanOrEqual(8);
+  await expect(page.getByText('空间节点', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /基础工作室/ })).toBeVisible();
+  await expect(page.getByText(/工业楼工作室/)).toBeVisible();
   const noHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalOverflow).toBe(true);
 });
 
-test('text ecology appears after action and deepens inside a place', async ({ page }) => {
-  await reset(page);
-  await start(page);
-  await expect(page.locator('.vx-fragment')).toHaveCount(0);
-  await doMinimumSystem(page);
-
-  await expect(page.getByRole('heading', { name: '工作室之外', exact: true })).toBeVisible();
-  expect(await page.locator('.vx-fragment').count()).toBeGreaterThanOrEqual(1);
-
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await nav.getByRole('button', { name: '探索', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '今天看到 / 听到', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: /基础工作室/ }).click();
-  const sheet = page.locator('.vx-sheet');
-  await expect(sheet.getByText('这个地方的文本不会完全一致', { exact: true })).toBeVisible();
-  expect(await sheet.locator('.vx-fragment').count()).toBeGreaterThanOrEqual(2);
-  const layers = await sheet.locator('.vx-fragment').evaluateAll((nodes) => [...new Set(nodes.map((node) => node.dataset.layer))]);
-  expect(layers.length).toBeGreaterThanOrEqual(2);
-});
-
-test('visiting a readable place unlocks a project grown from prior actions', async ({ page }) => {
+test('visiting a real place forms the project and advances episode two', async ({ page }) => {
   await reset(page);
   await start(page);
   await doMinimumSystem(page);
-  await page.getByRole('navigation', { name: '主要系统' }).getByRole('button', { name: '探索', exact: true }).click();
+  await visitBasicStudio(page);
 
-  await page.getByRole('button', { name: /基础工作室/ }).click();
-  const placeSheet = page.locator('.vx-sheet');
-  await expect(placeSheet.getByRole('heading', { name: '基础工作室' })).toBeVisible();
-  await expect(placeSheet.getByText('费用低', { exact: true })).toBeVisible();
-  await expect(placeSheet.getByText('适合长期试错', { exact: true })).toBeVisible();
-  await placeSheet.getByRole('button', { name: '去一次' }).click();
-
+  await openNav(page, '项目');
   await expect(page.getByRole('heading', { name: '最小反馈系统' })).toBeVisible();
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await expect(nav.getByRole('button', { name: '项目', exact: true })).toBeVisible();
-  await expect(nav.getByRole('button', { name: '联络', exact: true })).toHaveCount(0);
+  await expect(page.getByText('没进场地', { exact: true })).toHaveCount(0);
+
+  await openNav(page, 'EPISODE');
+  await expect(page.getByText('3. 形成项目', { exact: true })).toBeVisible();
 });
 
-test('project work reveals only contacts the player actually met', async ({ page }) => {
+test('episode three requires both project articulation and learning', async ({ page }) => {
   await reset(page);
   await start(page);
   await doMinimumSystem(page);
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await nav.getByRole('button', { name: '探索', exact: true }).click();
-  await page.getByRole('button', { name: /基础工作室/ }).click();
-  await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
+  await visitBasicStudio(page);
 
+  await openNav(page, '项目');
   await page.getByRole('button', { name: /做一个一页项目版本/ }).click();
   await page.locator('.vx-sheet').getByRole('button', { name: '执行这张卡' }).click();
 
-  await expect(nav.getByRole('button', { name: '联络', exact: true })).toBeVisible();
-  await nav.getByRole('button', { name: '联络', exact: true }).click();
+  await openNav(page, 'EPISODE');
+  await expect(page.getByText('3. 形成项目', { exact: true })).toBeVisible();
+
+  await openNav(page, '档案');
+  const firstEntry = page.locator('.vx-entry-list button').first();
+  await firstEntry.click();
+  await openNav(page, 'EPISODE');
+  await expect(page.getByText('4. 建立协作', { exact: true })).toBeVisible();
+});
+
+test('contact, workbench upgrade and blackbox visit complete the five-part opening episode', async ({ page }) => {
+  await reset(page);
+  await start(page);
+  await doMinimumSystem(page);
+  await visitBasicStudio(page);
+
+  await openNav(page, '项目');
+  await page.getByRole('button', { name: /做一个一页项目版本/ }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '执行这张卡' }).click();
+  await openNav(page, '档案');
+  await page.locator('.vx-entry-list button').first().click();
+
+  await openNav(page, '联络');
   await expect(page.getByRole('heading', { name: '林', exact: true })).toBeVisible();
-  await expect(page.getByText(/做实时影像和小型装置/)).toBeVisible();
-  await expect(page.getByText(/在基础工作室测试时认识/)).toBeVisible();
-  await expect(page.getByText(/先别做 PPT/)).toBeVisible();
-  await expect(page.getByRole('heading', { name: '这张关系网里', exact: true })).toBeVisible();
-  await expect(page.getByText(/↔ 李工/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /李工/ })).toHaveCount(0);
-});
-
-test('contact chat creates a delayed reply and then unlocks workbench', async ({ page }) => {
-  await reset(page);
-  await start(page);
-  await doMinimumSystem(page);
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await nav.getByRole('button', { name: '探索', exact: true }).click();
-  await page.getByRole('button', { name: /基础工作室/ }).click();
-  await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
-  await page.getByRole('button', { name: /做一个一页项目版本/ }).click();
-  await page.locator('.vx-sheet').getByRole('button', { name: '执行这张卡' }).click();
-  await nav.getByRole('button', { name: '联络', exact: true }).click();
-
   await page.getByRole('button', { name: /看一个当前版本/ }).click();
-  await expect(page.getByText('看一个当前版本', { exact: true })).toBeVisible();
-  await expect(nav.getByRole('button', { name: '工作台', exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: '结束本周' }).click();
-  await expect(page.getByText(/发我一个能跑的版本/)).toBeVisible();
+  await openNav(page, '工作台');
+  const outputCard = page.locator('.vx-capability').filter({ hasText: '输出 / Output' });
+  await expect(outputCard.getByRole('button', { name: '升级 · ¥800' })).toBeEnabled();
+  await outputCard.getByRole('button', { name: '升级 · ¥800' }).click();
+
+  await openNav(page, '地图');
+  const westbund = page.locator('.gh-world-map > button').filter({ hasText: '西岸' }).first();
+  await westbund.click();
+  await page.getByRole('button', { name: /黑盒 \/ 演出空间/ }).click();
+  await page.locator('.vx-sheet').getByRole('button', { name: '去一次' }).click();
+
+  await openNav(page, 'EPISODE');
+  await expect(page.getByText('EP.01 完成', { exact: true })).toBeVisible();
+  await expect(page.getByText('完成', { exact: true })).toHaveCount(5);
 });
 
-test('archive is large readable reference content and activity log remains separate', async ({ page }) => {
+test('archive remains a large text library and activity history stays separate', async ({ page }) => {
   await reset(page);
   await start(page);
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await nav.getByRole('button', { name: '档案', exact: true }).click();
+  await openNav(page, '档案');
 
-  await expect(page.getByRole('heading', { name: '档案', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '档案 / 学习', exact: true })).toBeVisible();
   const entries = page.locator('.vx-entry-list button');
   expect(await entries.count()).toBeGreaterThanOrEqual(30);
   await page.getByPlaceholder('搜索词条').fill('媒体考古');
   await expect(page.getByRole('button', { name: /媒体考古实验室/ })).toBeVisible();
   await page.getByRole('button', { name: /媒体考古实验室/ }).click();
   await expect(page.locator('.vx-reader').getByRole('heading', { name: '媒体考古实验室' })).toBeVisible();
-  await expect(page.locator('.vx-reader').getByText(/复古滤镜/)).toBeVisible();
 
   await page.getByRole('button', { name: '记录', exact: true }).click();
   const log = page.locator('.vx-log');
   await expect(log.getByRole('heading', { name: '行动记录' })).toBeVisible();
   await expect(log.getByText('媒体考古实验室', { exact: true })).toHaveCount(0);
-  await expect(log.getByText(/复古滤镜/)).toHaveCount(0);
 });
 
-test('dark interactions keep explicit light text in light color scheme', async ({ page }) => {
+test('dark interactions keep light text and mobile hub does not overflow the page', async ({ page }) => {
   await reset(page);
   const startButton = page.getByRole('button', { name: '开始新的实践' });
-  const titleColors = await startButton.evaluate((node) => ({
-    color: getComputedStyle(node).color,
-    background: getComputedStyle(node).backgroundColor,
-    scheme: getComputedStyle(document.documentElement).colorScheme
-  }));
-  expect(titleColors.color).toBe('rgb(255, 255, 255)');
-  expect(titleColors.background).toBe('rgb(23, 23, 25)');
-  expect(titleColors.scheme).toContain('light');
-
+  expect(await startButton.evaluate((node) => getComputedStyle(node).color)).toBe('rgb(255, 255, 255)');
   await start(page);
-  await doMinimumSystem(page);
-  const nav = page.getByRole('navigation', { name: '主要系统' });
-  await nav.getByRole('button', { name: '探索', exact: true }).click();
-  const activeFilter = page.getByRole('button', { name: '全部', exact: true });
-  expect(await activeFilter.evaluate((node) => getComputedStyle(node).color)).toBe('rgb(255, 255, 255)');
+
+  const episodeButton = page.locator('.gh-episode-focus');
+  expect(await episodeButton.evaluate((node) => getComputedStyle(node).color)).toBe('rgb(255, 255, 255)');
+  const noHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+  expect(noHorizontalOverflow).toBe(true);
 });
