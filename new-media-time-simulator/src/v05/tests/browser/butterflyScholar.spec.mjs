@@ -14,20 +14,29 @@ async function clearRoute(page) {
 async function revealNode(page) {
   const enter = page.getByRole('button', { name: '进入场景', exact: true });
   if (await enter.isVisible().catch(() => false)) await enter.click();
-  for (let i = 0; i < 8; i += 1) {
-    const decide = page.getByRole('button', { name: '做决定', exact: true });
+
+  const decide = page.getByRole('button', { name: '做决定', exact: true });
+  const next = page.getByRole('button', { name: '继续', exact: true });
+  for (let i = 0; i < 12; i += 1) {
     if (await decide.isVisible().catch(() => false)) return;
-    const next = page.getByRole('button', { name: '继续', exact: true });
-    if (await next.isVisible().catch(() => false)) await next.click();
-    else await page.waitForTimeout(240);
+    if (await next.isVisible().catch(() => false)) {
+      await next.click();
+      await page.waitForTimeout(80);
+      continue;
+    }
+    await page.waitForTimeout(180);
   }
+  await expect(decide).toBeVisible();
 }
 
 async function choose(page, name) {
   await revealNode(page);
   const decide = page.getByRole('button', { name: '做决定', exact: true });
-  if (await decide.isVisible().catch(() => false)) await decide.click();
-  await page.getByRole('button', { name }).click();
+  await expect(decide).toBeVisible();
+  await decide.click();
+  const option = page.getByRole('button', { name });
+  await expect(option).toBeVisible();
+  await option.click();
 }
 
 test('Butterfly Scholar is a readable special chapter with research, memory and a new-media making route', async ({ page, isMobile }) => {
@@ -43,7 +52,7 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
 
-  await choose(page, /接受。先写下我真正想弄明白的问题/);
+  await choose(page, /去。先写下我真正想弄明白的问题/);
   await choose(page, /先聊工作：明天先看样地和档案/);
 
   await revealNode(page);
