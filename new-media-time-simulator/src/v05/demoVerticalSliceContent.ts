@@ -58,17 +58,17 @@ export const outputDemoRoutes: DemoRoute[] = [
   },
   {
     id: 'demo-route-costa-rica-butterfly-scholar',
-    code: 'FIELD STUDY',
+    code: 'BUTTERFLY SCHOLAR',
     title: '哥斯达黎加的蝴蝶学者',
-    subtitle: '观察、扫描、植物保存与不断变化的花园',
-    summary: '你跟随一位在哥斯达黎加长期观察蝴蝶与寄主植物的学者工作。林下扫描、植物标本、观察表、天气和季节逐渐堆成一个项目。你需要决定：什么值得保存，什么必须允许它继续变化。',
+    subtitle: '一次关于采集、记忆、身份与情感空间数字化的旅程',
+    summary: '你本人是一位以蝴蝶、寄主植物、空间扫描和长期观察为材料的艺术家。工作室收到一份哥斯达黎加研究站的短期邀请，你决定离开熟悉的工作室，去验证“数字化到底应该保存什么”。旅程中，你会采集、重建、做作品，也会遇到一个你以前听说过、却没有完全说清自己身份的人。',
     resourcePackId: 'pack-archive',
-    signalTags: ['research', 'media', 'spatial', 'ecology'],
-    knownNpcIds: ['contact-m', 'contact-chen'],
-    firstProjectPrompt: '从一条蝴蝶与植物之间的关系开始，不要急着把整个森林保存下来。',
-    startingNotes: ['一盒标签不完整的植物标本', '两段林下空间扫描', '蝴蝶观察表：时间、天气、海拔、寄主植物', '只能带走记录，不能带走活体'],
-    blueprintSeed: ['project-question', 'nature-plant-specimen', 'nature-spatial-scan', 'nature-butterfly-observation', 'nature-decay-rule', 'prod-projector'],
-    memoryMoments: ['扫描缺口第一次被当成材料', '一只蝴蝶没有被保存，只留下与植物和季节的关系', '观众靠近时花园不是更清楚，而是开始改变']
+    signalTags: ['research', 'media', 'spatial', 'ecology', 'narrative'],
+    knownNpcIds: ['contact-m'],
+    firstProjectPrompt: '先选一个关系去采集：蝴蝶、寄主植物、空间路径，或者一次没有发生的观察。',
+    startingNotes: ['工作室艺术顾问发来的研究站邀请', '一台相机与可做深度扫描的设备', '旧植物扫描项目的工作文件', '一个尚未回答的问题：保存是不是等于冻结'],
+    blueprintSeed: ['project-question', 'butterfly-observation', 'plant-specimen', 'capture-photo-sequence', 'capture-quality-check', 'process-metashape-align', 'process-gaussian-splat', 'compose-memory-garden'],
+    memoryMoments: ['第一次发现采集对象比扫描软件更重要', '扫描缺口被保留下来而不是自动修掉', 'Inés 的身份说法出现矛盾', '一次私人关系选择改变了公开作品的数据边界']
   }
 ];
 
@@ -78,47 +78,38 @@ export const outputDemoBriefs: DemoBrief[] = [
   { id: 'brief-live-scope', routeIds: ['demo-route-live-system'], title: '删掉三分之一', hook: '当前版本节点太多，搭建窗口不允许它完整出现。', decision: '删功能、降输出，还是把实时部分改成缓存？', constraints: ['必须缩减 Scope'], rewards: ['Scope 方法', '稳定版本'], blueprintNodes: ['prod-deadline', 'prod-budget'] },
   { id: 'brief-live-public', routeIds: ['demo-route-live-system'], title: '第一次公开', hook: '观众已经进来了，项目不再只是测试工程。', decision: '保住稳定、保住互动，还是接受一次可见的失败？', constraints: ['不能停机重装'], rewards: ['公开输出', '人物反馈', 'Career Record'], blueprintNodes: ['field-note'] },
 
-  { id: 'brief-butterfly-first-record', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '第一条观察记录', hook: '学者没有先给你看最漂亮的蝴蝶，而是一张有时间、天气、海拔和寄主植物的观察表。', decision: '你先追踪物种、植物，还是它们发生关系的时间？', constraints: ['不能删掉不确定字段'], rewards: ['观察 Method', 'Ecology Fragment'], blueprintNodes: ['nature-butterfly-observation', 'nature-field-metadata'] },
-  { id: 'brief-butterfly-specimen', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '一片叶子应该保存什么', hook: '标本已经干燥、变色、失去气味，但仍携带地点与时间。', decision: '保存形态、保存关系，还是保存变化过程？', constraints: ['不能采集新的活体', '标签不完整'], rewards: ['植物保存 Method', '缺失标签 Thread'], blueprintNodes: ['nature-plant-specimen', 'nature-field-metadata'] },
-  { id: 'brief-butterfly-scan', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '扫描总会漏掉一些东西', hook: '薄叶、细枝和反光表面在空间扫描里不断破碎。', decision: '修复缺口、保留缺口，还是让缺口随时间扩大？', constraints: ['只有两次现场扫描'], rewards: ['扫描残片 Method', 'Decay Rule'], blueprintNodes: ['nature-spatial-scan', 'nature-decay-rule'] },
-  { id: 'brief-butterfly-absence', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '今天没有蝴蝶', hook: '你等了一整天，目标物种没有出现。', decision: '拿旧数据补上，还是把缺席本身记录下来？', constraints: ['不能伪造当日观察'], rewards: ['缺席 Fragment', '时间方法'], blueprintNodes: ['nature-season-cycle', 'field-note'] },
-  { id: 'brief-butterfly-public', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '观众走进花园', hook: '如果靠近只是“触发更多粒子”，这件事很快就会变得无聊。', decision: '靠近时揭示、扰动，还是让部分记录开始消失？', constraints: ['互动必须改变作品逻辑'], rewards: ['观众行为 Method', '第一次公开版本'], blueprintNodes: ['nature-presence-input', 'nature-decay-rule', 'prod-projector'] },
-
-  { id: 'brief-archive-failure', routeIds: ['demo-route-live-system', 'demo-route-costa-rica-butterfly-scholar'], title: '失败文件不是垃圾', hook: '你正准备删掉一个坏版本。', decision: '删除、归档，还是 Fork 成新的作品分支？', constraints: ['只能选一种默认处理规则'], rewards: ['Blueprint Lineage', '失败 Evidence'], blueprintNodes: ['field-note'] },
-  { id: 'brief-one-page', routeIds: ['demo-route-live-system', 'demo-route-costa-rica-butterfly-scholar'], title: '一页版本', hook: '一个机构只愿意花一分钟理解你现在在做什么。', decision: '用哪三条 Evidence 证明项目已经存在？', constraints: ['只允许三条证据'], rewards: ['Open Call Package'], blueprintNodes: ['prod-storyboard'] },
-  { id: 'brief-resource-gap', routeIds: ['demo-route-live-system', 'demo-route-costa-rica-butterfly-scholar'], title: '缺的东西不在你手里', hook: '图纸成立，但关键设备、数据或人不属于你。', decision: '借、租、替换，还是重写作品结构？', constraints: ['资源可获得性有限'], rewards: ['Availability Note', '人物关系'], blueprintNodes: ['prod-budget'] }
+  { id: 'brief-butterfly-departure', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '出发以前先留一句话', hook: '你的艺术顾问不要求完整提案，只让你决定：这趟旅程真正要验证什么？', decision: '带着明确问题出发，还是允许现场先改变你？', constraints: ['不能把“扫描整个森林”当目标'], rewards: ['Project Question', '第一条人物记忆'], blueprintNodes: ['project-question'] },
+  { id: 'brief-butterfly-first-record', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '先选一个关系', hook: '第一次进入样地。你不需要采完整个环境，只需要让一条关系开始变得可追踪。', decision: '从寄主植物、空间路径，还是“今天没有出现”的观察开始？', constraints: ['对象必须可追踪', '不伪造缺失信息'], rewards: ['Field Method', 'Ecology Fragment'], blueprintNodes: ['butterfly-observation', 'plant-specimen', 'capture-photo-sequence'] },
+  { id: 'brief-butterfly-capture', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '先采对，再谈重建', hook: '薄叶、风、反光和变化的光照开始破坏漂亮的扫描。', decision: '补拍、换采集方法，还是承认部分表面不会被完整捕捉？', constraints: ['现场时间有限'], rewards: ['Capture Check', 'Scan Gap Evidence'], blueprintNodes: ['capture-photo-sequence', 'capture-lidar-pass', 'capture-quality-check'] },
+  { id: 'brief-butterfly-reconstruct', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '照片并不会自动变成空间', hook: '回到临时工作台，你必须先判断相机有没有被正确求解，再选点云、网格或高斯。', decision: 'Metashape / COLMAP 先求稳，还是直接走快速高斯预览？', constraints: ['错误的相机位姿不能被“艺术化”掩盖'], rewards: ['Reconstruction Method', 'Blueprint Branch'], blueprintNodes: ['process-metashape-align', 'process-colmap-sfm', 'process-dense-reconstruction', 'process-gaussian-splat'] },
+  { id: 'brief-butterfly-gap', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '缺口是不是错误', hook: '薄叶边缘和一小块空间始终重建不出来。', decision: '修补、删除，还是把缺口变成作品方法？', constraints: ['必须说明为什么'], rewards: ['Preserve Gap Method', 'Archive Evidence'], blueprintNodes: ['process-point-clean', 'method-preserve-gap'] },
+  { id: 'brief-butterfly-ines', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '她没有完全说谎', hook: 'Inés 的组织身份与第一次介绍对不上。与此同时，你们的合作已经开始变得私人。', decision: '现在追问、继续观察，还是在知道真相后只保留专业关系？', constraints: ['人物会记住你怎么处理这次矛盾'], rewards: ['Narrative Memory', 'Data Rights Thread'], blueprintNodes: ['field-note'] },
+  { id: 'brief-butterfly-compose', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '从数据回到作品', hook: '如果最后只是展示一段漂亮高斯扫描，这趟旅程没有真正改变你的实践。', decision: '让作品围绕空间、关系、时间还是缺席组织？', constraints: ['互动必须改变作品逻辑'], rewards: ['Memory Garden', 'Public Version'], blueprintNodes: ['compose-memory-garden', 'nature-decay-rule', 'prod-projector'] },
+  { id: 'brief-butterfly-archive', routeIds: ['demo-route-costa-rica-butterfly-scholar'], title: '有些东西不应该全部公开', hook: '研究站、Inés 和你自己的工作记录里都有不适合无限复制的部分。', decision: '公开什么、保留什么、只留下关系还是留下原始数据？', constraints: ['不能默认所有数据都属于作品'], rewards: ['Career Archive', 'Selective Preservation Method'], blueprintNodes: ['compose-memory-garden', 'field-note'] }
 ];
 
 export const outputDemoEvents: DemoEvent[] = [
   { id: 'demo-evt-black-frame', title: '黑屏 12 秒', hook: '开场最不该黑的时候黑了。', tags: ['failure', 'public'], choices: [{ label: '立刻切备用', consequence: '稳定性提高，但失去当前互动状态。' }, { label: '让黑屏继续', consequence: '保留现场连续性，但机构会追问是否可控。' }] },
   { id: 'demo-evt-scope-plus', title: '“顺便再加一个”', hook: '对方说这个功能应该不复杂。', tags: ['scope'], choices: [{ label: '明确拒绝', consequence: 'Scope 保持，关系短期变硬。' }, { label: '接受，但删掉另一项', consequence: '项目结构改变并留下承诺记录。' }] },
-  { id: 'demo-evt-network-drop', title: '网络掉了', hook: '实时数据源消失。', tags: ['network', 'failure'], choices: [{ label: '切缓存数据', consequence: '作品继续运行，但实时性被改变。' }, { label: '保留无数据状态', consequence: '风险更高，失联成为作品状态。' }] },
-  { id: 'demo-evt-projector-shadow', title: '投影能打到，人也站在那里', hook: '技术位置与观看位置重叠。', tags: ['projection', 'site'], choices: [{ label: '缩小画面', consequence: '尺寸缩水但结构稳定。' }, { label: '改变观看路线', consequence: '空间关系改变，搭建成本增加。' }] },
+  { id: 'demo-evt-network-drop', title: '网络掉了', hook: '实时数据源消失。', tags: ['network', 'failure'], choices: [{ label: '切缓存数据', consequence: '作品继续运行，但实时性被改变。' }, { label: '保留无数据状态', consequence: '失联成为作品状态。' }] },
   { id: 'demo-evt-final-v7', title: 'final_final_v7_REAL', hook: '现场跑的不是你以为的最终版。', tags: ['version', 'archive'], choices: [{ label: '回滚', consequence: '恢复旧状态。' }, { label: '承认当前版本', consequence: '版本谱系变复杂。' }] },
-  { id: 'demo-evt-label-missing', title: '标本标签缺了一半', hook: '一株植物只剩名字，没有采集日期。', tags: ['ecology', 'archive'], choices: [{ label: '标记未知', consequence: '数据不完整但诚实。' }, { label: '根据邻近记录推断', consequence: '结构更完整，同时新增不确定性。' }] },
-  { id: 'demo-evt-scan-hole', title: '叶片边缘消失了', hook: '扫描无法稳定捕捉薄叶。', tags: ['scan', 'failure'], choices: [{ label: '算法补洞', consequence: '空间更完整，但生成部分不再来自现场。' }, { label: '保留破损', consequence: '缺口进入作品语言。' }] },
-  { id: 'demo-evt-butterfly-absence', title: '今天没有蝴蝶', hook: '观察点没有出现目标物种。', tags: ['ecology', 'time'], choices: [{ label: '使用旧观察数据', consequence: '内容增加，但跨时间混合。' }, { label: '记录缺席', consequence: 'Archive 获得一条“没有发生”的记录。' }] },
-  { id: 'demo-evt-season-shift', title: '季节比计划早了', hook: '植物状态和历史记录对不上。', tags: ['season', 'ecology'], choices: [{ label: '沿历史时间线', consequence: '可比性更高。' }, { label: '让当前季节覆盖', consequence: '作品更接近当下生态状态。' }] },
-  { id: 'demo-evt-audience-too-close', title: '观众贴得太近', hook: '传感系统持续触发。', tags: ['audience', 'sensor'], choices: [{ label: '增加冷却', consequence: '互动更稳定。' }, { label: '让过度靠近触发衰减', consequence: '身体距离变成作品规则。' }] },
-  { id: 'demo-evt-media-misread', title: '帖子给你贴了一个方便传播的标签', hook: '一句话比作品更快抵达下一个机构。', tags: ['identity', 'media'], choices: [{ label: '公开纠正', consequence: '解释更清楚但传播下降。' }, { label: '不回应', consequence: '误读继续影响机会。' }] },
-  { id: 'demo-evt-old-adapter', title: '旧转接头救了现场', hook: '你几次想扔掉的线材成为唯一接口。', tags: ['asset', 'recovery'], choices: [{ label: '继续用', consequence: '现场得救，同时留下脆弱性。' }, { label: '找正式替代', consequence: '增加成本，获得可靠路径。' }] }
+  { id: 'demo-evt-scan-hole', title: '叶片边缘消失了', hook: '薄叶始终无法稳定重建。', tags: ['scan', 'failure'], choices: [{ label: '重新采集', consequence: '增加现场时间，换取更可靠输入。' }, { label: '保留破损', consequence: '缺口进入作品方法。' }] },
+  { id: 'demo-evt-light-shift', title: '云层突然散开', hook: '同一对象前后照片的光照差异明显增大。', tags: ['capture', 'light'], choices: [{ label: '等待光线稳定', consequence: '采集时间增加。' }, { label: '继续记录变化', consequence: '重建风险增加，但时间变化进入档案。' }] },
+  { id: 'demo-evt-no-butterfly', title: '今天没有蝴蝶', hook: '目标物种没有出现。', tags: ['ecology', 'time'], choices: [{ label: '记录缺席', consequence: 'Archive 得到一条“没有发生”的记录。' }, { label: '延长观察', consequence: '时间成本增加，但可能得到新的关系。' }] },
+  { id: 'demo-evt-identity-mark', title: '文件上的组织标记不一样', hook: 'Inés 的现场文件与邀请函不是同一个组织。', tags: ['narrative', 'identity'], choices: [{ label: '直接问', consequence: '更快获得信息，也可能降低信任。' }, { label: '先记下来', consequence: '矛盾进入 Narrative State，等待后续验证。' }] },
+  { id: 'demo-evt-data-rights', title: '扫描数据到底属于谁', hook: '研究站并没有默认同意原始数据无限公开。', tags: ['archive', 'rights'], choices: [{ label: '只公开处理后的作品', consequence: '原始数据保持受限。' }, { label: '重新谈授权', consequence: '项目推进变慢，但数据边界更清楚。' }] },
+  { id: 'demo-evt-alignment-fail', title: '有一组照片没有对齐', hook: '相机位姿出现断裂。', tags: ['Metashape', 'COLMAP', 'failure'], choices: [{ label: '检查重叠与模糊', consequence: '回到采集质量判断。' }, { label: '换另一条重建路径', consequence: '产生 Blueprint 分支。' }] },
+  { id: 'demo-evt-pretty-splat', title: '高斯已经很好看了', hook: '预览顺滑、空间漂亮，但你突然不知道作品还缺什么。', tags: ['Gaussian', 'art'], choices: [{ label: '停下来重写问题', consequence: '减少技术堆叠，强化作品逻辑。' }, { label: '继续增加技术', consequence: '制作复杂度继续上升。' }] },
+  { id: 'demo-evt-private-record', title: '一段私人记录不适合公开', hook: '它对你很重要，但并不因此自动属于作品。', tags: ['relationship', 'archive'], choices: [{ label: '只记录它存在', consequence: '保留关系，不公开内容。' }, { label: '征得同意后使用', consequence: '形成新的共同决定与人物记忆。' }] }
 ];
 
 export const outputDemoArchive: DemoArchiveEntry[] = [
-  { id: 'archive-ecology-host-plant', category: 'ECOLOGY', title: '寄主植物不是背景', summary: '蝴蝶与植物之间不是装饰关系，而是一套生命史条件。', fragments: ['出现时间', '寄主关系', '海拔与天气', '观察缺席'], tags: ['butterfly', 'plant', 'relation'] },
-  { id: 'archive-ecology-absence', category: 'ECOLOGY', title: '缺席也是记录', summary: '长期观察并不保证每天都有事件。没有出现本身会改变你对季节和分布的理解。', fragments: ['零记录', '季节', '天气', '等待'], tags: ['absence', 'time'] },
-  { id: 'archive-method-scan-gap', category: 'METHODS', title: '扫描缺口', summary: '重建失败的位置可以修补，也可以被承认为媒介边界。', fragments: ['薄叶', '反光', '运动', '算法补洞'], tags: ['scan', 'failure'] },
-  { id: 'archive-method-preservation', category: 'METHODS', title: '保存不是冻结', summary: '植物标本、图像、坐标和扫描都只是不同保存制度，每一种都会主动丢掉东西。', fragments: ['压制标本', '颜色变化', '标签', '数字副本'], tags: ['preservation', 'plant'] },
-  { id: 'archive-media-scan', category: 'MEDIA', title: '空间扫描', summary: '扫描不是无损复制；遮挡、材质、运动和精度决定数字空间会留下什么。', fragments: ['点云', '高斯', '缺口', '坐标'], tags: ['scan', 'spatial'] },
-  { id: 'archive-project-first-run', category: 'PROJECTS', title: '第一个能跑的版本', summary: '第一次真正运行的版本通常很小，但它为后续所有判断提供了共同对象。', fragments: ['输入', '处理', '输出', '第一次失败'], tags: ['prototype', 'run'] },
-  { id: 'archive-people-scholar', category: 'PEOPLE', title: '哥斯达黎加的蝴蝶学者', summary: '他关心的不是把蝴蝶做成图像，而是观察记录里那些物种、植物、时间和地点之间的关系。', fragments: ['观察表', '寄主植物', '季节', '未知字段'], tags: ['ecology', 'research'] },
-  { id: 'archive-place-blackbox', category: 'PLACES', title: '两小时黑盒', summary: '一个时间很短、条件明确的测试现场。它的价值不是“像展览”，而是能快速暴露桌面上看不到的问题。', fragments: ['120 分钟', '投影', '网络', '恢复'], tags: ['blackbox', 'test'] }
+  { id: 'archive-signal-chain', category: 'METHODS', title: '最小信号链', summary: '先证明输入真的改变输出，再谈完整现场。', fragments: ['输入', '处理', '输出', '备用路径'], tags: ['live', 'system'] },
+  { id: 'archive-scope', category: 'METHODS', title: '删掉三分之一', summary: 'Scope 缩减不是失败，而是一种制作判断。', fragments: ['时间', '预算', '搭建窗口'], tags: ['scope', 'production'] },
+  { id: 'archive-field-capture', category: 'METHODS', title: '采集先于重建', summary: '重叠、视角、光照和对象选择决定后续软件能不能工作。', fragments: ['摄影测量', '现场检查', '重叠'], tags: ['capture', 'photogrammetry'] },
+  { id: 'archive-reconstruction', category: 'MEDIA', title: '点云 / 网格 / 高斯不是等级关系', summary: '它们是不同的空间表示方式，需要根据作品选择。', fragments: ['COLMAP', 'Metashape', 'Gaussian Splatting'], tags: ['3d', 'scan'] },
+  { id: 'archive-preserve-gap', category: 'METHODS', title: '保留扫描缺口', summary: '不是所有失败都应该被修复。', fragments: ['薄叶', '遮挡', '反光', '不可捕捉'], tags: ['failure', 'method'] },
+  { id: 'archive-ines', category: 'PEOPLE', title: 'Inés', summary: '第一次见面时，她没有把自己的组织关系说完整。', fragments: ['身份矛盾', '数据权利', '合作', '私人关系'], tags: ['narrative', 'memory'] },
+  { id: 'archive-no-butterfly', category: 'ECOLOGY', title: '今天没有蝴蝶', summary: '没有发生也可以进入长期观察。', fragments: ['时间', '季节', '缺席'], tags: ['ecology', 'absence'] },
+  { id: 'archive-memory-garden', category: 'PROJECTS', title: '情感空间数字化', summary: '空间重建、生态观察和人物记忆共同形成作品，而不是只展示扫描结果。', fragments: ['空间', '关系', '时间', '选择性公开'], tags: ['project', 'memory', 'garden'] }
 ];
-
-export function demoRouteById(id?: string | null) {
-  return outputDemoRoutes.find((item) => item.id === id) || outputDemoRoutes[0];
-}
-
-export function demoBriefsForRoute(routeId: string) {
-  return outputDemoBriefs.filter((item) => item.routeIds.includes(routeId));
-}
