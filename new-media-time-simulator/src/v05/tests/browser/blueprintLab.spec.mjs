@@ -15,7 +15,7 @@ async function openPalette(page, isMobile) {
   if (isMobile) {
     const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
     await tabs.getByRole('button', { name: '画布' }).click();
-    await page.getByRole('button', { name: /节点 Shift A/ }).click();
+    await page.locator('.be-canvas-tools').getByRole('button', { name: /节点/ }).click();
   } else {
     await page.keyboard.press('Shift+A');
   }
