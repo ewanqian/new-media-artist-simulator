@@ -5,6 +5,7 @@ import { applyCareerStoryCommand } from '../careerStoryRuntime.ts';
 import { applyCareerStageTwoCommand, careerStageTwoProgress, careerStageTwoScene } from '../careerStageTwo.ts';
 import { applyCareerStageThreeCommand, careerStageThreeProgress, careerStageThreeScene } from '../careerStageThree.ts';
 import { applyCareerStageFourCommand, careerStageFourProgress, careerStageFourScene } from '../careerStageFour.ts';
+import { applyCareerStageFiveCommand, careerStageFiveProgress, careerStageFiveScene } from '../careerStageFive.ts';
 import { openingQuestProgress } from '../questRuntime.ts';
 import './v05-story-career.css';
 
@@ -17,11 +18,12 @@ function loadSave() {
 
 function choiceDisabled(choice, save) {
   const attention = Number(choice.cost.match(/注意力\s*-\s*(\d+)/)?.[1] || 0);
-  const explicitCash = Number(choice.cost.match(/(?:成本\s*)?¥\s*(\d+)/)?.[1] || 0);
+  const explicitCash = Number(choice.cost.match(/(?:押金|成本|合作成本)?\s*¥\s*(\d+)/)?.[1] || 0);
   return Number(save?.attention || 0) < attention || Number(save?.cash || 0) < explicitCash;
 }
 
 function progressFor(stageId, save) {
+  if (stageId === 'stage-5') return careerStageFiveProgress(save || {});
   if (stageId === 'stage-4') return careerStageFourProgress(save || {});
   if (stageId === 'stage-3') return careerStageThreeProgress(save || {});
   if (stageId === 'stage-2') return careerStageTwoProgress(save || {});
@@ -29,6 +31,7 @@ function progressFor(stageId, save) {
 }
 
 function sceneFor(stageId, save) {
+  if (stageId === 'stage-5') return careerStageFiveScene(save || {});
   if (stageId === 'stage-4') return careerStageFourScene(save || {});
   if (stageId === 'stage-3') return careerStageThreeScene(save || {});
   if (stageId === 'stage-2') return careerStageTwoScene(save || {});
@@ -51,16 +54,20 @@ export default function V05StoryCareerView({ profile }) {
       ? { title: '网络：别人开始因为一件事找你', text: 'Stage 3：第一个小委托、Open Call、一页版本、传播误读和机构回流。' }
       : stageId === 'stage-3'
         ? { title: '方法：你不再每次从零开始', text: 'Stage 4：失败回收、Remix 自己、第一次把方法教给别人。' }
-        : { title: '基础设施：你开始维护一套自己的世界', text: 'Stage 5 会把空间、长期协作、维护责任与公开计划连接成一套可持续基础设施。' };
+        : stageId === 'stage-4'
+          ? { title: '基础设施：你开始维护一套自己的世界', text: 'Stage 5：28㎡ 临时基础设施、协作交接、Career Archive。' }
+          : { title: 'Career Archive', text: '五阶段主线已经闭合；新的 Episode 可以继续接在同一条实践历史上。' };
 
   function choose(choice) {
-    const result = choice.id.startsWith('story:stage4:')
-      ? applyCareerStageFourCommand(save || {}, choice.id)
-      : choice.id.startsWith('story:stage3:')
-        ? applyCareerStageThreeCommand(save || {}, choice.id)
-        : choice.id.startsWith('story:stage2:')
-          ? applyCareerStageTwoCommand(save || {}, choice.id)
-          : applyCareerStoryCommand(save || {}, choice.id);
+    const result = choice.id.startsWith('story:stage5:')
+      ? applyCareerStageFiveCommand(save || {}, choice.id)
+      : choice.id.startsWith('story:stage4:')
+        ? applyCareerStageFourCommand(save || {}, choice.id)
+        : choice.id.startsWith('story:stage3:')
+          ? applyCareerStageThreeCommand(save || {}, choice.id)
+          : choice.id.startsWith('story:stage2:')
+            ? applyCareerStageTwoCommand(save || {}, choice.id)
+            : applyCareerStoryCommand(save || {}, choice.id);
     if (result.save === save) {
       setNotice(result.notice);
       return;
@@ -78,7 +85,9 @@ export default function V05StoryCareerView({ profile }) {
     ? { id: 'story:stage3:enter', title: '进入第三阶段：网络', detail: '现场档案开始被别人转述。第一个小委托会因为你已经做过的具体事情找上门。', cost: '时间推进 · NETWORK', kind: 'route' }
     : stageId === 'stage-3' && progress.complete
       ? { id: 'story:stage4:enter', title: '进入第四阶段：方法', detail: '先别做新项目。回头拆前三阶段最像废料的失败、错误版本和未被选中的材料。', cost: '时间推进 · METHOD', kind: 'route' }
-      : null;
+      : stageId === 'stage-4' && progress.complete
+        ? { id: 'story:stage5:enter', title: '进入第五阶段：基础设施', detail: '方法已经能被复用和教给别人。现在看看空间、协作和持续维护是否也能离开你一个人的脑子。', cost: '时间推进 · INFRA', kind: 'route' }
+        : null;
 
   return (
     <main className="vstory-shell">
@@ -110,6 +119,8 @@ export default function V05StoryCareerView({ profile }) {
           <section><small>EVIDENCE / THREADS</small><strong>{save.evidenceIds?.length || 0} 条证据</strong><p>未解决问题：{openIssues.length}</p><p>方法：{save.methodIds?.length || 0}</p><p>特殊事件：{save.seenEventIds?.length || 0}</p></section>
           {Array.isArray(save.careerKnownFor) && save.careerKnownFor.length > 0 && <section className="vstory-knownfor"><small>KNOWN FOR</small><strong>别人现在因为什么找你</strong>{save.careerKnownFor.map((item) => <p key={item}>{item}</p>)}</section>}
           {save.careerMethodSet && <section className="vstory-methodset"><small>METHOD SET</small><strong>{save.careerMethodSet.title}</strong>{(save.careerMethodSet.methods || []).map((item) => <p key={item}>{item}</p>)}</section>}
+          {save.careerInfrastructure && <section className="vstory-infra"><small>INFRASTRUCTURE</small><strong>{save.careerInfrastructure.purpose || '正在形成'}</strong><p>{save.careerInfrastructure.mode || '未定义模式'} · 维护成本 ¥{save.careerInfrastructure.monthlyCost || 0}</p><p>交接：{(save.careerInfrastructure.handoff || []).join(' / ') || '尚未建立'}</p></section>}
+          {save.careerArchive && <section className="vstory-archive-result"><small>CAREER ARCHIVE</small><strong>{save.careerArchive.continuation}</strong><p>{save.careerArchive.evidenceCount} 条 Evidence · {save.careerArchive.categories.methods.length} 条方法 · {save.careerArchive.categories.people.length} 个人物关系</p></section>}
           {progress.complete && <section className="vstory-next"><small>NEXT</small><strong>{nextStage.title}</strong><p>{nextStage.text}</p></section>}
         </aside>
       </div>
