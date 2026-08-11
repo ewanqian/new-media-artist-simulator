@@ -18,6 +18,23 @@ import {
   projectStages,
   weeklyPulseFor
 } from '../gameLoop.ts';
+import {
+  applyResolvedProjectDelta,
+  hasOpenSourceCallback,
+  resolveDueCallbacks,
+  scheduleContactCallback,
+  scheduleOpportunityCallback
+} from '../consequenceLoop.ts';
+import {
+  attentionDomainLabel,
+  createAttentionTrace,
+  decayAttention,
+  describeAttention,
+  normalizeAttentionTrace,
+  opportunityDomainsFor,
+  rankOpportunityIds,
+  recordAttention
+} from '../attentionTrace.ts';
 import './v05-wireframe.css';
 
 const SAVE_KEY = 'nmas-v05-world-hub-preview';
@@ -73,7 +90,12 @@ function makeFreshSave() {
     },
     readKnowledgeEntryIds: [],
     reviewedOpportunityIds: [],
+    enteredOpportunityIds: [],
     contactTouches: {},
+    attentionTrace: createAttentionTrace(),
+    scheduledCallbacks: [],
+    resolvedCallbacks: [],
+    generatedArchive: [],
     actionLog: [
       { type: '系统', title: '新一轮开始', text: '第 1 周。地点、项目和联络网络已经建立。' }
     ]
@@ -100,7 +122,12 @@ function normalizeSave(raw) {
     primaryProject: { ...fresh.primaryProject, ...(raw.primaryProject || {}) },
     readKnowledgeEntryIds: Array.isArray(raw.readKnowledgeEntryIds) ? raw.readKnowledgeEntryIds : [],
     reviewedOpportunityIds: Array.isArray(raw.reviewedOpportunityIds) ? raw.reviewedOpportunityIds : [],
+    enteredOpportunityIds: Array.isArray(raw.enteredOpportunityIds) ? raw.enteredOpportunityIds : [],
     contactTouches: raw.contactTouches && typeof raw.contactTouches === 'object' ? raw.contactTouches : {},
+    attentionTrace: normalizeAttentionTrace(raw.attentionTrace),
+    scheduledCallbacks: Array.isArray(raw.scheduledCallbacks) ? raw.scheduledCallbacks : [],
+    resolvedCallbacks: Array.isArray(raw.resolvedCallbacks) ? raw.resolvedCallbacks : [],
+    generatedArchive: Array.isArray(raw.generatedArchive) ? raw.generatedArchive : [],
     actionLog: migratedLog
   };
 }
@@ -196,23 +223,24 @@ export default function V05Wireframe() {
     }));
   }
 
-  function openSystem(id) {
-    setSurface(id);
-  }
-
   function openRegion(region) {
     if (region.unlockAt > save.worldLevel) return;
-    setSave((current) => ({ ...current, currentRegionId: region.id }));
+    setSave((current) => ({
+      ...current,
+      currentRegionId: region.id,
+      attentionTrace: recordAttention(current.attentionTrace, 'site', current.week, 0.35)
+    }));
     setSelectedFacilityId(region.facilityIds[0]);
     setSurface('location');
     finishGoal('g2');
   }
 
-  function spendAttention(cost, entry) {
+  function spendAttention(cost, entry, domain = 'making') {
     if (save.attention < cost) return false;
     setSave((current) => ({
       ...current,
       attention: current.attention - cost,
+      attentionTrace: recordAttention(current.attentionTrace, domain, current.week, Math.max(0.25, cost)),
       actionLog: entry ? [...current.actionLog, entry] : current.actionLog
     }));
     return true;
@@ -227,9 +255,11 @@ export default function V05Wireframe() {
       const afterStage = deriveProjectStage(nextMetrics);
       const stageChanged = beforeStage.id !== afterStage.id;
       const stageIndex = projectStages.findIndex((item) => item.id === afterStage.id);
+      const domain = actionId === 'document' ? 'archive' : 'making';
       return {
         ...current,
         attention: current.attention - action.cost,
+        attentionTrace: recordAttention(current.attentionTrace, domain, current.week, action.cost),
         worldLevel: Math.max(current.worldLevel, Math.min(4, stageIndex)),
         primaryProject: {
           ...current.primaryProject,
@@ -276,9 +306,11 @@ export default function V05Wireframe() {
     const opportunity = opportunitySeeds.find((item) => item.id === id);
     if (!opportunity) return;
     const readiness = opportunityReadiness(id, save.primaryProject, save.week, save.cash);
+    const domain = opportunityDomainsFor(id)[0] || 'network';
     setSave((current) => ({
       ...current,
       attention: current.attention - 1,
+      attentionTrace: recordAttention(current.attentionTrace, domain, current.week, 1),
       reviewedOpportunityIds: current.reviewedOpportunityIds.includes(id)
         ? current.reviewedOpportunityIds
         : [...current.reviewedOpportunityIds, id],
@@ -286,21 +318,81 @@ export default function V05Wireframe() {
     }));
   }
 
+  function enterOpportunity(id) {
+    if (save.attention < 1) return;
+    const opportunity = opportunitySeeds.find((item) => item.id === id);
+    if (!opportunity) return;
+    const readiness = opportunityReadiness(id, save.primaryProject, save.week, save.cash);
+    if (!readiness.ready) return;
+    setSave((current) => {
+      const consequenceState = {
+        scheduledCallbacks: current.scheduledCallbacks,
+        resolvedCallbacks: current.resolvedCallbacks,
+        generatedArchive: current.generatedArchive
+      };
+      if (hasOpenSourceCallback(consequenceState, 'opportunity', id)) return current;
+      if (current.resolvedCallbacks.some((item) => item.sourceType === 'opportunity' && item.sourceId === id)) return current;
+      const callback = scheduleOpportunityCallback(id, current.week);
+      if (!callback) return current;
+      const domain = opportunityDomainsFor(id)[0] || 'making';
+      return {
+        ...current,
+        attention: current.attention - 1,
+        attentionTrace: recordAttention(current.attentionTrace, domain, current.week, 1.5),
+        enteredOpportunityIds: current.enteredOpportunityIds.includes(id)
+          ? current.enteredOpportunityIds
+          : [...current.enteredOpportunityIds, id],
+        scheduledCallbacks: [...current.scheduledCallbacks, callback],
+        actionLog: [...current.actionLog, { type: '机会', title: `进入 / ${opportunity.title}`, text: `${callback.waitingText} 预计第 ${callback.dueWeek} 周形成后果。` }]
+      };
+    });
+  }
+
   function contactAction(contact, action) {
     if (save.attention < 1) return;
-    setSave((current) => ({
-      ...current,
-      attention: current.attention - 1,
-      contactTouches: { ...current.contactTouches, [contact.id]: (current.contactTouches[contact.id] || 0) + 1 },
-      actionLog: [...current.actionLog, { type: '联络', title: `${contact.name} / ${action}`, text: `发出一条明确的联络：${action}` }]
-    }));
+    setSave((current) => {
+      const consequenceState = {
+        scheduledCallbacks: current.scheduledCallbacks,
+        resolvedCallbacks: current.resolvedCallbacks,
+        generatedArchive: current.generatedArchive
+      };
+      const alreadyWaiting = hasOpenSourceCallback(consequenceState, 'contact', contact.id);
+      const alreadyResolved = current.resolvedCallbacks.some((item) => item.sourceType === 'contact' && item.sourceId === contact.id);
+      const callback = !alreadyWaiting && !alreadyResolved ? scheduleContactCallback(contact.id, current.week) : null;
+      return {
+        ...current,
+        attention: current.attention - 1,
+        attentionTrace: recordAttention(current.attentionTrace, 'network', current.week, 1),
+        contactTouches: { ...current.contactTouches, [contact.id]: (current.contactTouches[contact.id] || 0) + 1 },
+        scheduledCallbacks: callback ? [...current.scheduledCallbacks, callback] : current.scheduledCallbacks,
+        actionLog: [...current.actionLog, {
+          type: '联络',
+          title: `${contact.name} / ${action}`,
+          text: callback ? `消息已发出。${callback.waitingText}` : `再次联络：${action}`
+        }]
+      };
+    });
   }
 
   function openKnowledge(id) {
     setSelectedKnowledgeId(id);
-    setSave((current) => current.readKnowledgeEntryIds.includes(id) ? current : ({
+    setSave((current) => ({
       ...current,
-      readKnowledgeEntryIds: [...current.readKnowledgeEntryIds, id]
+      readKnowledgeEntryIds: current.readKnowledgeEntryIds.includes(id)
+        ? current.readKnowledgeEntryIds
+        : [...current.readKnowledgeEntryIds, id],
+      attentionTrace: recordAttention(current.attentionTrace, 'archive', current.week, 0.35)
+    }));
+  }
+
+  function optimizeWorkbench() {
+    if (save.cash < 900) return;
+    setSave((current) => ({
+      ...current,
+      cash: current.cash - 900,
+      attentionTrace: recordAttention(current.attentionTrace, 'making', current.week, 1),
+      primaryProject: { ...current.primaryProject, stability: Math.min(4, current.primaryProject.stability + 1) },
+      actionLog: [...current.actionLog, { type: '工作台', title: '输出链整理', text: '花费 ¥900；稳定性 +1。' }]
     }));
   }
 
@@ -308,14 +400,40 @@ export default function V05Wireframe() {
     setSave((current) => {
       const nextWeek = current.week + 1;
       const nextPulse = weeklyPulseFor(nextWeek);
+      const consequenceState = {
+        scheduledCallbacks: current.scheduledCallbacks,
+        resolvedCallbacks: current.resolvedCallbacks,
+        generatedArchive: current.generatedArchive
+      };
+      const resolution = resolveDueCallbacks(consequenceState, nextWeek);
+      const nextProjectMetrics = applyResolvedProjectDelta(current.primaryProject, resolution.projectDelta);
+      const afterStage = deriveProjectStage(nextProjectMetrics);
+      const stageIndex = projectStages.findIndex((item) => item.id === afterStage.id);
+      const nextCash = current.cash - 450 + resolution.cashDelta;
+      let nextTrace = decayAttention(current.attentionTrace, nextWeek);
+      if (nextCash < 2200) nextTrace = recordAttention(nextTrace, 'survival', nextWeek, 0.75);
+      const callbackHistory = resolution.resolvedNow.map((item) => `第 ${nextWeek} 周 / 回流：${item.title}。${item.resultText}`);
+      const callbackLogs = resolution.resolvedNow.map((item) => ({ type: '回流', title: item.title, text: item.resultText }));
       return {
         ...current,
         week: nextWeek,
-        attention: current.attentionMax,
-        cash: current.cash - 450,
+        attentionMax: Math.max(4, Math.min(8, current.attentionMax + resolution.attentionMaxDelta)),
+        attention: Math.max(4, Math.min(8, current.attentionMax + resolution.attentionMaxDelta)),
+        cash: nextCash,
+        worldLevel: Math.max(current.worldLevel, Math.min(4, stageIndex)),
+        attentionTrace: nextTrace,
+        scheduledCallbacks: resolution.state.scheduledCallbacks,
+        resolvedCallbacks: resolution.state.resolvedCallbacks,
+        generatedArchive: resolution.state.generatedArchive,
+        primaryProject: {
+          ...current.primaryProject,
+          ...nextProjectMetrics,
+          history: [...current.primaryProject.history, ...callbackHistory]
+        },
         actionLog: [
           ...current.actionLog,
-          { type: '时间', title: `第 ${current.week} 周结束`, text: `固定支出 -450。下一周：${nextPulse.label}。` }
+          { type: '时间', title: `第 ${current.week} 周结束`, text: `固定支出 -450。下一周：${nextPulse.label}。` },
+          ...callbackLogs
         ]
       };
     });
@@ -346,11 +464,11 @@ export default function V05Wireframe() {
       </header>
 
       <div className="wf-app-grid">
-        <GlobalNav active={surface} onOpen={openSystem} />
+        <GlobalNav active={surface} onOpen={setSurface} />
         <main className="wf-main">
           {surface === 'world' && <WorldMap save={save} currentRegion={currentRegion} pulse={pulse} onOpen={openRegion} />}
-          {surface === 'projects' && <Projects save={save} stage={currentStage} pulse={pulse} onAction={doProjectAction} onReview={reviewOpportunity} onGoWorld={() => setSurface('world')} />}
-          {surface === 'workbench' && <Workbench save={save} practice={practice} learnedSkills={learnedSkills} setSave={setSave} />}
+          {surface === 'projects' && <Projects save={save} stage={currentStage} pulse={pulse} onAction={doProjectAction} onReview={reviewOpportunity} onEnter={enterOpportunity} onGoWorld={() => setSurface('world')} />}
+          {surface === 'workbench' && <Workbench save={save} practice={practice} learnedSkills={learnedSkills} onOptimize={optimizeWorkbench} />}
           {surface === 'contacts' && <Contacts save={save} selectedId={selectedContactId} setSelectedId={setSelectedContactId} onAction={contactAction} />}
           {surface === 'archive' && (
             <ArchiveLibrary
@@ -448,7 +566,10 @@ function WorldMap({ save, currentRegion, pulse, onOpen }) {
   const adjacent = currentRegion.adjacentIds
     .map((id) => spatialRegions.find((region) => region.id === id)?.name)
     .filter(Boolean);
-  const incoming = opportunitySeeds.slice(0, 4);
+  const rankedIds = rankOpportunityIds(opportunitySeeds.map((item) => item.id), save.attentionTrace);
+  const incoming = rankedIds.slice(0, 4).map((id) => opportunitySeeds.find((item) => item.id === id)).filter(Boolean);
+  const recentReturns = save.resolvedCallbacks.filter((item) => item.resolvedWeek >= save.week - 1).slice(-2).reverse();
+  const waiting = save.scheduledCallbacks.slice().sort((a, b) => a.dueWeek - b.dueWeek).slice(0, 2);
   return (
     <section className="wf-world-layout">
       <div className="wf-map-column">
@@ -481,52 +602,43 @@ function WorldMap({ save, currentRegion, pulse, onOpen }) {
         </div>
       </div>
       <aside className="wf-side">
-        <section className="wf-panel">
-          <small>THIS WEEK</small><h3>{pulse.label}</h3><p>{pulse.pressure}</p><p>{pulse.worldSignal}</p>
-        </section>
+        <section className="wf-panel"><small>THIS WEEK</small><h3>{pulse.label}</h3><p>{pulse.pressure}</p><p>{pulse.worldSignal}</p></section>
+        {(recentReturns.length > 0 || waiting.length > 0) && (
+          <section className="wf-panel wf-inbox">
+            <h3>回流</h3>
+            {recentReturns.map((item) => <article key={item.id}><small>第 {item.resolvedWeek} 周 · 已发生</small><strong>{item.title}</strong><p>{item.resultText}</p></article>)}
+            {waiting.map((item) => <article key={item.id}><small>第 {item.dueWeek} 周 · 等待</small><strong>{item.title}</strong><p>{item.waitingText}</p></article>)}
+          </section>
+        )}
         <TaskBook save={save} />
-        <section className="wf-panel wf-inbox">
-          <h3>传入</h3>
-          {incoming.map((item) => <article key={item.id}><small>{item.deadline}</small><strong>{item.title}</strong><p>{item.source}</p></article>)}
-        </section>
-        <section className="wf-panel">
-          <h3>当前位置</h3>
-          <small>{currentRegion.scope} / {currentRegion.shortName}</small>
-          <strong>{currentRegion.name}</strong>
-          <p>{currentRegion.description}</p>
-          <label>可继续前往</label><p>{adjacent.join(' / ') || '—'}</p>
-        </section>
+        <section className="wf-panel wf-inbox"><h3>传入</h3>{incoming.map((item) => <article key={item.id}><small>{item.deadline}</small><strong>{item.title}</strong><p>{item.source}</p></article>)}</section>
+        <section className="wf-panel"><h3>当前位置</h3><small>{currentRegion.scope} / {currentRegion.shortName}</small><strong>{currentRegion.name}</strong><p>{currentRegion.description}</p><label>可继续前往</label><p>{adjacent.join(' / ') || '—'}</p></section>
       </aside>
     </section>
   );
 }
 
 function TaskBook({ save }) {
-  return (
-    <section className="wf-panel"><h3>{save.menuBook.title}</h3>{save.menuBook.goals.map((goal) => <div key={goal.id} className="wf-task">[{goal.done ? 'x' : ' '}] {goal.label}</div>)}</section>
-  );
+  return <section className="wf-panel"><h3>{save.menuBook.title}</h3>{save.menuBook.goals.map((goal) => <div key={goal.id} className="wf-task">[{goal.done ? 'x' : ' '}] {goal.label}</div>)}</section>;
 }
 
-function Projects({ save, stage, pulse, onAction, onReview, onGoWorld }) {
+function Projects({ save, stage, pulse, onAction, onReview, onEnter, onGoWorld }) {
   const project = save.primaryProject;
+  const profile = describeAttention(save.attentionTrace);
+  const rankedIds = rankOpportunityIds(opportunitySeeds.map((item) => item.id), save.attentionTrace);
+  const orderedOpportunities = rankedIds.map((id) => opportunitySeeds.find((item) => item.id === id)).filter(Boolean);
   return (
     <section className="wf-page">
-      <div className="wf-page-head"><h1>项目</h1><p>项目不是经验条。它必须逐渐变得更清楚、更稳定、更能进入空间，也更容易被别人重新搭起来。</p></div>
+      <div className="wf-page-head"><h1>项目</h1><p>项目逐渐变得更清楚、更稳定、更能进入空间，也更容易被别人重新搭起来。</p></div>
       <div className="wf-project-top">
         <section className="wf-panel wf-current-project">
           <small>ACTIVE / {stage.label}</small><h2>{project.name}</h2><p className="wf-project-question">{project.question}</p>
-          <div className="wf-metric-row">
-            <Metric label="一致性" value={project.coherence} />
-            <Metric label="稳定性" value={project.stability} />
-            <Metric label="场地适配" value={project.siteFit} />
-            <Metric label="文档" value={project.documentation} />
-          </div>
-          <label>阶段</label><p>{stage.description}</p>
-          <label>这个阶段会打开</label><p>{stage.unlocks.join(' / ')}</p>
-          <label>当前方法</label><p>{project.methods.join(' / ')}</p>
+          <div className="wf-metric-row"><Metric label="一致性" value={project.coherence} /><Metric label="稳定性" value={project.stability} /><Metric label="场地适配" value={project.siteFit} /><Metric label="文档" value={project.documentation} /></div>
+          <label>阶段</label><p>{stage.description}</p><label>这个阶段会打开</label><p>{stage.unlocks.join(' / ')}</p><label>当前方法</label><p>{project.methods.join(' / ')}</p>
         </section>
         <div>
           <section className="wf-panel"><small>WEEK {save.week}</small><h3>{pulse.label}</h3><p>{pulse.pressure}</p></section>
+          <section className="wf-panel"><small>ATTENTION TRACE</small><h3>近期注意力</h3><p>{profile.dominant.length ? profile.dominant.map(attentionDomainLabel).join(' / ') : '尚未形成偏向'}</p><p>{profile.neglected.length ? `较少投入：${profile.neglected.map(attentionDomainLabel).join(' / ')}` : '当前比较均衡'}</p></section>
           <TaskBook save={save} />
         </div>
       </div>
@@ -535,27 +647,30 @@ function Projects({ save, stage, pulse, onAction, onReview, onGoWorld }) {
       <div className="wf-opportunity-grid">
         {projectActions.map((action) => (
           <article key={action.id} className="wf-opportunity">
-            <header><small>项目动作</small><strong>{action.label}</strong><span>-{action.cost} 注意力</span></header>
-            <p>{action.description}</p>
-            {action.id === 'site-test'
-              ? <button onClick={onGoWorld}>去地点找真实场地 →</button>
-              : <button disabled={save.attention < action.cost} onClick={() => onAction(action.id)}>{action.label} / -{action.cost}</button>}
+            <header><small>项目动作</small><strong>{action.label}</strong><span>-{action.cost} 注意力</span></header><p>{action.description}</p>
+            {action.id === 'site-test' ? <button onClick={onGoWorld}>去地点找真实场地 →</button> : <button disabled={save.attention < action.cost} onClick={() => onAction(action.id)}>{action.label} / -{action.cost}</button>}
           </article>
         ))}
       </div>
 
-      <div className="wf-section-head wf-project-board-head"><h2>机会板</h2><span>价值和风险由项目状态重新解释</span></div>
+      <div className="wf-section-head wf-project-board-head"><h2>机会板</h2><span>排序会受你长期实际投入的注意力影响</span></div>
       <div className="wf-opportunity-grid">
-        {opportunitySeeds.map((item) => {
+        {orderedOpportunities.map((item) => {
           const readiness = opportunityReadiness(item.id, project, save.week, save.cash);
           const reviewed = save.reviewedOpportunityIds.includes(item.id);
+          const waiting = save.scheduledCallbacks.find((callback) => callback.sourceType === 'opportunity' && callback.sourceId === item.id);
+          const resolved = save.resolvedCallbacks.find((callback) => callback.sourceType === 'opportunity' && callback.sourceId === item.id);
+          const stateLabel = waiting ? '等待回流' : resolved ? '已形成后果' : readiness.ready ? '现在可进入' : '条件不足';
           return (
             <article key={item.id} className="wf-opportunity">
-              <header><small>{readiness.ready ? '现在可进入' : '条件不足'}</small><strong>{item.title}</strong><span>{item.deadline}</span></header>
-              <p>{item.source} · {item.place}</p>
-              <dl><dt>可能有用</dt><dd>{item.value}</dd><dt>真正风险</dt><dd>{item.risk}</dd></dl>
+              <header><small>{stateLabel}</small><strong>{item.title}</strong><span>{item.deadline}</span></header>
+              <p>{item.source} · {item.place}</p><dl><dt>可能有用</dt><dd>{item.value}</dd><dt>真正风险</dt><dd>{item.risk}</dd></dl>
               <p><strong>{reviewed ? '判断结果' : '当前判断'}</strong>：{readiness.reason}</p>
-              <button disabled={save.attention < 1} onClick={() => onReview(item.id)}>{reviewed ? '重新判断' : '花 1 注意力判断'}</button>
+              {waiting ? <button disabled>等待第 {waiting.dueWeek} 周</button>
+                : resolved ? <button disabled>已形成后果</button>
+                  : !reviewed ? <button disabled={save.attention < 1} onClick={() => onReview(item.id)}>花 1 注意力判断</button>
+                    : readiness.ready ? <button disabled={save.attention < 1} onClick={() => onEnter(item.id)}>进入这条线 / -1</button>
+                      : <button disabled={save.attention < 1} onClick={() => onReview(item.id)}>重新判断</button>}
             </article>
           );
         })}
@@ -569,47 +684,17 @@ function Metric({ label, value }) {
   return <div><small>{label}</small><strong>{value}/4</strong></div>;
 }
 
-function Workbench({ save, practice, learnedSkills, setSave }) {
+function Workbench({ save, practice, learnedSkills, onOptimize }) {
   const tier = computeTiers[1];
   const services = relevantSpecialistServices(save.practiceId);
-  function optimize() {
-    if (save.cash < 900) return;
-    setSave((current) => ({
-      ...current,
-      cash: current.cash - 900,
-      primaryProject: { ...current.primaryProject, stability: Math.min(4, current.primaryProject.stability + 1) },
-      actionLog: [...current.actionLog, { type: '工作台', title: '输出链整理', text: '花费 ¥900；稳定性 +1。' }]
-    }));
-  }
   return (
     <section className="wf-page">
       <div className="wf-page-head"><h1>工作台</h1><p>管理自己拥有的制作能力。专业服务按项目需要出现，不占据地图。</p></div>
       <div className="wf-workbench">
-        <section className="wf-panel">
-          <small>LOCAL</small><h3>制作设备</h3>
-          <strong>x86 Desktop / {tier.label}</strong><p>{tier.enables.join(' / ')}</p>
-          <button onClick={optimize}>整理输出链 / ¥900</button>
-        </section>
-        <section className="wf-panel">
-          <small>PRACTICE</small><h3>已掌握能力</h3>
-          <strong>{practice?.name.replace('实践', '')}</strong>
-          {learnedSkills.map((skill) => <div key={skill.id} className="wf-skill"><span>{skill.family}</span>{skill.name}</div>)}
-        </section>
-        <section className="wf-panel wf-services">
-          <small>ON DEMAND</small><h3>按需服务</h3>
-          {services.length ? services.map((service) => (
-            <article key={service.id}><strong>{service.name}</strong><p>{service.description}</p><small>{service.functions.join(' / ')}</small></article>
-          )) : <p>当前项目没有需要外部调用的技术服务。</p>}
-        </section>
-        <section className="wf-panel wf-toolbox">
-          <small>CHECKLIST</small><h3>制作检查</h3>
-          <div>[{save.primaryProject.documentation >= 1 ? 'x' : ' '}] 技术单 / 项目说明</div>
-          <div>[{save.primaryProject.siteFit >= 1 ? 'x' : ' '}] 场地尺寸 / 观看距离</div>
-          <div>[{save.primaryProject.stability >= 2 ? 'x' : ' '}] 连续运行测试</div>
-          <div>[{save.primaryProject.stability >= 3 ? 'x' : ' '}] 备份方案</div>
-          <div>[{save.primaryProject.documentation >= 2 ? 'x' : ' '}] 现场记录</div>
-          <div>[{deriveProjectStage(save.primaryProject).id === 'archive' ? 'x' : ' '}] 可恢复档案</div>
-        </section>
+        <section className="wf-panel"><small>LOCAL</small><h3>制作设备</h3><strong>x86 Desktop / {tier.label}</strong><p>{tier.enables.join(' / ')}</p><button onClick={onOptimize}>整理输出链 / ¥900</button></section>
+        <section className="wf-panel"><small>PRACTICE</small><h3>已掌握能力</h3><strong>{practice?.name.replace('实践', '')}</strong>{learnedSkills.map((skill) => <div key={skill.id} className="wf-skill"><span>{skill.family}</span>{skill.name}</div>)}</section>
+        <section className="wf-panel wf-services"><small>ON DEMAND</small><h3>按需服务</h3>{services.length ? services.map((service) => <article key={service.id}><strong>{service.name}</strong><p>{service.description}</p><small>{service.functions.join(' / ')}</small></article>) : <p>当前项目没有需要外部调用的技术服务。</p>}</section>
+        <section className="wf-panel wf-toolbox"><small>CHECKLIST</small><h3>制作检查</h3><div>[{save.primaryProject.documentation >= 1 ? 'x' : ' '}] 技术单 / 项目说明</div><div>[{save.primaryProject.siteFit >= 1 ? 'x' : ' '}] 场地尺寸 / 观看距离</div><div>[{save.primaryProject.stability >= 2 ? 'x' : ' '}] 连续运行测试</div><div>[{save.primaryProject.stability >= 3 ? 'x' : ' '}] 备份方案</div><div>[{save.primaryProject.documentation >= 2 ? 'x' : ' '}] 现场记录</div><div>[{deriveProjectStage(save.primaryProject).id === 'archive' ? 'x' : ' '}] 可恢复档案</div></section>
       </div>
     </section>
   );
@@ -618,34 +703,22 @@ function Workbench({ save, practice, learnedSkills, setSave }) {
 function Contacts({ save, selectedId, setSelectedId, onAction }) {
   const selected = contactSeeds.find((item) => item.id === selectedId) || contactSeeds[0];
   const region = spatialRegions.find((item) => item.id === selected.regionId);
+  const waiting = save.scheduledCallbacks.find((item) => item.sourceType === 'contact' && item.sourceId === selected.id);
+  const resolved = save.resolvedCallbacks.slice().reverse().find((item) => item.sourceType === 'contact' && item.sourceId === selected.id);
   return (
     <section className="wf-page">
       <div className="wf-page-head"><h1>联络</h1><p>谁知道什么、你们之间还有什么没解决、下一次为什么要联系。</p></div>
       <div className="wf-contact-layout">
-        <nav className="wf-contact-list">
-          {contactSeeds.map((contact) => (
-            <button key={contact.id} className={contact.id === selected.id ? 'active' : ''} onClick={() => setSelectedId(contact.id)}>
-              <small>{contact.state}</small><strong>{contact.name}</strong><span>{contact.role}</span>
-            </button>
-          ))}
-        </nav>
+        <nav className="wf-contact-list">{contactSeeds.map((contact) => <button key={contact.id} className={contact.id === selected.id ? 'active' : ''} onClick={() => setSelectedId(contact.id)}><small>{contact.state}</small><strong>{contact.name}</strong><span>{contact.role}</span></button>)}</nav>
         <section className="wf-panel wf-contact-detail">
-          <small>{selected.state} · {region?.name || '未知地点'}</small>
-          <h2>{selected.name}</h2><strong>{selected.role}</strong>
-          <label>最近一句</label><blockquote>{selected.lastMessage}</blockquote>
-          <label>没结束的事</label><p>{selected.openThread}</p>
-          <label>本轮联络</label><p>{save.contactTouches[selected.id] || 0} 次</p>
-          <label>现在可以联系他做什么</label>
-          <div className="wf-contact-actions">
-            {selected.canAsk.map((action) => <button key={action} disabled={save.attention < 1} onClick={() => onAction(selected, action)}>{action} / -1</button>)}
-          </div>
+          <small>{selected.state} · {region?.name || '未知地点'}</small><h2>{selected.name}</h2><strong>{selected.role}</strong>
+          <label>最近一句</label><blockquote>{selected.lastMessage}</blockquote><label>没结束的事</label><p>{selected.openThread}</p><label>本轮联络</label><p>{save.contactTouches[selected.id] || 0} 次</p>
+          {waiting && <><label>等待回复</label><p>第 {waiting.dueWeek} 周 · {waiting.waitingText}</p></>}
+          {resolved && <><label>最近回流</label><p>{resolved.resultText}</p></>}
+          <label>现在可以联系他做什么</label><div className="wf-contact-actions">{selected.canAsk.map((action) => <button key={action} disabled={save.attention < 1} onClick={() => onAction(selected, action)}>{action} / -1</button>)}</div>
           <div className="wf-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </section>
-        <aside className="wf-panel">
-          <h3>网络说明</h3>
-          <p>同一个人可以同时是同行、供应商、朋友、项目入口或风险来源。</p>
-          <p>联络次数不会直接变成“好感度”。真正有用的是尚未解决的事和下一次能交换什么。</p>
-        </aside>
+        <aside className="wf-panel"><h3>网络说明</h3><p>联络不会直接变成“好感度”。真正留下的是等待回复、共同项目、未解决问题和之后会回来的结果。</p></aside>
       </div>
     </section>
   );
@@ -657,25 +730,13 @@ function ArchiveLibrary({ save, category, setCategory, selectedId, onOpen }) {
   const related = selected.relatedIds.map((id) => knowledgeById.get(id)).filter(Boolean);
   return (
     <section className="wf-page wf-archive-page">
-      <div className="wf-page-head"><h1>档案库</h1><p>词条、方法、行业说明和世界背景。行动记录是另一套东西。</p></div>
+      <div className="wf-page-head"><h1>档案库</h1><p>公共知识和你这一轮真正产生的项目档案分开保存。</p></div>
       <div className="wf-knowledge-layout">
-        <nav className="wf-knowledge-categories">
-          <strong>分类</strong>
-          {knowledgeCategories.map((item) => <button key={item} className={category === item ? 'active' : ''} onClick={() => setCategory(item)}>{item}</button>)}
-          <div className="wf-knowledge-progress"><small>已阅读</small><strong>{save.readKnowledgeEntryIds.length}/{knowledgeEntries.length}</strong></div>
-          <div className="wf-knowledge-progress"><small>旧研究空间模板</small><strong>{legacyResearchSpaceTemplates.length}</strong></div>
-        </nav>
-        <div className="wf-knowledge-list">
-          {filtered.map((entry) => {
-            const read = save.readKnowledgeEntryIds.includes(entry.id);
-            return <button key={entry.id} className={entry.id === selected.id ? 'active' : ''} onClick={() => onOpen(entry.id)}><small>{entry.category} · {read ? '已读' : '未读'}</small><strong>{entry.title}</strong></button>;
-          })}
-        </div>
+        <nav className="wf-knowledge-categories"><strong>分类</strong>{knowledgeCategories.map((item) => <button key={item} className={category === item ? 'active' : ''} onClick={() => setCategory(item)}>{item}</button>)}<div className="wf-knowledge-progress"><small>已阅读</small><strong>{save.readKnowledgeEntryIds.length}/{knowledgeEntries.length}</strong></div><div className="wf-knowledge-progress"><small>本轮档案</small><strong>{save.generatedArchive.length}</strong></div><div className="wf-knowledge-progress"><small>旧研究空间模板</small><strong>{legacyResearchSpaceTemplates.length}</strong></div></nav>
+        <div className="wf-knowledge-list">{filtered.map((entry) => { const read = save.readKnowledgeEntryIds.includes(entry.id); return <button key={entry.id} className={entry.id === selected.id ? 'active' : ''} onClick={() => onOpen(entry.id)}><small>{entry.category} · {read ? '已读' : '未读'}</small><strong>{entry.title}</strong></button>; })}</div>
         <article className="wf-knowledge-reader">
-          <header><small>{selected.category} / ENTRY</small><h2>{selected.title}</h2><p>{selected.summary}</p></header>
-          {selected.body.map((paragraph, index) => <p key={`${selected.id}-${index}`}>{paragraph}</p>)}
-          <div className="wf-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-          <section className="wf-related"><h3>相关词条</h3>{related.map((entry) => <button key={entry.id} onClick={() => onOpen(entry.id)}>→ {entry.title}</button>)}</section>
+          <header><small>{selected.category} / ENTRY</small><h2>{selected.title}</h2><p>{selected.summary}</p></header>{selected.body.map((paragraph, index) => <p key={`${selected.id}-${index}`}>{paragraph}</p>)}<div className="wf-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><section className="wf-related"><h3>相关词条</h3>{related.map((entry) => <button key={entry.id} onClick={() => onOpen(entry.id)}>→ {entry.title}</button>)}</section>
+          {save.generatedArchive.length > 0 && <section className="wf-related"><h3>本轮生成档案</h3>{save.generatedArchive.slice().reverse().map((entry) => <article key={entry.id}><small>第 {entry.week} 周</small><strong>{entry.title}</strong><p>{entry.text}</p></article>)}</section>}
         </article>
       </div>
     </section>
@@ -689,33 +750,8 @@ function Location({ region, selectedFacilityId, setSelectedFacilityId, onBack, o
     <section className="wf-page">
       <div className="wf-page-head"><button onClick={onBack}>← 地点</button><small>{region.scope} / {region.shortName}</small><h1>{region.name}</h1><p>{region.description}</p></div>
       <div className="wf-location-layout">
-        <div className="wf-local-map">
-          <div className="wf-section-head"><h2>区域内部</h2><span>地点之间也有位置关系</span></div>
-          <div className="wf-local-map-board">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              {facilities.flatMap((facility) => facility.adjacentIds.map((id) => {
-                const target = facilityById.get(id);
-                if (!target || facility.id > target.id) return null;
-                return <line key={`${facility.id}-${id}`} x1={facility.x} y1={facility.y} x2={target.x} y2={target.y} />;
-              }))}
-            </svg>
-            {facilities.map((facility) => (
-              <button key={facility.id} className={`wf-local-node ${facility.id === selected?.id ? 'active' : ''}`} style={{ left: `${facility.x}%`, top: `${facility.y}%` }} onClick={() => setSelectedFacilityId(facility.id)}>
-                <small>{facility.kind}</small><strong>{facility.name}</strong>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="wf-location-main">
-          <section className="wf-panel wf-facility-detail">
-            <small>{selected?.kind}</small><h2>{selected?.name}</h2><p>{selected?.description}</p>
-            <label>这里会出现</label><p>{selected?.functions.join(' / ')}</p>
-            <div className="wf-location-actions">
-              <button onClick={() => onSpend(1, { type: '地点', title: selected?.name || '地点', text: `${region.name} / 做了一次现场行动。` })}>在这里行动 / -1</button>
-            </div>
-          </section>
-          <ContextEvent facility={selected} onSpend={onSpend} onVenue={onVenue} />
-        </div>
+        <div className="wf-local-map"><div className="wf-section-head"><h2>区域内部</h2><span>地点之间也有位置关系</span></div><div className="wf-local-map-board"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">{facilities.flatMap((facility) => facility.adjacentIds.map((id) => { const target = facilityById.get(id); if (!target || facility.id > target.id) return null; return <line key={`${facility.id}-${id}`} x1={facility.x} y1={facility.y} x2={target.x} y2={target.y} />; }))}</svg>{facilities.map((facility) => <button key={facility.id} className={`wf-local-node ${facility.id === selected?.id ? 'active' : ''}`} style={{ left: `${facility.x}%`, top: `${facility.y}%` }} onClick={() => setSelectedFacilityId(facility.id)}><small>{facility.kind}</small><strong>{facility.name}</strong></button>)}</div></div>
+        <div className="wf-location-main"><section className="wf-panel wf-facility-detail"><small>{selected?.kind}</small><h2>{selected?.name}</h2><p>{selected?.description}</p><label>这里会出现</label><p>{selected?.functions.join(' / ')}</p><div className="wf-location-actions"><button onClick={() => onSpend(1, { type: '地点', title: selected?.name || '地点', text: `${region.name} / 做了一次现场行动。` }, 'site')}>在这里行动 / -1</button></div></section><ContextEvent facility={selected} onSpend={onSpend} onVenue={onVenue} /></div>
       </div>
     </section>
   );
@@ -723,88 +759,23 @@ function Location({ region, selectedFacilityId, setSelectedFacilityId, onBack, o
 
 function ContextEvent({ facility, onSpend, onVenue }) {
   if (!facility) return null;
-  if (facility.functions.includes('open-call')) {
-    return (
-      <article className="wf-text-event">
-        <small>公开信息 / 截止 5 天</small><h2>一份征集只写了主题、三张图和“提供一定制作支持”。</h2>
-        <p>真正要查的是：制作费、安装期、技术支持、版权和最后到底要交什么。</p>
-        <div className="wf-decisions">
-          <button onClick={() => onSpend(1, { type: '判断', title: '拆征集条件', text: '先查支持条件和责任边界。' })}><b>1</b><span>先把支持条件查清</span><small>-1</small></button>
-          <button onClick={() => onSpend(2, { type: '申请', title: '做申请版本', text: '把当前项目压成一页可以提交的版本。' })}><b>2</b><span>直接整理申请版本</span><small>-2</small></button>
-        </div>
-      </article>
-    );
-  }
-  if (facility.functions.includes('client') || facility.functions.includes('scope')) {
-    return (
-      <article className="wf-text-event">
-        <small>会议进行到 47 分钟</small><h2>“视觉这块没问题。顺便服务器、播控和现场网络也一起包了吧？”</h2>
-        <p>报价没有变，责任范围正在变。</p>
-        <div className="wf-decisions">
-          <button onClick={() => onSpend(1, { type: 'Scope', title: '把新增内容列出来', text: '要求新增责任进入范围与报价。' })}><b>1</b><span>把新增内容列成 Scope</span><small>-1</small></button>
-          <button onClick={() => onSpend(0, { type: 'Scope', title: '先不答应', text: '不在会议里口头吞下新的责任。' })}><b>2</b><span>先不口头答应</span><small>0</small></button>
-        </div>
-      </article>
-    );
-  }
-  if (facility.functions.includes('logistics') || facility.functions.includes('transport')) {
-    return (
-      <article className="wf-text-event">
-        <small>物流 / 当天 17:40</small><h2>箱子能装下设备，但进不了货梯。</h2>
-        <p>效果图里没有货梯，报价里也没有第二次搬运。</p>
-        <div className="wf-decisions">
-          <button onClick={() => onSpend(1, { type: '后勤', title: '重做运输路径', text: '重新确认尺寸、重量和进场路线。' })}><b>1</b><span>重新确认运输路径</span><small>-1</small></button>
-          <button onClick={() => onSpend(2, { type: '后勤', title: '改结构', text: '把设备拆成可以分批进入的模块。' })}><b>2</b><span>把结构改成可拆模块</span><small>-2</small></button>
-        </div>
-      </article>
-    );
-  }
-  if (facility.functions.includes('venue-preview')) {
-    return (
-      <article className="wf-text-event">
-        <small>场地空档 / 2 小时</small><h2>这里今天没有正式活动，可以把项目接上真实输出跑一次。</h2>
-        <p>没人要求把它做漂亮。两小时只用来发现桌面上看不见的问题。</p>
-        <div className="wf-decisions"><button onClick={onVenue}><b>1</b><span>进入场地预演</span><small>→</small></button></div>
-      </article>
-    );
-  }
-  if (facility.functions.includes('conversation') || facility.functions.includes('network')) {
-    return (
-      <article className="wf-text-event">
-        <small>消息 / 14:20</small><h2>有人提到一个项目，但他说不清预算，也不知道是谁最终决定。</h2>
-        <p>这不是“接 / 不接”的二选一。先判断消息离真正的项目有多远。</p>
-        <div className="wf-decisions">
-          <button onClick={() => onSpend(1, { type: '联络', title: '追问信息源', text: '先确认是谁组织、什么时候、有什么支持。' })}><b>1</b><span>问清是谁在组织</span><small>-1</small></button>
-          <button onClick={() => onSpend(0, { type: '判断', title: '记下线索', text: '不立即投入，只保留这条消息。' })}><b>2</b><span>先记着，不投入</span><small>0</small></button>
-        </div>
-      </article>
-    );
-  }
+  if (facility.functions.includes('open-call')) return <article className="wf-text-event"><small>公开信息 / 截止 5 天</small><h2>一份征集只写了主题、三张图和“提供一定制作支持”。</h2><p>真正要查的是：制作费、安装期、技术支持、版权和最后到底要交什么。</p><div className="wf-decisions"><button onClick={() => onSpend(1, { type: '判断', title: '拆征集条件', text: '先查支持条件和责任边界。' }, 'archive')}><b>1</b><span>先把支持条件查清</span><small>-1</small></button><button onClick={() => onSpend(2, { type: '申请', title: '做申请版本', text: '把当前项目压成一页可以提交的版本。' }, 'archive')}><b>2</b><span>直接整理申请版本</span><small>-2</small></button></div></article>;
+  if (facility.functions.includes('client') || facility.functions.includes('scope')) return <article className="wf-text-event"><small>会议进行到 47 分钟</small><h2>“视觉这块没问题。顺便服务器、播控和现场网络也一起包了吧？”</h2><p>报价没有变，责任范围正在变。</p><div className="wf-decisions"><button onClick={() => onSpend(1, { type: 'Scope', title: '把新增内容列出来', text: '要求新增责任进入范围与报价。' }, 'survival')}><b>1</b><span>把新增内容列成 Scope</span><small>-1</small></button><button onClick={() => onSpend(0, { type: 'Scope', title: '先不答应', text: '不在会议里口头吞下新的责任。' }, 'survival')}><b>2</b><span>先不口头答应</span><small>0</small></button></div></article>;
+  if (facility.functions.includes('logistics') || facility.functions.includes('transport')) return <article className="wf-text-event"><small>物流 / 当天 17:40</small><h2>箱子能装下设备，但进不了货梯。</h2><p>效果图里没有货梯，报价里也没有第二次搬运。</p><div className="wf-decisions"><button onClick={() => onSpend(1, { type: '后勤', title: '重做运输路径', text: '重新确认尺寸、重量和进场路线。' }, 'site')}><b>1</b><span>重新确认运输路径</span><small>-1</small></button><button onClick={() => onSpend(2, { type: '后勤', title: '改结构', text: '把设备拆成可以分批进入的模块。' }, 'site')}><b>2</b><span>把结构改成可拆模块</span><small>-2</small></button></div></article>;
+  if (facility.functions.includes('venue-preview')) return <article className="wf-text-event"><small>场地空档 / 2 小时</small><h2>这里今天没有正式活动，可以把项目接上真实输出跑一次。</h2><p>两小时只用来发现桌面上看不见的问题。</p><div className="wf-decisions"><button onClick={onVenue}><b>1</b><span>进入场地预演</span><small>→</small></button></div></article>;
+  if (facility.functions.includes('conversation') || facility.functions.includes('network')) return <article className="wf-text-event"><small>消息 / 14:20</small><h2>有人提到一个项目，但他说不清预算，也不知道是谁最终决定。</h2><p>先判断消息离真正的项目有多远。</p><div className="wf-decisions"><button onClick={() => onSpend(1, { type: '联络', title: '追问信息源', text: '先确认是谁组织、什么时候、有什么支持。' }, 'network')}><b>1</b><span>问清是谁在组织</span><small>-1</small></button><button onClick={() => onSpend(0, { type: '判断', title: '记下线索', text: '不立即投入，只保留这条消息。' }, 'network')}><b>2</b><span>先记着，不投入</span><small>0</small></button></div></article>;
   return <article className="wf-empty-event"><small>当前没有强事件</small><p>地点仍然可以用于工作、观察或触发后续条件。</p></article>;
 }
 
 function VenueTest({ save, facilityId, onBack, onSpend, onComplete }) {
   const facility = facilityById.get(facilityId);
   function run(preset) {
-    if (!onSpend(2, { type: '预演', title: `${facility?.name || '场地'} / ${preset.name}`, text: `测试 ${preset.spec}。` })) return;
+    if (!onSpend(2, { type: '预演', title: `${facility?.name || '场地'} / ${preset.name}`, text: `测试 ${preset.spec}。` }, 'site')) return;
     onComplete(preset);
   }
-  return (
-    <section className="wf-page">
-      <div className="wf-page-head"><button onClick={onBack}>← {facility?.name || '地点'}</button><small>场地 / 输出关系</small><h1>场地预演</h1><p>{save.primaryProject.name} · 先把空间问题暴露出来。</p></div>
-      <div className="wf-venue-grid">{VENUE_PRESETS.map((preset) => <button key={preset.id} onClick={() => run(preset)}><small>{preset.spec}</small><strong>{preset.name}</strong><pre>{preset.diagram}</pre><p>{preset.note}</p><span>运行测试 / 注意力 -2</span></button>)}</div>
-    </section>
-  );
+  return <section className="wf-page"><div className="wf-page-head"><button onClick={onBack}>← {facility?.name || '地点'}</button><small>场地 / 输出关系</small><h1>场地预演</h1><p>{save.primaryProject.name} · 先把空间问题暴露出来。</p></div><div className="wf-venue-grid">{VENUE_PRESETS.map((preset) => <button key={preset.id} onClick={() => run(preset)}><small>{preset.spec}</small><strong>{preset.name}</strong><pre>{preset.diagram}</pre><p>{preset.note}</p><span>运行测试 / 注意力 -2</span></button>)}</div></section>;
 }
 
 function ActionLog({ entries, onClose }) {
-  return (
-    <div className="wf-overlay" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <aside className="wf-log-drawer">
-        <header><div><small>ACTIVITY LOG</small><h2>行动记录</h2></div><button onClick={onClose}>关闭 [L]</button></header>
-        <p className="wf-log-note">这里只记录“你做过什么”。词条、说明和可阅读内容在档案库。</p>
-        <div className="wf-log-list">{entries.slice().reverse().map((entry, index) => <article key={`${entry.title}-${index}`}><small>{entry.type}</small><strong>{entry.title}</strong><p>{entry.text}</p></article>)}</div>
-      </aside>
-    </div>
-  );
+  return <div className="wf-overlay" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><aside className="wf-log-drawer"><header><div><small>ACTIVITY LOG</small><h2>行动记录</h2></div><button onClick={onClose}>关闭 [L]</button></header><p className="wf-log-note">这里只记录“你做过什么”。词条、说明和可阅读内容在档案库。</p><div className="wf-log-list">{entries.slice().reverse().map((entry, index) => <article key={`${entry.title}-${index}`}><small>{entry.type}</small><strong>{entry.title}</strong><p>{entry.text}</p></article>)}</div></aside></div>;
 }
