@@ -3,7 +3,11 @@ import './v05-narrative-stage.css';
 
 const DEFAULT_META = { kicker: 'EPISODE', time: '', objective: '', pacing: [], holdChoices: false };
 
-export default function V05NarrativeStage({
+export default function V05NarrativeStage(props) {
+  return <NarrativeStageInner key={props.contentKey} {...props} />;
+}
+
+function NarrativeStageInner({
   contentKey,
   scene,
   speaker,
@@ -18,12 +22,6 @@ export default function V05NarrativeStage({
   const [phase, setPhase] = useState(showLoad ? 'loading' : 'dialogue');
   const [visibleCount, setVisibleCount] = useState(0);
   const [choicesVisible, setChoicesVisible] = useState(false);
-
-  useEffect(() => {
-    setPhase(showLoad ? 'loading' : 'dialogue');
-    setVisibleCount(0);
-    setChoicesVisible(false);
-  }, [contentKey, showLoad]);
 
   useEffect(() => {
     if (phase !== 'dialogue' || visibleCount >= paragraphs.length) return;
