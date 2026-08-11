@@ -42,7 +42,7 @@ test('Butterfly Scholar special route is reachable from home, completes narrativ
 
   await page.getByRole('link', { name: '打开最终工作图' }).click();
   await page.waitForURL(/core=v05.*lab=blueprint.*preset=butterfly|lab=blueprint.*preset=butterfly/);
-  await expect(page.getByDisplayValue('哥斯达黎加的蝴蝶学者 / 第一次采集')).toBeVisible();
+  await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 第一次采集"]')).toBeVisible();
   await expect(page.getByText('Gaussian Splatting', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('摄影测量采集', { exact: true }).first()).toBeVisible();
 });
