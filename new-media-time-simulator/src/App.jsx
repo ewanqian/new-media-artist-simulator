@@ -19,7 +19,7 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
-const V05Experience = lazy(() => import('./v05/web/V05ExperienceHub.jsx'));
+const V05Experience = lazy(() => import('./v05/web/V05TriadExperience.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -83,86 +83,48 @@ function LegacySimulator() {
     setState((current) => startGameWithArchetype(current, archetypeId));
   };
 
-  const handleReset = () => {
-    const fresh = createInitialState();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
-    setState(fresh);
+  const handleStartProject = (projectId) => {
+    setState((current) => startProject(current, projectId));
   };
 
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'new-media-artist-simulator-save.json';
-    anchor.click();
-    URL.revokeObjectURL(url);
+  const handleMove = (regionId) => {
+    setState((current) => moveToRegion(current, regionId));
   };
 
-  const handleImport = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      setState(parsed);
-    } catch (error) {
-      alert('导入失败：存档文件格式不对。');
-    }
+  const handlePerformAction = (actionId) => {
+    setState((current) => performAction(current, actionId));
   };
+
+  const handleEquipSkill = (slot, skillId) => {
+    setState((current) => equipSkill(current, slot, skillId));
+  };
+
+  if (state.stage === 'assessment') {
+    return (
+      <Assessment
+        answers={state.answers}
+        onAnswer={handleAnswer}
+        onFinish={handleFinishAssessment}
+        getRecommendation={getRecommendedArchetype}
+      />
+    );
+  }
+
+  if (state.stage === 'pick') {
+    return <ArchetypePicker recommendedId={state.recommendedArchetypeId} onSelect={handleSelectArchetype} />;
+  }
 
   return (
-    <main className="app-shell">
-      <header className="topbar">
-        <div>
-          <div className="eyebrow">React / Vite / GitHub Pages</div>
-          <strong>新媒体艺术家模拟器</strong>
-        </div>
-        <p>艺术生态、生存策略与技能演化实验</p>
-      </header>
-
-      {state.stage === 'intro' && (
-        <Assessment
-          answers={state.answers}
-          onAnswer={handleAnswer}
-          onFinish={handleFinishAssessment}
-          recommendedArchetypeId={state.recommendedArchetypeId}
-          onChooseRecommendation={handleSelectArchetype}
-        />
-      )}
-
-      {state.stage === 'pick' && (
-        <>
-          <Assessment
-            answers={state.answers}
-            onAnswer={handleAnswer}
-            onFinish={handleFinishAssessment}
-            recommendedArchetypeId={state.recommendedArchetypeId}
-            onChooseRecommendation={handleSelectArchetype}
-          />
-          <ArchetypePicker
-            recommendedArchetypeId={state.recommendedArchetypeId}
-            onSelect={handleSelectArchetype}
-          />
-        </>
-      )}
-
-      {state.stage === 'play' && (
-        <Dashboard
-          state={state}
-          computedStats={computedStats}
-          currentRegion={currentRegion}
-          currentSubmap={currentSubmap}
-          availableRegions={availableRegions}
-          onMove={(regionId, submapId) => setState((current) => moveToRegion(current, regionId, submapId))}
-          onAction={(actionId) => setState((current) => performAction(current, actionId))}
-          onEquip={(skillId) => setState((current) => equipSkill(current, skillId))}
-          onStartProject={(projectId) => setState((current) => startProject(current, projectId))}
-          onReset={handleReset}
-          onExport={handleExport}
-          onImport={handleImport}
-        />
-      )}
-    </main>
+    <Dashboard
+      state={state}
+      computedStats={computedStats}
+      currentRegion={currentRegion}
+      currentSubmap={currentSubmap}
+      availableRegions={availableRegions}
+      onStartProject={handleStartProject}
+      onMove={handleMove}
+      onPerformAction={handlePerformAction}
+      onEquipSkill={handleEquipSkill}
+    />
   );
 }
