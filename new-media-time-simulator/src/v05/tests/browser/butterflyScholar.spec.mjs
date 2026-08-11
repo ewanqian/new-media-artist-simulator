@@ -8,10 +8,14 @@ async function clearRoute(page) {
   });
 }
 
-test('Butterfly Scholar special route completes narrative and opens its real Blueprint preset', async ({ page }) => {
-  await page.goto('/?core=v05&mode=butterfly', { waitUntil: 'networkidle' });
+test('Butterfly Scholar special route is reachable from home, completes narrative, and opens its real Blueprint preset', async ({ page }) => {
+  await page.goto('/?core=v05', { waitUntil: 'networkidle' });
   await clearRoute(page);
   await page.reload({ waitUntil: 'networkidle' });
+
+  await expect(page.getByText('哥斯达黎加的蝴蝶学者', { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: /进入特殊路线/ }).click();
+  await page.waitForURL(/core=v05.*mode=butterfly|mode=butterfly/);
 
   await expect(page.getByRole('heading', { name: '出发前的工作室' })).toBeVisible();
   await expect(page.getByText('艺术家 / 蝴蝶研究者', { exact: true })).toBeVisible();
