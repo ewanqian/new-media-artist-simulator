@@ -56,3 +56,26 @@ test('Butterfly Scholar is a formal special chapter with staged training and an 
     await expect(page.getByText('现场采集检查', { exact: true }).first()).toBeVisible();
   }
 });
+
+test('desktop Butterfly training advances 1/3 to complete through real graph connections', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'port-connection training is locked on desktop in this regression');
+  await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
+  await clearRoute(page);
+  await page.reload({ waitUntil: 'networkidle' });
+
+  const hud = page.getByLabel('蝴蝶学者训练任务');
+  await expect(hud).toContainText('任务 1 / 3');
+
+  await page.getByLabel('摄影测量采集 输出 照片序列').click();
+  await page.getByLabel('现场采集检查 输入 采集数据').click();
+  await expect(hud).toContainText('任务 2 / 3');
+
+  await page.getByLabel('现场采集检查 输出 可处理数据').click();
+  await page.getByLabel('Metashape · 照片对齐 输入 照片序列').click();
+  await expect(hud).toContainText('任务 3 / 3');
+
+  await page.getByLabel('Metashape · 照片对齐 输出 相机位姿').click();
+  await page.getByLabel('Gaussian Splatting 输入 相机位姿 + 图像').click();
+  await expect(hud).toContainText('训练完成');
+  await expect(hud.getByRole('link', { name: /返回章节选择/ })).toBeVisible();
+});
