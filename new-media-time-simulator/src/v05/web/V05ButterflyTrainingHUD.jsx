@@ -4,7 +4,7 @@ import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-training-hud.css';
 
 const AUTOSAVE_KEY = 'nmas-blueprint-editor-autosave-v2';
-const COMPLETE_KEY = 'nmas-butterfly-training-complete-v2';
+const COMPLETE_KEY = 'nmas-butterfly-training-complete-v3';
 
 function readBlueprint() {
   try { return JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null'); } catch { return null; }
@@ -39,16 +39,16 @@ export default function V05ButterflyTrainingHUD() {
   useEffect(() => {
     if (!complete || localStorage.getItem(COMPLETE_KEY) === '1') return;
     localStorage.setItem(COMPLETE_KEY, '1');
-    emitGlobalFeedback({ kind: 'achievement', code: 'TRAINING COMPLETE', title: '第一次扫描工作流', detail: '你已经知道：先采集，再检查，再求相机位置，最后才选点云或 Gaussian。' });
+    emitGlobalFeedback({ kind: 'achievement', code: 'TRAINING COMPLETE', title: '第一条采集链', detail: '你已经接通：现场调查 → 摄影测量 → 离场检查 → 相机求解。点云 / Gaussian / Blender 现在可以自由继续。' });
   }, [complete]);
 
   return <aside className={`bt-hud ${collapsed ? 'collapsed' : ''}`} aria-label="蝴蝶学者训练任务">
-    <header><div><small>SPECIAL 01 / TRAINING</small><strong>{complete ? '完成' : `${doneCount} / ${status.length}`}</strong></div><button onClick={() => setCollapsed((value) => !value)}>{collapsed ? '展开任务' : '收起'}</button></header>
+    <header><div><small>SPECIAL 01 / BLUEPRINT LESSON</small><strong>{complete ? '三步完成' : `任务 ${doneCount + 1} / ${status.length}`}</strong></div><button onClick={() => setCollapsed((value) => !value)}>{collapsed ? '展开任务' : '收起'}</button></header>
     {!collapsed && <>
-      <div className="bt-flow" aria-label="扫描工作流"><span><small>INPUT</small><b>采集</b></span><i>→</i><span><small>CHECK</small><b>检查</b></span><i>→</i><span><small>SOLVE</small><b>相机位置</b></span><i>→</i><span><small>OUTPUT</small><b>点云 / Gaussian</b></span></div>
-      {!complete && current && <section className="bt-current"><small>现在只做这一件事</small><h2>{current.title}</h2><p>{current.why}</p><em>{current.hint}</em></section>}
+      <div className="bt-legend"><span><b>右侧 ●</b> 输出</span><span><b>左侧 ○</b> 输入</span><span>先点输出，再点输入</span></div>
+      {!complete && current && <section className="bt-current"><small>现在只做这一条线</small><h2>{current.title}</h2><div className="bt-wire-instruction"><span>①【{current.fromLabel}】右侧 ● <b>{current.fromPort}</b></span><i>→</i><span>②【{current.toLabel}】左侧 ○ <b>{current.toPort}</b></span></div><p>{current.why}</p></section>}
       <ol>{status.map((item, index) => <li key={item.id} className={item.done ? 'done' : current?.id === item.id ? 'current' : ''}><i>{item.done ? '✓' : index + 1}</i><span>{item.title}</span></li>)}</ol>
-      <footer>{complete ? <><strong>你已经把工作流接通。</strong><p>下一次项目里，这三个节点组不会再强制提示。</p><a href={chapterHref()}>返回章节选择 →</a></> : <p>连线方法：点上游节点右侧输出端口，再点下游节点左侧输入端口。只需要完成任务条，不需要把所有端口都接满。</p>}</footer>
+      <footer>{complete ? <><strong>第一条采集链已经接通。</strong><p>现在可以继续试点云、Gaussian 或 Blender；这些不再是教程必选答案。</p><a href={chapterHref()}>完成 · 返回章节选择 →</a></> : <p>不需要把所有端口都接满。这里只学三件事：先定义现场对象、离场前检查、先求解相机。</p>}</footer>
     </>}
   </aside>;
 }
