@@ -7,6 +7,8 @@ export type ButterflyTrainingStep = {
   title: string;
   plain: string;
   why: string;
+  operation?: string;
+  reference?: string;
   nodeIds: string[];
   failureSignals: string[];
 };
@@ -38,6 +40,7 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     title: '先决定你在采集什么',
     plain: '不要先扫整个森林。选一个可追踪对象：一株寄主植物、一段小径、一个观察点，或一组蝴蝶与植物的关系。',
     why: '对象越明确，后面的照片、扫描、标本和笔记才有共同坐标。',
+    operation: '先写一张观察卡：对象 / 时间 / 地点 / 寄主植物 / 是否出现。',
     nodeIds: ['project-question', 'butterfly-observation', 'plant-specimen'],
     failureSignals: ['采集很多，但彼此没有关系', '最后只剩一个“大自然素材库”']
   },
@@ -45,7 +48,9 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     id: 'train-capture',
     title: '拍摄 / 扫描',
     plain: '围绕对象移动，保持足够重叠；同一对象要从不同位置被看到。薄叶、反光、水面和快速移动对象需要额外注意。',
-    why: '摄影测量依赖不同视角之间能找到共同特征。COLMAP 的官方教程也强调高重叠、不同视点和相对稳定的光照。',
+    why: '摄影测量依赖不同视角之间能找到共同特征。高重叠、不同视点和相对稳定的光照，比盲目增加照片数量更重要。',
+    operation: '边移动边拍，不要只站原地旋转；让关键表面至少在多张照片里重复出现。',
+    reference: 'COLMAP Tutorial · Capture guidelines',
     nodeIds: ['capture-photo-sequence', 'capture-lidar-pass'],
     failureSignals: ['匹配点太少', '叶片边缘破碎', '相机位姿断裂', '反光区域漂移']
   },
@@ -53,7 +58,9 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     id: 'train-check',
     title: '现场先检查，不要回去才发现',
     plain: '快速看一遍覆盖、模糊、强反光、曝光突变和明显漏拍。重要对象至少应该被多张照片共同看到。',
-    why: '采集阶段补一张照片通常只要几十秒；离开现场后重新补采可能意味着下一次旅行。',
+    why: '采集阶段补一组照片只要几十秒；离开现场后重新补采可能意味着下一次旅行。',
+    operation: '离场前看缩略图和覆盖：漏拍就沿缺口重新走一小段，用相近曝光补拍。',
+    reference: 'COLMAP Tutorial · overlap / illumination / viewpoints',
     nodeIds: ['capture-quality-check', 'field-note'],
     failureSignals: ['只有单一角度', '光照跨越太大', '关键表面完全无纹理']
   },
@@ -62,6 +69,8 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     title: '对齐 / 相机求解',
     plain: '先让软件判断“这些照片是从哪里拍的”。你可以用 Metashape 的 Align Photos 或 COLMAP 的 SfM 思路理解这一层。',
     why: '如果相机位置本身不可信，后面的稠密点云、网格或高斯都只是把错误做得更漂亮。',
+    operation: 'Metashape：Workflow → Add Photos → Align Photos → 看相机位置和 tie points。COLMAP：先用 Automatic Reconstruction；需要诊断时再拆成 feature extraction → matching → reconstruction。',
+    reference: 'Agisoft Metashape 2.3 / COLMAP Tutorial',
     nodeIds: ['process-metashape-align', 'process-colmap-sfm'],
     failureSignals: ['大量照片未对齐', '相机轨迹突然跳跃', '稀疏点结构明显错误']
   },
@@ -69,7 +78,8 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     id: 'train-reconstruct',
     title: '选择一种重建方式',
     plain: '你不必永远追求一个“最完整 3D 模型”。根据作品需要选择点云、网格或 Gaussian Splatting。',
-    why: '它们不是同一条质量等级。点云适合保留采样感；网格适合几何表面；高斯适合快速、连续地重放视图与空间外观。',
+    why: '它们不是同一条质量等级。点云适合保留采样感；网格偏几何表面；高斯适合连续重放空间外观。',
+    operation: '先确认相机求解可靠，再问作品需要“几何 / 采样痕迹 / 视图连续性”中的哪一种。',
     nodeIds: ['process-dense-reconstruction', 'process-gaussian-splat'],
     failureSignals: ['为了技术炫耀选错表达', '文件巨大但作品没有因此更成立']
   },
@@ -78,6 +88,8 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     title: '清理，但不要自动把缺口当垃圾',
     plain: '删浮点、裁掉无关区域、整理坐标；同时决定哪些破损应该保留。',
     why: '对这条艺术家路线来说，扫描失败、缺失标签和季节空白都可能成为内容。',
+    operation: 'Gaussian 可在 SuperSplat 浏览器编辑器里 trim floaters、crop、调颜色、做 camera animation；只有选择 publish 时才需要上传发布。',
+    reference: 'PlayCanvas SuperSplat Editor',
     nodeIds: ['process-point-clean', 'method-preserve-gap'],
     failureSignals: ['把所有异常都修成光滑表面', '失去采集过程的证据']
   },
@@ -86,13 +98,14 @@ export const butterflyScholarTraining: ButterflyTrainingStep[] = [
     title: '把采集物变成作品，而不是数据展示',
     plain: '把空间、观察时间、植物记录、缺席和观看行为重新连成一个规则。',
     why: '工作流的终点不是“我成功扫描了”，而是“为什么观众要进入这段被保存、被删减、被重新组织的关系”。',
+    operation: '把公开比例、缺席记录、时间变化、观看路径写回 Blueprint，再决定现场输出。',
     nodeIds: ['compose-memory-garden', 'nature-decay-rule', 'prod-projector'],
     failureSignals: ['只剩技术 Demo', '互动只是靠近就多几个粒子']
   }
 ];
 
 export const butterflyScholarNarrativePack: NarrativePack = {
-  id: 'narrative-butterfly-scholar-v1',
+  id: 'narrative-butterfly-scholar-v2',
   title: '哥斯达黎加的蝴蝶学者',
   actors: [
     {
@@ -131,13 +144,14 @@ export const butterflyScholarNarrativePack: NarrativePack = {
     { id: 'fact-ines-role-public', subjectId: 'ines', label: 'Inés 自称只是独立艺术组织的现场协调人。', state: 'claimed', sourceIds: ['ines'], contradicts: ['fact-ines-network'] },
     { id: 'fact-ines-network', subjectId: 'ines', label: '她同时在替另一个艺术研究网络评估档案与数据合作。', state: 'unknown', sourceIds: [], contradicts: ['fact-ines-role-public'], revealText: '她没有完全撒谎，但她第一次介绍自己时明显省略了一半。' },
     { id: 'fact-data-rights', subjectId: 'route', label: '研究站并不希望所有采集数据被无限复制和公开。', state: 'unknown', sourceIds: [] },
-    { id: 'fact-absence', subjectId: 'project', label: '没有出现的蝴蝶也可以是一条有效观察记录。', state: 'unknown', sourceIds: [] }
+    { id: 'fact-absence', subjectId: 'project', label: '没有出现的蝴蝶也可以是一条有效观察记录。', state: 'unknown', sourceIds: [] },
+    { id: 'fact-bad-solve', subjectId: 'project', label: '对齐失败不能靠换一种最终表示自动修好。', state: 'unknown', sourceIds: [] }
   ],
   scenes: [
     { id: 'scene-studio', title: '出发前的工作室', location: '你的工作室', entryNodeId: 'bs-01-invite', actorIds: ['player-butterfly-scholar', 'advisor-rui'], tags: ['briefing', 'origin'] },
     { id: 'scene-arrival', title: '研究站入口', location: '哥斯达黎加 · 山地研究站', entryNodeId: 'bs-02-arrival', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['arrival', 'relationship'] },
     { id: 'scene-field', title: '第一次采集', location: '云雾林样地', entryNodeId: 'bs-03-field', actorIds: ['player-butterfly-scholar', 'ines', 'rojas'], tags: ['capture', 'blueprint'] },
-    { id: 'scene-night', title: '晚上的工作台', location: '研究站临时工作室', entryNodeId: 'bs-04-process', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['processing', 'relationship', 'contradiction'] },
+    { id: 'scene-night', title: '晚上的工作台', location: '研究站临时工作室', entryNodeId: 'bs-04-process', actorIds: ['player-butterfly-scholar', 'ines', 'rojas'], tags: ['processing', 'relationship', 'contradiction'] },
     { id: 'scene-public', title: '花园第一次被别人进入', location: '临时展示空间', entryNodeId: 'bs-05-public', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['public', 'archive'] }
   ],
   nodes: [
@@ -161,14 +175,47 @@ export const butterflyScholarNarrativePack: NarrativePack = {
       id: 'bs-03-field', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene',
       text: ['第一块样地比照片里小得多。真正麻烦的是薄叶、风、反光、水汽和不停改变位置的光。', 'Rojas 说：先别扫整个森林。挑一个关系。'],
       choices: [
-        { id: 'bs-capture-plant', label: '从寄主植物开始', subtext: '植物标本 + 局部扫描 + 观察时间。', effects: { setFlags: ['capture-plant-route'], factUpdates: [{ factId: 'fact-data-rights', state: 'observed', sourceId: 'rojas' }] }, nextNodeId: 'bs-04-process' },
-        { id: 'bs-capture-path', label: '从一段空间路径开始', subtext: '把扫描缺口和观看路线一起留下。', effects: { setFlags: ['capture-space-route'], factUpdates: [{ factId: 'fact-data-rights', state: 'observed', sourceId: 'rojas' }] }, nextNodeId: 'bs-04-process' },
-        { id: 'bs-capture-absence', label: '记录“今天没有出现”', subtext: '把缺席当作时间数据，而不是失败。', effects: { setFlags: ['capture-absence-route'], factUpdates: [{ factId: 'fact-absence', state: 'verified', sourceId: 'field-log' }] }, nextNodeId: 'bs-04-process' }
+        { id: 'bs-capture-plant', label: '从寄主植物开始', subtext: '植物标本 + 局部扫描 + 观察时间。', effects: { setFlags: ['capture-plant-route'], factUpdates: [{ factId: 'fact-data-rights', state: 'observed', sourceId: 'rojas' }] }, nextNodeId: 'bs-03b-audit' },
+        { id: 'bs-capture-path', label: '从一段空间路径开始', subtext: '把扫描缺口和观看路线一起留下。', effects: { setFlags: ['capture-space-route'], factUpdates: [{ factId: 'fact-data-rights', state: 'observed', sourceId: 'rojas' }] }, nextNodeId: 'bs-03b-audit' },
+        { id: 'bs-capture-absence', label: '记录“今天没有出现”', subtext: '把缺席当作时间数据，而不是失败。', effects: { setFlags: ['capture-absence-route'], factUpdates: [{ factId: 'fact-absence', state: 'verified', sourceId: 'field-log' }] }, nextNodeId: 'bs-03b-audit' }
       ]
     },
     {
-      id: 'bs-04-process', sceneId: 'scene-night', speakerId: 'ines', channel: 'dialogue',
-      text: ['晚上你们在同一张桌子上检查照片。几组相机没有成功对齐；薄叶像被吃掉了一圈。', 'Inés 没催你把洞补上。她问：“你确定完整才更接近这里吗？”'],
+      id: 'bs-03b-audit', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene',
+      text: ['准备离场时，你快速翻了一遍缩略图。叶片背面几乎没有覆盖，小径转角只有一个方向，最后十几张曝光也明显变了。', 'Rojas 没告诉你该不该重拍。他只问：“你现在回去，明天还能得到同一个现场吗？”'],
+      choices: [
+        { id: 'bs-audit-recapture', label: '现在补拍缺口', subtext: '沿缺口重新走一小段，用相近曝光补足重叠和视角。', effects: { setFlags: ['field-recapture'], memories: [{ actorId: 'rojas', about: 'capture-discipline', value: '离场前主动检查覆盖并补拍', weight: 3 }] }, nextNodeId: 'bs-04-process' },
+        { id: 'bs-audit-leave', label: '先回去，赌后期能救', subtext: '保留这次决策，让它在重建阶段真正产生后果。', effects: { setFlags: ['capture-gap-debt'], memories: [{ actorId: 'rojas', about: 'capture-discipline', value: '明知覆盖不足仍离开现场', weight: 2 }] }, nextNodeId: 'bs-04-process' }
+      ]
+    },
+    {
+      id: 'bs-04-process', sceneId: 'scene-night', speakerId: 'rojas', channel: 'scene',
+      text: ['晚上开始对齐。结果只有一部分照片注册成功，相机轨迹在叶片背面附近断成了两段。', '现在的问题还不是“点云还是高斯”，而是：这些照片到底有没有形成可信的相机与空间关系？'],
+      choices: [
+        { id: 'bs-align-diagnose', label: '先诊断相机与匹配', subtext: '看未注册照片、相机轨迹、tie points / matches；必要时补匹配或回现场重拍。', effects: { setFlags: ['diagnosed-camera-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'rojas' }] }, nextNodeId: 'bs-04a-represent' },
+        { id: 'bs-align-force-dense', label: '直接继续稠密重建', subtext: '你会得到更多点，但错误的相机关系仍然在底层。', effects: { setFlags: ['forced-dense-on-bad-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'observed', sourceId: 'reconstruction' }] }, nextNodeId: 'bs-04a-represent' },
+        { id: 'bs-align-switch-gaussian', label: '换 Gaussian 试试看', subtext: '换表示方式不会自动修复错误的相机求解。', effects: { setFlags: ['switched-representation-before-fix'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'failed-splat' }] }, nextNodeId: 'bs-04a-represent' }
+      ]
+    },
+    {
+      id: 'bs-04a-represent', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record',
+      text: ['相机关系终于足够可信，你可以开始决定作品到底需要什么样的空间表示。', '这不是“哪个技术最高级”。你要决定观众看到的是采样痕迹，还是连续、带视角感的空间外观。'],
+      choices: [
+        { id: 'bs-represent-pointcloud', label: '保留采样痕迹，做点云', subtext: '让点的密度、缺口和测量过程继续可见。', effects: { setFlags: ['representation-pointcloud'] }, nextNodeId: 'bs-04c-browser' },
+        { id: 'bs-represent-gaussian', label: '保留视图连续性，做 Gaussian', subtext: '让空间外观在移动视角中连续，但不把它误认成“更高级点云”。', effects: { setFlags: ['representation-gaussian'] }, nextNodeId: 'bs-04c-browser' }
+      ]
+    },
+    {
+      id: 'bs-04c-browser', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record',
+      text: ['现在要做第一次网页版预览。点云路线可以保持本地并导出展示版本；Gaussian 路线则可以把 splat 放进浏览器编辑器继续清理。', 'SuperSplat 这类工具真正有用的地方不是“一键变艺术”，而是 trim floaters、crop、颜色修整、相机动画和发布。'],
+      choices: [
+        { id: 'bs-browser-supersplat', label: '在 SuperSplat 里先清理再预览', subtext: '浏览器里裁剪浮点、整理观看路径；是否 publish 仍然由你决定。', effects: { setFlags: ['browser-splat-cleanup'] }, nextNodeId: 'bs-04d-gap' },
+        { id: 'bs-browser-local', label: '保持本地处理，只导出展示版本', subtext: '把网页当输出端，不把所有工作都迁进浏览器。', effects: { setFlags: ['local-processing-web-output'] }, nextNodeId: 'bs-04d-gap' }
+      ]
+    },
+    {
+      id: 'bs-04d-gap', sceneId: 'scene-night', speakerId: 'ines', channel: 'dialogue',
+      text: ['清理到最后，薄叶仍像被吃掉了一圈，扫描里还有一些无法解释的洞。', 'Inés 没催你把洞补上。她问：“你确定完整才更接近这里吗？”'],
       choices: [
         { id: 'bs-preserve-gaps', label: '保留一部分缺口', subtext: '把失败扫描作为作品的一层。', effects: { setFlags: ['method-preserve-gap'], trustDelta: { ines: 2 }, memories: [{ actorId: 'ines', about: 'night-work', value: '玩家没有把技术缺口自动当成垃圾', weight: 3 }] }, nextNodeId: 'bs-04b-reveal' },
         { id: 'bs-repair-gaps', label: '先得到稳定模型', subtext: '把可用数据与概念判断分开。', effects: { setFlags: ['method-repair-first'], trustDelta: { ines: 0 }, memories: [{ actorId: 'ines', about: 'night-work', value: '玩家优先建立可控重建，再决定删什么', weight: 2 }] }, nextNodeId: 'bs-04b-reveal' }
@@ -205,6 +252,15 @@ export const butterflyWorldEffectsByChoice: Record<string, ButterflyWorldEffect>
   'bs-capture-plant': { unlockNodeIds: ['plant-specimen', 'butterfly-observation', 'capture-photo-sequence'], methodIds: ['method-field-metadata'] },
   'bs-capture-path': { unlockNodeIds: ['capture-photo-sequence', 'capture-lidar-pass', 'capture-quality-check'], methodIds: ['method-spatial-capture-route'] },
   'bs-capture-absence': { unlockNodeIds: ['butterfly-observation', 'field-note'], methodIds: ['method-record-absence'], archiveEntryIds: ['archive-no-butterfly-today'] },
+  'bs-audit-recapture': { unlockNodeIds: ['capture-quality-check'], methodIds: ['method-check-before-leave'], evidenceIds: ['ev-field-recapture'] },
+  'bs-audit-leave': { threadIds: ['thread-capture-gap-debt'], evidenceIds: ['ev-known-coverage-gap'] },
+  'bs-align-diagnose': { unlockNodeIds: ['process-metashape-align', 'process-colmap-sfm'], methodIds: ['method-diagnose-before-reconstruct'], evidenceIds: ['ev-camera-registration-check'] },
+  'bs-align-force-dense': { unlockNodeIds: ['process-dense-reconstruction'], threadIds: ['thread-unreliable-camera-solve'], evidenceIds: ['ev-dense-on-bad-solve'] },
+  'bs-align-switch-gaussian': { unlockNodeIds: ['process-gaussian-splat'], methodIds: ['method-representation-does-not-fix-capture'], threadIds: ['thread-camera-solve-unresolved'] },
+  'bs-represent-pointcloud': { unlockNodeIds: ['process-dense-reconstruction'], methodIds: ['method-sampling-as-form'], projectTags: ['point-cloud'] },
+  'bs-represent-gaussian': { unlockNodeIds: ['process-gaussian-splat'], methodIds: ['method-view-dependent-space'], projectTags: ['gaussian-splatting'] },
+  'bs-browser-supersplat': { unlockNodeIds: ['process-point-clean'], methodIds: ['method-browser-splat-cleanup'], evidenceIds: ['ev-web-preview'] },
+  'bs-browser-local': { methodIds: ['method-local-export-pipeline'], evidenceIds: ['ev-local-preview'] },
   'bs-preserve-gaps': { unlockNodeIds: ['method-preserve-gap', 'process-point-clean'], methodIds: ['method-preserve-gap'], evidenceIds: ['ev-scan-gap'] },
   'bs-repair-gaps': { unlockNodeIds: ['process-metashape-align', 'process-colmap-sfm', 'process-point-clean'], methodIds: ['method-reconstruct-before-interpret'] },
   'bs-reveal-accept': { threadIds: ['thread-data-rights'], archiveEntryIds: ['archive-ines-reveal'], projectTags: ['data-rights'] },
