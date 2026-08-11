@@ -23,6 +23,8 @@ const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
 const V05Experience = lazy(() => import('./v05/web/V05TriadExperience.jsx'));
 const V05BlueprintEditor = lazy(() => import('./v05/web/V05BlueprintEditor.jsx'));
 const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
+const V05CareerEntry = lazy(() => import('./v05/web/V05CareerEntry.jsx'));
+const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
@@ -37,6 +39,20 @@ export default function App() {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}>
         <V05BlueprintEditor />
+      </Suspense>
+    );
+  }
+  if (preview === 'v05' && mode === 'career') {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在建立生涯档案…</section></main>}>
+        <V05CareerEntry />
+      </Suspense>
+    );
+  }
+  if (preview === 'v05' && mode === 'content') {
+    return (
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入内容管理…</section></main>}>
+        <V05ContentManager />
       </Suspense>
     );
   }
