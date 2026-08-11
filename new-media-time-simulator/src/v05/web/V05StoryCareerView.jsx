@@ -16,14 +16,12 @@ function loadSave() {
   catch { return null; }
 }
 
-function choiceDisabled(choice, save) {
-  // Only positive requirements can block an action. A negative cash balance is
-  // debt, not a reason to disable an otherwise ¥0 action.
-  const requirements = choice?.requirements || {};
-  const attention = Number(requirements.attention || 0);
-  const cash = Number(requirements.cash || 0);
-  return (attention > 0 && Number(save?.attention || 0) < attention)
-    || (cash > 0 && Number(save?.cash || 0) < cash);
+function consequenceLabel(value = '') {
+  const cleaned = String(value)
+    .replace(/注意力\s*-\d+\s*·?\s*/g, '')
+    .replace(/注意力\s*0\s*·?\s*/g, '')
+    .trim();
+  return cleaned || '这个选择会留下后果';
 }
 
 function progressFor(stageId, save) {
@@ -40,6 +38,14 @@ function sceneFor(stageId, save) {
   if (stageId === 'stage-3') return careerStageThreeScene(save || {});
   if (stageId === 'stage-2') return careerStageTwoScene(save || {});
   return careerStageOneScene(save || {}, 'story');
+}
+
+function runChoice(runtimeSave, choiceId) {
+  if (choiceId.startsWith('story:stage5:')) return applyCareerStageFiveCommand(runtimeSave, choiceId);
+  if (choiceId.startsWith('story:stage4:')) return applyCareerStageFourCommand(runtimeSave, choiceId);
+  if (choiceId.startsWith('story:stage3:')) return applyCareerStageThreeCommand(runtimeSave, choiceId);
+  if (choiceId.startsWith('story:stage2:')) return applyCareerStageTwoCommand(runtimeSave, choiceId);
+  return applyCareerStoryCommand(runtimeSave, choiceId);
 }
 
 export default function V05StoryCareerView({ profile }) {
@@ -63,20 +69,36 @@ export default function V05StoryCareerView({ profile }) {
           : { title: 'Career Archive', text: '五阶段主线已经闭合；新的 Episode 可以继续接在同一条实践历史上。' };
 
   function choose(choice) {
-    const result = choice.id.startsWith('story:stage5:')
-      ? applyCareerStageFiveCommand(save || {}, choice.id)
-      : choice.id.startsWith('story:stage4:')
-        ? applyCareerStageFourCommand(save || {}, choice.id)
-        : choice.id.startsWith('story:stage3:')
-          ? applyCareerStageThreeCommand(save || {}, choice.id)
-          : choice.id.startsWith('story:stage2:')
-            ? applyCareerStageTwoCommand(save || {}, choice.id)
-            : applyCareerStoryCommand(save || {}, choice.id);
-    if (result.save === save) {
+    const original = save || {};
+    const originalAttention = Number(original.attention || 0);
+    const originalCash = Number(original.cash || 0);
+
+    // Attention and cash remain consequences, not hard gates. Existing stage
+    // runtimes still use resource checks internally, so decisions run against a
+    // permissive projection and then write only the real deltas back.
+    const runtimeSave = {
+      ...original,
+      attention: Math.max(Number(original.attentionMax || 6), 99),
+      cash: Math.max(originalCash, 100000)
+    };
+    const result = runChoice(runtimeSave, choice.id);
+    if (result.save === runtimeSave) {
       setNotice(result.notice);
       return;
     }
-    const next = { ...result.save, screen: 'play' };
+
+    const weekAdvanced = Number(result.save.week || 0) > Number(original.week || 0);
+    const cashDelta = Number(result.save.cash || 0) - Number(runtimeSave.cash || 0);
+    const attentionDelta = Number(result.save.attention || 0) - Number(runtimeSave.attention || 0);
+    const next = {
+      ...result.save,
+      screen: 'play',
+      cash: originalCash + cashDelta,
+      attention: weekAdvanced
+        ? Number(result.save.attention || original.attentionMax || 6)
+        : Math.max(0, originalAttention + attentionDelta)
+    };
+
     localStorage.setItem(CAREER_SAVE_KEY, JSON.stringify(next));
     setSave(next);
     setNotice(result.notice);
@@ -97,7 +119,7 @@ export default function V05StoryCareerView({ profile }) {
     <main className="vstory-shell">
       <header className="vstory-top">
         <div><small>CAREER {stage.index}/5 · {stage.code}</small><strong>{profile?.title || '起步档案'}</strong><span>{stage.subtitle}</span></div>
-        <div className="vstory-stats"><span>第 {save.week} 周</span><span>注意力 {save.attention}/{save.attentionMax}</span><span>¥{save.cash}</span></div>
+        <div className="vstory-stats"><span>第 {save.week} 周</span><span>¥{save.cash}</span></div>
       </header>
 
       <div className="vstory-layout">
@@ -110,8 +132,8 @@ export default function V05StoryCareerView({ profile }) {
             <header><small>{scene.kicker}</small><h1>{scene.title}</h1></header>
             <div className="vstory-copy">{scene.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
             {scene.note && <aside className="vstory-note"><small>当前版本说明</small><p>{scene.note}</p></aside>}
-            {scene.choices.length > 0 && <div className="vstory-choices">{scene.choices.map((choice) => <button key={choice.id} onClick={() => choose(choice)} disabled={choiceDisabled(choice, save)}><small>{kindLabel[choice.kind]}</small><strong>{choice.title}</strong><p>{choice.detail}</p><span>{choice.cost}</span></button>)}</div>}
-            {stageTransition && <div className="vstory-transition"><button onClick={() => choose(stageTransition)}><small>ROUTE</small><strong>{stageTransition.title}</strong><p>{stageTransition.detail}</p><span>{stageTransition.cost}</span></button></div>}
+            {scene.choices.length > 0 && <div className="vstory-choices">{scene.choices.map((choice) => <button key={choice.id} onClick={() => choose(choice)}><small>{kindLabel[choice.kind]}</small><strong>{choice.title}</strong><p>{choice.detail}</p><span>{consequenceLabel(choice.cost)}</span></button>)}</div>}
+            {stageTransition && <div className="vstory-transition"><button onClick={() => choose(stageTransition)}><small>ROUTE</small><strong>{stageTransition.title}</strong><p>{stageTransition.detail}</p><span>{consequenceLabel(stageTransition.cost)}</span></button></div>}
             {scene.optionalWorkbench && <p className="vstory-optional">{scene.optionalWorkbench}</p>}
           </article>
         </section>
