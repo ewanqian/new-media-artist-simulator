@@ -49,7 +49,7 @@ test('Butterfly Scholar special route is reachable from home, completes narrativ
     await tabs.getByRole('button', { name: '节点' }).click();
     const library = page.getByLabel('节点库');
     await expect(library).toBeVisible();
-    await expect(library.getByRole('button', { name: /Gaussian Splatting/ })).toBeVisible();
+    await expect(library.getByRole('button', { name: /Gaussian Splatting 用大量三维高斯表示空间外观/ })).toBeVisible();
     await expect(library.getByRole('button', { name: /摄影测量采集/ })).toBeVisible();
   } else {
     await expect(page.getByText('Gaussian Splatting', { exact: true }).first()).toBeVisible();
