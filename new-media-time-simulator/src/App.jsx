@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard.jsx';
 import './v05/onboardingPolicy.ts';
 import './v05/web/v05-mobile-fix.css';
 import './v05/web/v05-blueprint-editor-fixes.css';
+import V05GlobalFeedback from './v05/web/V05GlobalFeedback.jsx';
 import {
   createInitialState,
   equipSkill,
@@ -28,6 +29,10 @@ const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
 const V05ButterflyScholarRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
+function V05Frame({ children }) {
+  return <>{children}<V05GlobalFeedback /></>;
+}
+
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const corePreview = params.get('core');
@@ -38,44 +43,32 @@ export default function App() {
 
   if (preview === 'v05' && lab === 'blueprint') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}>
-        <V05BlueprintEditor />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}><V05BlueprintEditor /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'butterfly') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入《哥斯达黎加的蝴蝶学者》…</section></main>}>
-        <V05ButterflyScholarRoute />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入《哥斯达黎加的蝴蝶学者》…</section></main>}><V05ButterflyScholarRoute /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'career') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在建立生涯档案…</section></main>}>
-        <V05CareerEntry />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在建立生涯档案…</section></main>}><V05CareerEntry /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'content') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入内容管理…</section></main>}>
-        <V05ContentManager />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入内容管理…</section></main>}><V05ContentManager /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'story') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
-        <V05Experience />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}><V05Experience /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05') {
     return (
-      <Suspense fallback={<main className="app-shell"><section className="panel">正在载入…</section></main>}>
-        <V05Home />
-      </Suspense>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入…</section></main>}><V05Home /></Suspense></V05Frame>
     );
   }
   if (preview === 'v03') {
