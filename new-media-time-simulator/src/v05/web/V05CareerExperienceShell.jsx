@@ -7,10 +7,8 @@ import {
   careerStageById,
   resourcePackById
 } from '../careerContent.ts';
-import V05TriadExperience from './V05TriadExperience.jsx';
 import V05StoryCareerView from './V05StoryCareerView.jsx';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
-import V05AutomationOverlay from './V05AutomationOverlay.jsx';
 import './v05-career-shell.css';
 
 function readCareer() {
@@ -72,29 +70,8 @@ export default function V05CareerExperienceShell() {
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (career.profile?.workMode === 'story') return undefined;
-    if (!career.profile || !career.save?.careerProfileId || career.save?.screen !== 'play') return undefined;
-    let attempts = 0;
-    const timer = window.setInterval(() => {
-      attempts += 1;
-      const title = document.querySelector('.vx-title');
-      if (!title) {
-        if (attempts > 80) window.clearInterval(timer);
-        return;
-      }
-      const button = [...title.querySelectorAll('button')].find((item) => item.textContent?.trim() === '继续');
-      if (button) {
-        button.click();
-        window.clearInterval(timer);
-      }
-    }, 50);
-    return () => window.clearInterval(timer);
-  }, [career.profile?.id, career.profile?.workMode]);
-
   const stage = careerStageById(career.save?.careerStageId);
   const episode = useMemo(() => currentCareerEpisode(career.save), [career.save]);
-  const storyMode = career.profile?.workMode === 'story';
   const showBlueprint = career.profile?.workMode !== 'story';
   const episodePeople = (episode?.primaryNpcIds || []).map((id) => careerNpcArcs.find((npc) => npc.id === id)).filter(Boolean);
   const pack = resourcePackById(career.profile?.resourcePackId);
@@ -108,7 +85,8 @@ export default function V05CareerExperienceShell() {
 
   return (
     <div className="vcareer-wrap">
-      {storyMode ? <V05StoryCareerView profile={career.profile} /> : <V05TriadExperience />}
+      <V05StoryCareerView profile={career.profile} />
+
       <aside className="vcareer-rail" aria-label="生涯工具">
         <button className="vcareer-stage" onClick={() => setBriefOpen((value) => !value)}>
           <small>CAREER {stage.index}/5</small><strong>{stage.title}</strong><span>{stage.subtitle}</span>
@@ -120,11 +98,11 @@ export default function V05CareerExperienceShell() {
 
       {introOpen && career.profile && <section className="vcareer-intro" aria-label="第一周开场">
         <div className="vcareer-intro-card">
-          <header><small>WEEK 01 · 23:48 · 自己的工作位</small><h1>先让一个东西存在。</h1></header>
-          <p>你现在没有一个需要证明的职业称号。桌上只有这些东西：<b>{pack.assets.slice(0, 4).join('、')}</b>。现金 ¥{pack.cash}，注意力 6。</p>
+          <header><small>WEEK 01 · 23:48</small><h1>先让一个东西存在。</h1></header>
+          <p>桌上只有这些东西：<b>{pack.assets.slice(0, 4).join('、')}</b>。手里的现金是 ¥{pack.cash}。这些条件会改变后果，但不会替你做决定。</p>
           <blockquote>{firstMessage}</blockquote>
-          <div className="vcareer-first-prompt"><small>今晚的问题</small><strong>{career.profile.firstProjectPrompt}</strong><span>完整提案、职业定位和长期规划都可以晚一点。先留下第一个可运行证据。</span></div>
-          <footer><button className="primary" onClick={closeIntro}>开始第一周</button>{showBlueprint && <a href={v05Href('lab=blueprint')}>先看工作图</a>}</footer>
+          <div className="vcareer-first-prompt"><small>今晚的问题</small><strong>{career.profile.firstProjectPrompt}</strong><span>完整提案、职业定位和长期规划都可以晚一点。先做第一次决定。</span></div>
+          <footer><button className="primary" onClick={closeIntro}>进入第一周</button>{showBlueprint && <a href={v05Href('lab=blueprint')}>打开工作图</a>}</footer>
         </div>
       </section>}
 
@@ -132,10 +110,10 @@ export default function V05CareerExperienceShell() {
         <header><div><small>{stage.code} / CURRENT LINE</small><h2>{episode.title}</h2></div><button aria-label="关闭任务线简报" onClick={() => setBriefOpen(false)}>×</button></header>
         <p className="vcareer-hook">{episode.hook}</p>
         {episodePeople.length > 0 && <div className="vcareer-people">{episodePeople.map((npc) => <span key={npc.id}><b>{npc.name}</b>{npc.role}</span>)}</div>}
-        <div className="vcareer-goals"><small>现在值得追的事</small>{episode.goals.map((goal, index) => <div key={goal}><i>{String(index + 1).padStart(2, '0')}</i><span>{goal}</span></div>)}</div>
-        {episode.blueprintMoment && career.profile?.workMode !== 'story' && <aside><small>工作图入口</small><p>{episode.blueprintMoment}</p><a href={v05Href('lab=blueprint')}>打开工作图 →</a></aside>}
+        <div className="vcareer-goals"><small>现在真正需要决定的事</small>{episode.goals.map((goal, index) => <div key={goal}><i>{String(index + 1).padStart(2, '0')}</i><span>{goal}</span></div>)}</div>
+        {episode.blueprintMoment && showBlueprint && <aside><small>工作图</small><p>{episode.blueprintMoment}</p><a href={v05Href('lab=blueprint')}>打开当前工作图 →</a></aside>}
       </section>}
-      {showBlueprint && career.save?.screen === 'play' && !introOpen && <V05AutomationOverlay save={career.save}/>} 
+
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </div>
   );
