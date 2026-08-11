@@ -5,10 +5,10 @@ import {
   careerAssessmentQuestions,
   careerPresets,
   careerResourcePacks,
-  profileFromAssessment,
   profileFromPreset,
   resourcePackById
 } from '../careerContent.ts';
+import { buildAssessmentCareerProfile } from '../careerProfileRuntime.ts';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
 import './v05-career-entry.css';
 
@@ -72,7 +72,7 @@ export default function V05CareerEntry() {
   }, []);
 
   const draftProfile = useMemo(() => {
-    if (entryType === 'assessment' && answers.length === careerAssessmentQuestions.length) return profileFromAssessment(answers, workMode);
+    if (entryType === 'assessment' && answers.length === careerAssessmentQuestions.length) return buildAssessmentCareerProfile(answers, workMode);
     return profileFromPreset(presetId, workMode);
   }, [entryType, answers, presetId, workMode]);
   const pack = resourcePackById(draftProfile.resourcePackId);
@@ -99,7 +99,7 @@ export default function V05CareerEntry() {
   }
 
   function enterCareer() {
-    const profile = entryType === 'assessment' ? profileFromAssessment(answers, workMode) : profileFromPreset(presetId, workMode);
+    const profile = entryType === 'assessment' ? buildAssessmentCareerProfile(answers, workMode) : profileFromPreset(presetId, workMode);
     localStorage.setItem(CAREER_PROFILE_KEY, JSON.stringify(profile));
     localStorage.setItem(CAREER_SAVE_KEY, JSON.stringify(seedCareerSave(profile)));
     window.location.href = './?mode=story';
