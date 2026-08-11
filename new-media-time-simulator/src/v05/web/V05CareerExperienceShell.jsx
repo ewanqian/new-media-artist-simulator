@@ -8,6 +8,7 @@ import {
   resourcePackById
 } from '../careerContent.ts';
 import V05TriadExperience from './V05TriadExperience.jsx';
+import V05StoryCareerView from './V05StoryCareerView.jsx';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
 import './v05-career-shell.css';
 
@@ -71,6 +72,7 @@ export default function V05CareerExperienceShell() {
   }, []);
 
   useEffect(() => {
+    if (career.profile?.workMode === 'story') return undefined;
     if (!career.profile || !career.save?.careerProfileId || career.save?.screen !== 'play') return undefined;
     let attempts = 0;
     const timer = window.setInterval(() => {
@@ -87,10 +89,11 @@ export default function V05CareerExperienceShell() {
       }
     }, 50);
     return () => window.clearInterval(timer);
-  }, [career.profile?.id]);
+  }, [career.profile?.id, career.profile?.workMode]);
 
   const stage = careerStageById(career.save?.careerStageId);
   const episode = useMemo(() => currentCareerEpisode(career.save), [career.save]);
+  const storyMode = career.profile?.workMode === 'story';
   const showBlueprint = career.profile?.workMode !== 'story';
   const episodePeople = (episode?.primaryNpcIds || []).map((id) => careerNpcArcs.find((npc) => npc.id === id)).filter(Boolean);
   const pack = resourcePackById(career.profile?.resourcePackId);
@@ -104,7 +107,7 @@ export default function V05CareerExperienceShell() {
 
   return (
     <div className="vcareer-wrap">
-      <V05TriadExperience />
+      {storyMode ? <V05StoryCareerView profile={career.profile} /> : <V05TriadExperience />}
       <aside className="vcareer-rail" aria-label="生涯工具">
         <button className="vcareer-stage" onClick={() => setBriefOpen((value) => !value)}>
           <small>CAREER {stage.index}/5</small><strong>{stage.title}</strong><span>{stage.subtitle}</span>
