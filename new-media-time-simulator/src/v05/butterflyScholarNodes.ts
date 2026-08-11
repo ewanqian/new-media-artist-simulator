@@ -7,23 +7,32 @@ const select = (id: string, label: string, defaultValue: string, options: string
 const text = (id: string, label: string, defaultValue: string): EditorParam => ({ id, label, kind: 'text', defaultValue });
 const toggle = (id: string, label: string, defaultValue = false): EditorParam => ({ id, label, kind: 'toggle', defaultValue });
 
-/**
- * This pack intentionally models decisions, not every software button.
- * New players should understand the capture pipeline after one episode;
- * experienced players can still recognize the real tools and failure points.
- */
 export const butterflyScholarNodeDefinitions: EditorNodeDefinition[] = [
+  {
+    id: 'field-capture-session', label: '现场调查', group: '输入',
+    summary: '先决定今天要采什么、现场条件是什么，再把任务交给照片、视频、LiDAR 或观察记录。',
+    ports: [output('subject', '采集对象', 'space'), output('conditions', '现场条件', 'data'), output('question', '观察问题', 'concept')],
+    params: [text('location', '地点', '云雾林样地 A'), text('question', '今天要回答', '蝴蝶如何使用这株寄主植物？'), select('weather', '现场状态', '风小 / 散射光', ['风小 / 散射光', '风大', '直射阳光', '小雨'])],
+    tags: ['现场', '调查', '采集计划', '输入']
+  },
   {
     id: 'butterfly-observation', label: '蝴蝶观察', group: '输入',
     summary: '记录蝴蝶是什么、什么时候出现、停在哪里、和哪株植物有关。飞着的蝴蝶不必强行扫描成 3D。',
-    ports: [output('record', '观察记录', 'data'), output('relation', '蝴蝶—植物关系', 'concept')],
+    ports: [input('question', '观察问题', 'concept'), output('record', '观察记录', 'data'), output('relation', '蝴蝶—植物关系', 'concept')],
     params: [text('species', '对象', '目标蝴蝶 / 未确认'), text('hostPlant', '寄主植物', '未知'), select('presence', '今天看到吗', '出现', ['出现', '未出现', '不确定'])],
     tags: ['蝴蝶', '观察', '生态', '时间', '输入']
   },
   {
+    id: 'capture-motion-video', label: '活体运动记录', group: '输入',
+    summary: '用视频或轨迹记录会移动的蝴蝶。重点是停留、飞行方向和时间，不是假装把每只蝴蝶冻成静态模型。',
+    ports: [input('subject', '活动对象', 'space'), output('video', '运动视频', 'video'), output('motion', '运动轨迹', 'data')],
+    params: [range('fps', '帧率', 60, 24, 240, 'fps', 1), select('tracking', '记录方式', '视频 + 手动标记', ['视频', '视频 + 手动标记', '自动追踪'])],
+    tags: ['蝴蝶', '视频', '运动', '轨迹', '输入']
+  },
+  {
     id: 'plant-specimen', label: '植物 / 标本记录', group: '输入',
     summary: '保存植物图像、名称和采集信息。标签缺失也要保留，不要假装知道。',
-    ports: [output('image', '图像', 'video'), output('metadata', '记录', 'data'), output('subject', '可扫描对象', 'space')],
+    ports: [input('subject', '现场对象', 'space'), output('image', '图像', 'video'), output('metadata', '记录', 'data'), output('scanSubject', '可扫描对象', 'space')],
     params: [text('name', '名称', '寄主植物 A'), text('label', '标签', '样地 / 日期 / 采集者'), toggle('incomplete', '标签不完整', false)],
     tags: ['植物', '标本', '档案', '输入']
   },
@@ -91,6 +100,20 @@ export const butterflyScholarNodeDefinitions: EditorNodeDefinition[] = [
     tags: ['Blender', 'Geometry Nodes', 'Noise', '程序化动画', '点云动画']
   },
   {
+    id: 'process-physics-motion', label: 'Blender · 物理运动', group: '处理',
+    summary: '用风、重力、碰撞或粒子模拟驱动扫描碎片。它适合需要“像真实受力一样运动”的版本。',
+    ports: [input('geometry', '几何 / 粒子', 'data'), input('conditions', '风 / 环境条件', 'data'), output('animated', '物理动画', 'data')],
+    params: [select('force', '主要作用力', '风', ['风', '重力', '碰撞', '粒子力场']), range('strength', '强度', 30, 0, 100, '%', 5)],
+    tags: ['Blender', '物理', '风', '模拟', '动画']
+  },
+  {
+    id: 'process-butterfly-behavior', label: '蝴蝶行为系统', group: '处理',
+    summary: '把真实观察到的停留、逃离、靠近寄主植物等行为转成规则；不要求画面里出现写实蝴蝶。',
+    ports: [input('motion', '真实运动记录', 'data'), input('trigger', '观众 / 环境', 'trigger'), output('behavior', '实时行为', 'data')],
+    params: [select('rule', '主要行为', '靠近 / 逃离', ['靠近 / 逃离', '停留', '聚集', '迁移']), range('sensitivity', '反应灵敏度', 55, 0, 100, '%', 5)],
+    tags: ['实时', '互动', '蝴蝶', '行为', '生成']
+  },
+  {
     id: 'method-preserve-gap', label: '方法：保留缺口', group: '方法',
     summary: '不把所有扫描失败都修掉。缺失部分可以说明风、遮挡、反光、时间变化或技术边界。',
     ports: [input('failure', '缺口 / 失败', 'concept'), output('method', '作品方法', 'concept')],
@@ -132,38 +155,42 @@ export function buildButterflyScholarPreset() {
     schema: 'nmas-blueprint-v1' as const,
     id: 'bp-butterfly-scholar-field-capture',
     title: '哥斯达黎加的蝴蝶学者 / 完整工作流',
-    revision: 3,
+    revision: 4,
     nodes: [
-      { id: 'bsn1', definitionId: 'project-question', x: 40, y: 100, params: { question: '真实蝴蝶、寄主植物和一次旅行，最后怎样变成一件数字作品？' } },
-      { id: 'bsn2', definitionId: 'butterfly-observation', x: 250, y: 20, params: { species: '目标蝴蝶 / 未确认', hostPlant: '寄主植物 A', presence: '出现' } },
-      { id: 'bsn3', definitionId: 'plant-specimen', x: 250, y: 190, params: { name: '寄主植物 A', label: '样地 / 日期 / 采集者', incomplete: false } },
-      { id: 'bsn4', definitionId: 'capture-photo-sequence', x: 470, y: 190, params: { photos: 80, overlap: '高', lighting: '较小', viewpoints: '充分' } },
-      { id: 'bsn5', definitionId: 'capture-quality-check', x: 690, y: 190, params: { blur: false, missing: false, specular: false, lightingShift: false } },
-      { id: 'bsn6', definitionId: 'process-metashape-align', x: 910, y: 190, params: { accuracy: '中', aligned: 92 } },
-      { id: 'bsn7', definitionId: 'process-dense-reconstruction', x: 1130, y: 80, params: { detail: '中', millions: 8 } },
-      { id: 'bsn8', definitionId: 'process-gaussian-splat', x: 1130, y: 270, params: { iterations: 30, goal: '预览速度' } },
-      { id: 'bsn9', definitionId: 'process-point-clean', x: 1350, y: 80, params: { cleanup: 40, preserveGaps: true } },
-      { id: 'bsn10', definitionId: 'process-blender-procedural', x: 1570, y: 80, params: { driver: 'Noise', strength: 25, speed: 20 } },
-      { id: 'bsn11', definitionId: 'method-source-attribution', x: 1130, y: 460, params: { source: '蝴蝶题材 / 数字艺术参考', relation: '独立发展' } },
-      { id: 'bsn12', definitionId: 'compose-memory-garden', x: 1790, y: 190, params: { focus: '关系', publicData: 50 } },
-      { id: 'bsn13', definitionId: 'nature-decay-rule', x: 2010, y: 190, params: { driver: '时间', rate: 30 } },
-      { id: 'bsn14', definitionId: 'output-web-scene', x: 2230, y: 190, params: { interaction: '自由查看', mobile: true } }
+      { id: 'bsn0', definitionId: 'field-capture-session', x: 40, y: 160, params: { location: '云雾林样地 A', question: '蝴蝶如何使用这株寄主植物？', weather: '风小 / 散射光' } },
+      { id: 'bsn1', definitionId: 'butterfly-observation', x: 270, y: 20, params: { species: '目标蝴蝶 / 未确认', hostPlant: '寄主植物 A', presence: '出现' } },
+      { id: 'bsn2', definitionId: 'capture-motion-video', x: 500, y: 20, params: { fps: 60, tracking: '视频 + 手动标记' } },
+      { id: 'bsn3', definitionId: 'plant-specimen', x: 270, y: 250, params: { name: '寄主植物 A', label: '样地 / 日期 / 采集者', incomplete: false } },
+      { id: 'bsn4', definitionId: 'capture-photo-sequence', x: 500, y: 250, params: { photos: 80, overlap: '高', lighting: '较小', viewpoints: '充分' } },
+      { id: 'bsn5', definitionId: 'capture-quality-check', x: 730, y: 250, params: { blur: false, missing: false, specular: false, lightingShift: false } },
+      { id: 'bsn6', definitionId: 'process-metashape-align', x: 960, y: 250, params: { accuracy: '中', aligned: 92 } },
+      { id: 'bsn7', definitionId: 'process-dense-reconstruction', x: 1190, y: 140, params: { detail: '中', millions: 8 } },
+      { id: 'bsn8', definitionId: 'process-gaussian-splat', x: 1190, y: 330, params: { iterations: 30, goal: '预览速度' } },
+      { id: 'bsn9', definitionId: 'process-point-clean', x: 1420, y: 220, params: { cleanup: 40, preserveGaps: true } },
+      { id: 'bsn10', definitionId: 'process-blender-procedural', x: 1650, y: 100, params: { driver: 'Noise', strength: 25, speed: 20 } },
+      { id: 'bsn11', definitionId: 'process-butterfly-behavior', x: 1650, y: 320, params: { rule: '靠近 / 逃离', sensitivity: 55 } },
+      { id: 'bsn12', definitionId: 'method-source-attribution', x: 1650, y: 500, params: { source: '蝴蝶题材 / 数字艺术参考', relation: '独立发展' } },
+      { id: 'bsn13', definitionId: 'compose-memory-garden', x: 1880, y: 220, params: { focus: '关系', publicData: 50 } },
+      { id: 'bsn14', definitionId: 'nature-decay-rule', x: 2110, y: 220, params: { driver: '时间', rate: 30 } },
+      { id: 'bsn15', definitionId: 'output-web-scene', x: 2340, y: 220, params: { interaction: '自由查看', mobile: true } }
     ],
     edges: [
-      { id: 'bse1', from: 'bsn1', to: 'bsn2', kind: 'concept' as const },
-      { id: 'bse2', from: 'bsn1', to: 'bsn3', kind: 'concept' as const },
-      { id: 'bse3', from: 'bsn3', to: 'bsn4', kind: 'dependency' as const },
+      { id: 'bse0', from: 'bsn0', to: 'bsn1', kind: 'concept' as const },
+      { id: 'bse1', from: 'bsn0', to: 'bsn3', kind: 'physical' as const },
+      { id: 'bse2', from: 'bsn1', to: 'bsn2', kind: 'signal' as const },
+      { id: 'bse3', from: 'bsn3', to: 'bsn4', kind: 'physical' as const },
       { id: 'bse4', from: 'bsn4', to: 'bsn5', kind: 'signal' as const },
       { id: 'bse5', from: 'bsn5', to: 'bsn6', kind: 'signal' as const },
       { id: 'bse6', from: 'bsn6', to: 'bsn7', kind: 'signal' as const },
       { id: 'bse7', from: 'bsn7', to: 'bsn9', kind: 'signal' as const },
       { id: 'bse8', from: 'bsn9', to: 'bsn10', kind: 'signal' as const },
-      { id: 'bse9', from: 'bsn10', to: 'bsn12', kind: 'signal' as const },
-      { id: 'bse10', from: 'bsn2', to: 'bsn12', kind: 'concept' as const },
-      { id: 'bse11', from: 'bsn11', to: 'bsn12', kind: 'concept' as const },
-      { id: 'bse12', from: 'bsn12', to: 'bsn13', kind: 'signal' as const },
-      { id: 'bse13', from: 'bsn13', to: 'bsn14', kind: 'signal' as const }
+      { id: 'bse9', from: 'bsn2', to: 'bsn11', kind: 'signal' as const },
+      { id: 'bse10', from: 'bsn10', to: 'bsn13', kind: 'signal' as const },
+      { id: 'bse11', from: 'bsn11', to: 'bsn13', kind: 'signal' as const },
+      { id: 'bse12', from: 'bsn12', to: 'bsn13', kind: 'concept' as const },
+      { id: 'bse13', from: 'bsn13', to: 'bsn14', kind: 'signal' as const },
+      { id: 'bse14', from: 'bsn14', to: 'bsn15', kind: 'signal' as const }
     ],
-    notes: ['完整工作流：观察真实蝴蝶与植物关系 → 扫描植物/空间 → 检查 → 相机求解 → 重建 → Blender 动画或 Gaussian → 作品结构 → 网页/现场输出。']
+    notes: ['完整工作流：现场调查 → 蝴蝶运动 / 植物空间分开采集 → 检查 → 相机求解 → 重建 → Blender 动画或实时行为 → 作品结构 → 网页/现场输出。']
   };
 }
