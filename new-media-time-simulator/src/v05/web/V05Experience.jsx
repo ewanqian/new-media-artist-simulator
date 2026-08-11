@@ -10,7 +10,15 @@ import {
   satiricalEvents,
   unlockSteps
 } from '../legacyDeck.ts';
+import {
+  CardTextFragments,
+  ContactNetworkPanel,
+  ExperienceTextStream,
+  KnowledgeSourcesPanel,
+  PlaceTextFragments
+} from './TextEcologyPanels.jsx';
 import './v05-experience.css';
+import './v05-text-ecology.css';
 
 const SAVE_KEY = 'nmas-v05-world-hub-preview';
 const SCHEMA = 'card-first-20260811';
@@ -155,7 +163,7 @@ export default function V05Experience() {
 
   function continueGame() {
     setSave((current) => ({ ...current, screen: 'play' }));
-    setSurface(save.guideStep === 0 ? 'studio' : 'studio');
+    setSurface('studio');
   }
 
   function discover(ids = []) {
@@ -396,6 +404,7 @@ export default function V05Experience() {
       {selectedCardId && (
         <CardSheet
           card={actionCards.find((item) => item.id === selectedCardId)}
+          week={save.week}
           disabled={save.attention < (actionCards.find((item) => item.id === selectedCardId)?.cost || 0)}
           onClose={() => setSelectedCardId(null)}
           onDo={(card) => card.category === 'project' ? performProjectCard(card) : performCard(card)}
@@ -404,6 +413,7 @@ export default function V05Experience() {
       {selectedPlaceId && (
         <PlaceSheet
           place={placeCards.find((item) => item.id === selectedPlaceId)}
+          week={save.week}
           disabled={save.attention < (placeCards.find((item) => item.id === selectedPlaceId)?.cost || 0)}
           onClose={() => setSelectedPlaceId(null)}
           onVisit={visitPlace}
@@ -454,6 +464,7 @@ function Studio({ save, onOpenCard }) {
     <section className="vx-page">
       <PageHead eyebrow="STUDIO" title="今天在工作室做什么" text="先做具体行动。系统、方法和路线会从行动里长出来。" />
       <CardGrid cards={studioCards} save={save} onOpen={onOpenCard} />
+      {save.completedCardIds.length > 0 && <ExperienceTextStream save={save} title="工作室之外" limit={2} />}
       {incomeCards.length > 0 && <><div className="vx-section-title"><h2>生存</h2><span>不是副职业，是现金流</span></div><CardGrid cards={incomeCards} save={save} onOpen={onOpenCard} /></>}
     </section>
   );
@@ -489,6 +500,7 @@ function Explore({ save, kind, setKind, places, onOpen }) {
           </button>
         ))}
       </div>
+      <ExperienceTextStream save={save} title="今天看到 / 听到" limit={4} />
     </section>
   );
 }
@@ -507,6 +519,7 @@ function Project({ save, onOpenCard }) {
       <div className="vx-methods">{save.primaryProject?.methods?.map((method) => <span key={method}>{method}</span>)}</div>
       <div className="vx-section-title"><h2>下一步</h2><span>一次只解决一个问题</span></div>
       <CardGrid cards={projectCards} save={save} onOpen={onOpenCard} />
+      <ExperienceTextStream save={save} title="项目周围的声音" limit={3} />
     </section>
   );
 }
@@ -524,6 +537,7 @@ function Contacts({ save, contacts, selectedId, onSelect, onSend }) {
           <header><small>{selected.role}</small><h2>{selected.name}</h2><p>{selected.background}</p><div className="vx-how-met">认识方式 · {selected.howMet}</div></header>
           <div className="vx-chat">{thread.map((message, index) => <div key={`${message.text}-${index}`} className={`vx-message ${message.from}`}><small>{message.from === 'you' ? '你' : message.from === 'them' ? selected.name : '记录'}</small><p>{message.text}</p></div>)}</div>
           <div className="vx-ask-row">{selected.asks.map((ask, index) => <button key={ask} disabled={save.attention < 1} onClick={() => onSend(selected, ask, index)}>{ask}<span>-1</span></button>)}</div>
+          <ContactNetworkPanel contact={selected} week={save.week} />
         </article>
       </div>
     </section>
@@ -555,13 +569,13 @@ function Archive({ save, entries, selected, query, setQuery, onOpen }) {
           <div className="vx-archive-count">已读 {save.readKnowledgeEntryIds.length} / {knowledgeEntries.length + archiveExpansion.length}</div>
           <div className="vx-entry-list">{entries.map((entry) => <button key={entry.id} className={entry.id === selected.id ? 'active' : ''} onClick={() => onOpen(entry.id)}><small>{entry.category} · {save.readKnowledgeEntryIds.includes(entry.id) ? '已读' : '未读'}</small><strong>{entry.title}</strong><span>{entry.summary}</span></button>)}</div>
         </aside>
-        <article className="vx-reader"><small>{selected.category}</small><h2>{selected.title}</h2><p className="vx-lead">{selected.summary}</p>{selected.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}<div className="vx-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></article>
+        <article className="vx-reader"><small>{selected.category}</small><h2>{selected.title}</h2><p className="vx-lead">{selected.summary}</p>{selected.body.map((paragraph, index) => <p key={index}>{paragraph}</p>)}<div className="vx-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><KnowledgeSourcesPanel knowledgeId={selected.id} week={save.week} /></article>
       </div>
     </section>
   );
 }
 
-function CardSheet({ card, disabled, onClose, onDo }) {
+function CardSheet({ card, week, disabled, onClose, onDo }) {
   if (!card) return null;
   return (
     <div className="vx-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -572,13 +586,14 @@ function CardSheet({ card, disabled, onClose, onDo }) {
         <section><small>说明</small><p>{card.detail}</p></section>
         <section><small>大白话</small><p>{card.plain}</p></section>
         {card.satire && <section className="vx-satire"><small>旁注</small><p>{card.satire}</p></section>}
+        <CardTextFragments cardId={card.id} week={week} />
         <button className="vx-primary vx-sheet-action" disabled={disabled} onClick={() => onDo(card)}>执行这张卡</button>
       </article>
     </div>
   );
 }
 
-function PlaceSheet({ place, disabled, onClose, onVisit }) {
+function PlaceSheet({ place, week, disabled, onClose, onVisit }) {
   if (!place) return null;
   return (
     <div className="vx-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -587,6 +602,7 @@ function PlaceSheet({ place, disabled, onClose, onVisit }) {
         <h1>{place.title}</h1><p className="vx-sheet-lead">{place.summary}</p><section><small>这里是什么</small><p>{place.detail}</p></section>
         <section><small>信息透明</small><ul className="vx-transparent">{place.transparent.map((line) => <li key={line}>{line}</li>)}</ul></section>
         <section><small>可以做</small><p>{place.actions.join(' · ')}</p></section>
+        <PlaceTextFragments placeId={place.id} week={week} />
         <button className="vx-primary vx-sheet-action" disabled={disabled} onClick={() => onVisit(place)}>去一次</button>
       </article>
     </div>
