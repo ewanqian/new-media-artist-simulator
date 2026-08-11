@@ -45,6 +45,7 @@ export default function V05ButterflyTrainingHUD() {
   return <aside className={`bt-hud ${collapsed ? 'collapsed' : ''}`} aria-label="蝴蝶学者训练任务">
     <header><div><small>SPECIAL 01 / TRAINING</small><strong>{complete ? '完成' : `${doneCount} / ${status.length}`}</strong></div><button onClick={() => setCollapsed((value) => !value)}>{collapsed ? '展开任务' : '收起'}</button></header>
     {!collapsed && <>
+      <div className="bt-flow" aria-label="扫描工作流"><span><small>INPUT</small><b>采集</b></span><i>→</i><span><small>CHECK</small><b>检查</b></span><i>→</i><span><small>SOLVE</small><b>相机位置</b></span><i>→</i><span><small>OUTPUT</small><b>点云 / Gaussian</b></span></div>
       {!complete && current && <section className="bt-current"><small>现在只做这一件事</small><h2>{current.title}</h2><p>{current.why}</p><em>{current.hint}</em></section>}
       <ol>{status.map((item, index) => <li key={item.id} className={item.done ? 'done' : current?.id === item.id ? 'current' : ''}><i>{item.done ? '✓' : index + 1}</i><span>{item.title}</span></li>)}</ol>
       <footer>{complete ? <><strong>你已经把工作流接通。</strong><p>下一次项目里，这三个节点组不会再强制提示。</p><a href={chapterHref()}>返回章节选择 →</a></> : <p>连线方法：点上游节点右侧输出端口，再点下游节点左侧输入端口。只需要完成任务条，不需要把所有端口都接满。</p>}</footer>
