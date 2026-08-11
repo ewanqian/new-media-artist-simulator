@@ -11,10 +11,23 @@ export function emitGlobalFeedback(detail) {
 const durationByKind = {
   node: 2600,
   method: 2400,
+  knowledge: 2800,
+  decision: 2400,
   evidence: 2100,
   relationship: 2300,
   stage: 3000,
   achievement: 4200
+};
+
+const labelByKind = {
+  node: 'NODE UNLOCKED',
+  method: 'METHOD LEARNED',
+  knowledge: 'KNOWLEDGE ADDED',
+  decision: 'STATE CHANGED',
+  evidence: 'RECORD ADDED',
+  relationship: 'RELATIONSHIP UPDATED',
+  stage: 'CHAPTER COMPLETE',
+  achievement: 'TRIUMPH'
 };
 
 export default function V05GlobalFeedback() {
@@ -53,7 +66,7 @@ export default function V05GlobalFeedback() {
   return (
     <div className={`gf-layer ${major ? 'major' : 'minor'}`} aria-live="polite" onClick={() => setActive(null)}>
       <section className={`gf-card kind-${active.kind}`}>
-        <small>{active.code || ({ node: 'NODE UNLOCKED', method: 'METHOD LEARNED', evidence: 'RECORD ADDED', relationship: 'RELATIONSHIP UPDATED', stage: 'CHAPTER COMPLETE', achievement: 'TRIUMPH' }[active.kind] || 'SYSTEM')}</small>
+        <small>{active.code || labelByKind[active.kind] || 'SYSTEM'}</small>
         <strong>{active.title}</strong>
         {active.detail && <p>{active.detail}</p>}
         {major && <span>点击继续</span>}
