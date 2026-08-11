@@ -9,6 +9,15 @@ import {
 } from '../locationGraph.ts';
 import { contactSeeds, opportunitySeeds, starterProjectsByPractice } from '../contentFrame.ts';
 import { knowledgeById, knowledgeCategories, knowledgeEntries } from '../knowledgeBase.ts';
+import {
+  applyProjectAction,
+  cashPressure,
+  deriveProjectStage,
+  opportunityReadiness,
+  projectActions,
+  projectStages,
+  weeklyPulseFor
+} from '../gameLoop.ts';
 import './v05-wireframe.css';
 
 const SAVE_KEY = 'nmas-v05-world-hub-preview';
@@ -57,14 +66,16 @@ function makeFreshSave() {
       id: 'task-01',
       title: '本周焦点',
       goals: [
-        { id: 'g1', label: '确认当前项目要解决的问题', done: false },
+        { id: 'g1', label: '把项目推进到「原型」', done: false },
         { id: 'g2', label: '去一个真实地点', done: false },
-        { id: 'g3', label: '完成一次场地预演', done: false }
+        { id: 'g3', label: '完成一次真实场地测试', done: false }
       ]
     },
     readKnowledgeEntryIds: [],
+    reviewedOpportunityIds: [],
+    contactTouches: {},
     actionLog: [
-      { type: '系统', title: '新一轮开始', text: '第 1 周。城市、项目和联络网络已建立。' }
+      { type: '系统', title: '新一轮开始', text: '第 1 周。地点、项目和联络网络已经建立。' }
     ]
   };
 }
@@ -88,6 +99,8 @@ function normalizeSave(raw) {
     menuBook: fresh.menuBook,
     primaryProject: { ...fresh.primaryProject, ...(raw.primaryProject || {}) },
     readKnowledgeEntryIds: Array.isArray(raw.readKnowledgeEntryIds) ? raw.readKnowledgeEntryIds : [],
+    reviewedOpportunityIds: Array.isArray(raw.reviewedOpportunityIds) ? raw.reviewedOpportunityIds : [],
+    contactTouches: raw.contactTouches && typeof raw.contactTouches === 'object' ? raw.contactTouches : {},
     actionLog: migratedLog
   };
 }
@@ -126,7 +139,7 @@ export default function V05Wireframe() {
         return;
       }
       if (key === 'm') setSurface('world');
-      if (key === 'p') { setSurface('projects'); finishGoal('g1'); }
+      if (key === 'p') setSurface('projects');
       if (key === 'w') setSurface('workbench');
       if (key === 'c') setSurface('contacts');
       if (key === 'k') setSurface('archive');
@@ -184,7 +197,6 @@ export default function V05Wireframe() {
   }
 
   function openSystem(id) {
-    if (id === 'projects') finishGoal('g1');
     setSurface(id);
   }
 
@@ -206,17 +218,81 @@ export default function V05Wireframe() {
     return true;
   }
 
-  function progressProject() {
+  function doProjectAction(actionId) {
+    const action = projectActions.find((item) => item.id === actionId);
+    if (!action || save.attention < action.cost) return;
+    setSave((current) => {
+      const beforeStage = deriveProjectStage(current.primaryProject);
+      const nextMetrics = applyProjectAction(current.primaryProject, actionId);
+      const afterStage = deriveProjectStage(nextMetrics);
+      const stageChanged = beforeStage.id !== afterStage.id;
+      const stageIndex = projectStages.findIndex((item) => item.id === afterStage.id);
+      return {
+        ...current,
+        attention: current.attention - action.cost,
+        worldLevel: Math.max(current.worldLevel, Math.min(4, stageIndex)),
+        primaryProject: {
+          ...current.primaryProject,
+          ...nextMetrics,
+          history: [
+            ...current.primaryProject.history,
+            `第 ${current.week} 周 / ${action.label}：${action.description}${stageChanged ? ` → 进入「${afterStage.label}」` : ''}`
+          ]
+        },
+        menuBook: afterStage.id !== 'clue'
+          ? { ...current.menuBook, goals: current.menuBook.goals.map((goal) => goal.id === 'g1' ? { ...goal, done: true } : goal) }
+          : current.menuBook,
+        actionLog: [
+          ...current.actionLog,
+          { type: '项目', title: action.label, text: stageChanged ? `${action.description} 项目进入「${afterStage.label}」。` : action.description }
+        ]
+      };
+    });
+  }
+
+  function completeVenueTest(preset) {
+    setSave((current) => {
+      const beforeStage = deriveProjectStage(current.primaryProject);
+      const nextMetrics = applyProjectAction(current.primaryProject, 'site-test');
+      const afterStage = deriveProjectStage(nextMetrics);
+      const stageChanged = beforeStage.id !== afterStage.id;
+      const stageIndex = projectStages.findIndex((item) => item.id === afterStage.id);
+      return {
+        ...current,
+        worldLevel: Math.max(current.worldLevel, Math.min(4, stageIndex)),
+        primaryProject: {
+          ...current.primaryProject,
+          ...nextMetrics,
+          history: [...current.primaryProject.history, `第 ${current.week} 周 / 场地测试：${preset.name} ${preset.spec}${stageChanged ? ` → 进入「${afterStage.label}」` : ''}`]
+        },
+        menuBook: { ...current.menuBook, goals: current.menuBook.goals.map((goal) => goal.id === 'g3' ? { ...goal, done: true } : goal) },
+        actionLog: [...current.actionLog, { type: '场地', title: `${preset.name}测试完成`, text: `场地适配 +1。${stageChanged ? `项目进入「${afterStage.label}」。` : ''}` }]
+      };
+    });
+  }
+
+  function reviewOpportunity(id) {
+    if (save.attention < 1) return;
+    const opportunity = opportunitySeeds.find((item) => item.id === id);
+    if (!opportunity) return;
+    const readiness = opportunityReadiness(id, save.primaryProject, save.week, save.cash);
+    setSave((current) => ({
+      ...current,
+      attention: current.attention - 1,
+      reviewedOpportunityIds: current.reviewedOpportunityIds.includes(id)
+        ? current.reviewedOpportunityIds
+        : [...current.reviewedOpportunityIds, id],
+      actionLog: [...current.actionLog, { type: '机会判断', title: opportunity.title, text: `${readiness.ready ? '现在可以进入。' : '现在不适合进入。'} ${readiness.reason}` }]
+    }));
+  }
+
+  function contactAction(contact, action) {
     if (save.attention < 1) return;
     setSave((current) => ({
       ...current,
       attention: current.attention - 1,
-      primaryProject: {
-        ...current.primaryProject,
-        coherence: Math.min(4, current.primaryProject.coherence + 1),
-        history: [...current.primaryProject.history, `第 ${current.week} 周：做了一次收缩，把一个模糊问题变成可测试版本。`]
-      },
-      actionLog: [...current.actionLog, { type: '项目', title: '推进当前版本', text: '一致性 +1。' }]
+      contactTouches: { ...current.contactTouches, [contact.id]: (current.contactTouches[contact.id] || 0) + 1 },
+      actionLog: [...current.actionLog, { type: '联络', title: `${contact.name} / ${action}`, text: `发出一条明确的联络：${action}` }]
     }));
   }
 
@@ -229,13 +305,20 @@ export default function V05Wireframe() {
   }
 
   function endWeek() {
-    setSave((current) => ({
-      ...current,
-      week: current.week + 1,
-      attention: current.attentionMax,
-      cash: current.cash - 450,
-      actionLog: [...current.actionLog, { type: '时间', title: `第 ${current.week} 周结束`, text: '固定支出 -450。注意力恢复。' }]
-    }));
+    setSave((current) => {
+      const nextWeek = current.week + 1;
+      const nextPulse = weeklyPulseFor(nextWeek);
+      return {
+        ...current,
+        week: nextWeek,
+        attention: current.attentionMax,
+        cash: current.cash - 450,
+        actionLog: [
+          ...current.actionLog,
+          { type: '时间', title: `第 ${current.week} 周结束`, text: `固定支出 -450。下一周：${nextPulse.label}。` }
+        ]
+      };
+    });
   }
 
   if (save.screen === 'title') {
@@ -246,21 +329,29 @@ export default function V05Wireframe() {
     return <DirectionSelect onSelect={chooseDirection} onBack={() => setSave((current) => ({ ...current, screen: 'title' }))} />;
   }
 
+  const currentStage = deriveProjectStage(save.primaryProject);
+  const pulse = weeklyPulseFor(save.week);
+
   return (
     <div className="wf-shell">
       <header className="wf-header">
         <button className="wf-title-button" onClick={() => setSurface('world')}>新媒体艺术家模拟器</button>
-        <div className="wf-header-state"><span>第 {save.week} 周</span><span>注意力 {save.attention}/{save.attentionMax}</span><span>¥{save.cash}</span></div>
+        <div className="wf-header-state">
+          <span>第 {save.week} 周</span>
+          <span>注意力 {save.attention}/{save.attentionMax}</span>
+          <span>¥{save.cash} · {cashPressure(save.cash)}</span>
+          <span>{currentStage.label}</span>
+        </div>
         <button className="wf-end-week" onClick={endWeek}>结束本周</button>
       </header>
 
       <div className="wf-app-grid">
         <GlobalNav active={surface} onOpen={openSystem} />
         <main className="wf-main">
-          {surface === 'world' && <WorldMap save={save} currentRegion={currentRegion} onOpen={openRegion} />}
-          {surface === 'projects' && <Projects save={save} onProgress={progressProject} onSpend={spendAttention} />}
+          {surface === 'world' && <WorldMap save={save} currentRegion={currentRegion} pulse={pulse} onOpen={openRegion} />}
+          {surface === 'projects' && <Projects save={save} stage={currentStage} pulse={pulse} onAction={doProjectAction} onReview={reviewOpportunity} onGoWorld={() => setSurface('world')} />}
           {surface === 'workbench' && <Workbench save={save} practice={practice} learnedSkills={learnedSkills} setSave={setSave} />}
-          {surface === 'contacts' && <Contacts selectedId={selectedContactId} setSelectedId={setSelectedContactId} onSpend={spendAttention} />}
+          {surface === 'contacts' && <Contacts save={save} selectedId={selectedContactId} setSelectedId={setSelectedContactId} onAction={contactAction} />}
           {surface === 'archive' && (
             <ArchiveLibrary
               save={save}
@@ -286,7 +377,7 @@ export default function V05Wireframe() {
               facilityId={selectedFacilityId}
               onBack={() => setSurface('location')}
               onSpend={spendAttention}
-              onComplete={() => finishGoal('g3')}
+              onComplete={completeVenueTest}
             />
           )}
         </main>
@@ -308,7 +399,7 @@ function TitleScreen({ hasSave, onContinue, onNew }) {
       <div className="wf-title-box">
         <small>NEW MEDIA ARTIST SIMULATOR</small>
         <h1>新媒体艺术家模拟器</h1>
-        <p>从项目、地点、联络和制作现实中长出来的艺术家模拟。</p>
+        <p>地点、项目、联络、制作现实和长期档案共同推进。</p>
         <div className="wf-menu">
           <button onClick={onContinue}>{hasSave ? '继续' : '开始'}</button>
           <button onClick={onNew}>新游戏</button>
@@ -323,7 +414,7 @@ function TitleScreen({ hasSave, onContinue, onNew }) {
 function DirectionSelect({ onSelect, onBack }) {
   return (
     <main className="wf-direction-screen">
-      <div className="wf-page-head"><button onClick={onBack}>← 主菜单</button><h1>从哪里开始</h1><p>只决定你的第一个项目和起始能力，不锁职业。</p></div>
+      <div className="wf-page-head"><button onClick={onBack}>← 主菜单</button><h1>从哪里开始</h1><p>只决定第一个项目和起始能力，不锁职业。</p></div>
       <div className="wf-direction-list">
         {practices.map((item, index) => {
           const starter = starterProjectsByPractice[item.id];
@@ -353,11 +444,11 @@ function GlobalNav({ active, onOpen }) {
   );
 }
 
-function WorldMap({ save, currentRegion, onOpen }) {
+function WorldMap({ save, currentRegion, pulse, onOpen }) {
   const adjacent = currentRegion.adjacentIds
     .map((id) => spatialRegions.find((region) => region.id === id)?.name)
     .filter(Boolean);
-  const incoming = opportunitySeeds.slice(0, 3);
+  const incoming = opportunitySeeds.slice(0, 4);
   return (
     <section className="wf-world-layout">
       <div className="wf-map-column">
@@ -390,6 +481,9 @@ function WorldMap({ save, currentRegion, onOpen }) {
         </div>
       </div>
       <aside className="wf-side">
+        <section className="wf-panel">
+          <small>THIS WEEK</small><h3>{pulse.label}</h3><p>{pulse.pressure}</p><p>{pulse.worldSignal}</p>
+        </section>
         <TaskBook save={save} />
         <section className="wf-panel wf-inbox">
           <h3>传入</h3>
@@ -413,35 +507,58 @@ function TaskBook({ save }) {
   );
 }
 
-function Projects({ save, onProgress, onSpend }) {
+function Projects({ save, stage, pulse, onAction, onReview, onGoWorld }) {
   const project = save.primaryProject;
   return (
     <section className="wf-page">
-      <div className="wf-page-head"><h1>项目</h1><p>一个项目不是名字和进度条，而是一组正在被解决、被拖延和被外部条件改变的问题。</p></div>
+      <div className="wf-page-head"><h1>项目</h1><p>项目不是经验条。它必须逐渐变得更清楚、更稳定、更能进入空间，也更容易被别人重新搭起来。</p></div>
       <div className="wf-project-top">
         <section className="wf-panel wf-current-project">
-          <small>ACTIVE / 01</small><h2>{project.name}</h2><p className="wf-project-question">{project.question}</p>
+          <small>ACTIVE / {stage.label}</small><h2>{project.name}</h2><p className="wf-project-question">{project.question}</p>
           <div className="wf-metric-row">
             <Metric label="一致性" value={project.coherence} />
             <Metric label="稳定性" value={project.stability} />
             <Metric label="场地适配" value={project.siteFit} />
             <Metric label="文档" value={project.documentation} />
           </div>
+          <label>阶段</label><p>{stage.description}</p>
+          <label>这个阶段会打开</label><p>{stage.unlocks.join(' / ')}</p>
           <label>当前方法</label><p>{project.methods.join(' / ')}</p>
-          <button onClick={onProgress}>推进一个可测试版本 / 注意力 -1</button>
         </section>
-        <TaskBook save={save} />
+        <div>
+          <section className="wf-panel"><small>WEEK {save.week}</small><h3>{pulse.label}</h3><p>{pulse.pressure}</p></section>
+          <TaskBook save={save} />
+        </div>
       </div>
-      <div className="wf-section-head wf-project-board-head"><h2>机会板</h2><span>不是任务列表：先判断值不值得做</span></div>
+
+      <div className="wf-section-head wf-project-board-head"><h2>下一步怎么做</h2><span>每个动作只解决一种问题</span></div>
       <div className="wf-opportunity-grid">
-        {opportunitySeeds.map((item) => (
-          <article key={item.id} className="wf-opportunity">
-            <header><small>{item.status}</small><strong>{item.title}</strong><span>{item.deadline}</span></header>
-            <p>{item.source} · {item.place}</p>
-            <dl><dt>可能有用</dt><dd>{item.value}</dd><dt>真正风险</dt><dd>{item.risk}</dd></dl>
-            <button onClick={() => onSpend(1, { type: '项目判断', title: item.title, text: `查看：${item.value} / 风险：${item.risk}` })}>花 1 注意力判断</button>
+        {projectActions.map((action) => (
+          <article key={action.id} className="wf-opportunity">
+            <header><small>项目动作</small><strong>{action.label}</strong><span>-{action.cost} 注意力</span></header>
+            <p>{action.description}</p>
+            {action.id === 'site-test'
+              ? <button onClick={onGoWorld}>去地点找真实场地 →</button>
+              : <button disabled={save.attention < action.cost} onClick={() => onAction(action.id)}>{action.label} / -{action.cost}</button>}
           </article>
         ))}
+      </div>
+
+      <div className="wf-section-head wf-project-board-head"><h2>机会板</h2><span>价值和风险由项目状态重新解释</span></div>
+      <div className="wf-opportunity-grid">
+        {opportunitySeeds.map((item) => {
+          const readiness = opportunityReadiness(item.id, project, save.week, save.cash);
+          const reviewed = save.reviewedOpportunityIds.includes(item.id);
+          return (
+            <article key={item.id} className="wf-opportunity">
+              <header><small>{readiness.ready ? '现在可进入' : '条件不足'}</small><strong>{item.title}</strong><span>{item.deadline}</span></header>
+              <p>{item.source} · {item.place}</p>
+              <dl><dt>可能有用</dt><dd>{item.value}</dd><dt>真正风险</dt><dd>{item.risk}</dd></dl>
+              <p><strong>{reviewed ? '判断结果' : '当前判断'}</strong>：{readiness.reason}</p>
+              <button disabled={save.attention < 1} onClick={() => onReview(item.id)}>{reviewed ? '重新判断' : '花 1 注意力判断'}</button>
+            </article>
+          );
+        })}
       </div>
       <section className="wf-panel wf-project-history"><h3>项目脉络</h3>{project.history.map((entry, index) => <p key={`${entry}-${index}`}>{String(index + 1).padStart(2, '0')} / {entry}</p>)}</section>
     </section>
@@ -466,7 +583,7 @@ function Workbench({ save, practice, learnedSkills, setSave }) {
   }
   return (
     <section className="wf-page">
-      <div className="wf-page-head"><h1>工作台</h1><p>这里管理你拥有的制作能力。服务按项目需要出现，不是假装每个人都有一座渲染农场。</p></div>
+      <div className="wf-page-head"><h1>工作台</h1><p>管理自己拥有的制作能力。专业服务按项目需要出现，不占据地图。</p></div>
       <div className="wf-workbench">
         <section className="wf-panel">
           <small>LOCAL</small><h3>制作设备</h3>
@@ -485,20 +602,25 @@ function Workbench({ save, practice, learnedSkills, setSave }) {
           )) : <p>当前项目没有需要外部调用的技术服务。</p>}
         </section>
         <section className="wf-panel wf-toolbox">
-          <small>CHECKLIST</small><h3>项目工具箱</h3>
-          <div>[ ] 技术单</div><div>[ ] 场地尺寸</div><div>[ ] 输出规格</div><div>[ ] 备份方案</div><div>[ ] 现场记录</div><div>[ ] 可恢复存档</div>
+          <small>CHECKLIST</small><h3>制作检查</h3>
+          <div>[{save.primaryProject.documentation >= 1 ? 'x' : ' '}] 技术单 / 项目说明</div>
+          <div>[{save.primaryProject.siteFit >= 1 ? 'x' : ' '}] 场地尺寸 / 观看距离</div>
+          <div>[{save.primaryProject.stability >= 2 ? 'x' : ' '}] 连续运行测试</div>
+          <div>[{save.primaryProject.stability >= 3 ? 'x' : ' '}] 备份方案</div>
+          <div>[{save.primaryProject.documentation >= 2 ? 'x' : ' '}] 现场记录</div>
+          <div>[{deriveProjectStage(save.primaryProject).id === 'archive' ? 'x' : ' '}] 可恢复档案</div>
         </section>
       </div>
     </section>
   );
 }
 
-function Contacts({ selectedId, setSelectedId, onSpend }) {
+function Contacts({ save, selectedId, setSelectedId, onAction }) {
   const selected = contactSeeds.find((item) => item.id === selectedId) || contactSeeds[0];
   const region = spatialRegions.find((item) => item.id === selected.regionId);
   return (
     <section className="wf-page">
-      <div className="wf-page-head"><h1>联络</h1><p>不是好感度列表。这里记录谁知道什么、你们之间还有什么没解决、下一次为什么要联系。</p></div>
+      <div className="wf-page-head"><h1>联络</h1><p>谁知道什么、你们之间还有什么没解决、下一次为什么要联系。</p></div>
       <div className="wf-contact-layout">
         <nav className="wf-contact-list">
           {contactSeeds.map((contact) => (
@@ -512,16 +634,17 @@ function Contacts({ selectedId, setSelectedId, onSpend }) {
           <h2>{selected.name}</h2><strong>{selected.role}</strong>
           <label>最近一句</label><blockquote>{selected.lastMessage}</blockquote>
           <label>没结束的事</label><p>{selected.openThread}</p>
+          <label>本轮联络</label><p>{save.contactTouches[selected.id] || 0} 次</p>
           <label>现在可以联系他做什么</label>
           <div className="wf-contact-actions">
-            {selected.canAsk.map((action) => <button key={action} onClick={() => onSpend(1, { type: '联络', title: `${selected.name} / ${action}`, text: `发出一条明确的联络：${action}` })}>{action} / -1</button>)}
+            {selected.canAsk.map((action) => <button key={action} disabled={save.attention < 1} onClick={() => onAction(selected, action)}>{action} / -1</button>)}
           </div>
           <div className="wf-tag-row">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </section>
         <aside className="wf-panel">
-          <h3>联络原则</h3>
+          <h3>网络说明</h3>
           <p>同一个人可以同时是同行、供应商、朋友、项目入口或风险来源。</p>
-          <p>之后这里会接：未读消息、等待回复、共同项目、欠的人情、引荐和阵营关系。</p>
+          <p>联络次数不会直接变成“好感度”。真正有用的是尚未解决的事和下一次能交换什么。</p>
         </aside>
       </div>
     </section>
@@ -534,17 +657,18 @@ function ArchiveLibrary({ save, category, setCategory, selectedId, onOpen }) {
   const related = selected.relatedIds.map((id) => knowledgeById.get(id)).filter(Boolean);
   return (
     <section className="wf-page wf-archive-page">
-      <div className="wf-page-head"><h1>档案库</h1><p>词条、方法、行业说明和世界背景。行动记录已经移到独立日志，不再混在这里。</p></div>
+      <div className="wf-page-head"><h1>档案库</h1><p>词条、方法、行业说明和世界背景。行动记录是另一套东西。</p></div>
       <div className="wf-knowledge-layout">
         <nav className="wf-knowledge-categories">
           <strong>分类</strong>
           {knowledgeCategories.map((item) => <button key={item} className={category === item ? 'active' : ''} onClick={() => setCategory(item)}>{item}</button>)}
           <div className="wf-knowledge-progress"><small>已阅读</small><strong>{save.readKnowledgeEntryIds.length}/{knowledgeEntries.length}</strong></div>
+          <div className="wf-knowledge-progress"><small>旧研究空间模板</small><strong>{legacyResearchSpaceTemplates.length}</strong></div>
         </nav>
         <div className="wf-knowledge-list">
           {filtered.map((entry) => {
             const read = save.readKnowledgeEntryIds.includes(entry.id);
-            return <button key={entry.id} className={entry.id === selected.id ? 'active' : ''} onClick={() => onOpen(entry.id)}><small>{entry.category} · {read ? '已读' : '未读'}</small><strong>{entry.title}</strong><p>{entry.summary}</p></button>;
+            return <button key={entry.id} className={entry.id === selected.id ? 'active' : ''} onClick={() => onOpen(entry.id)}><small>{entry.category} · {read ? '已读' : '未读'}</small><strong>{entry.title}</strong></button>;
           })}
         </div>
         <article className="wf-knowledge-reader">
@@ -561,7 +685,6 @@ function ArchiveLibrary({ save, category, setCategory, selectedId, onOpen }) {
 function Location({ region, selectedFacilityId, setSelectedFacilityId, onBack, onSpend, onVenue }) {
   const facilities = region.facilityIds.map((id) => facilityById.get(id)).filter(Boolean);
   const selected = facilityById.get(selectedFacilityId) || facilities[0];
-  const hasVenuePreview = selected?.functions.includes('venue-preview');
   return (
     <section className="wf-page">
       <div className="wf-page-head"><button onClick={onBack}>← 地点</button><small>{region.scope} / {region.shortName}</small><h1>{region.name}</h1><p>{region.description}</p></div>
@@ -589,7 +712,6 @@ function Location({ region, selectedFacilityId, setSelectedFacilityId, onBack, o
             <label>这里会出现</label><p>{selected?.functions.join(' / ')}</p>
             <div className="wf-location-actions">
               <button onClick={() => onSpend(1, { type: '地点', title: selected?.name || '地点', text: `${region.name} / 做了一次现场行动。` })}>在这里行动 / -1</button>
-              {hasVenuePreview && <button onClick={onVenue}>场地预演 →</button>}
             </div>
           </section>
           <ContextEvent facility={selected} onSpend={onSpend} onVenue={onVenue} />
@@ -605,7 +727,7 @@ function ContextEvent({ facility, onSpend, onVenue }) {
     return (
       <article className="wf-text-event">
         <small>公开信息 / 截止 5 天</small><h2>一份征集只写了主题、三张图和“提供一定制作支持”。</h2>
-        <p>你已经知道真正要查的是：制作费、安装期、技术支持、版权和最后到底要交什么。</p>
+        <p>真正要查的是：制作费、安装期、技术支持、版权和最后到底要交什么。</p>
         <div className="wf-decisions">
           <button onClick={() => onSpend(1, { type: '判断', title: '拆征集条件', text: '先查支持条件和责任边界。' })}><b>1</b><span>先把支持条件查清</span><small>-1</small></button>
           <button onClick={() => onSpend(2, { type: '申请', title: '做申请版本', text: '把当前项目压成一页可以提交的版本。' })}><b>2</b><span>直接整理申请版本</span><small>-2</small></button>
@@ -641,7 +763,7 @@ function ContextEvent({ facility, onSpend, onVenue }) {
     return (
       <article className="wf-text-event">
         <small>场地空档 / 2 小时</small><h2>这里今天没有正式活动，可以把项目接上真实输出跑一次。</h2>
-        <p>没人要求你把它做漂亮。两小时只用来发现桌面上看不见的问题。</p>
+        <p>没人要求把它做漂亮。两小时只用来发现桌面上看不见的问题。</p>
         <div className="wf-decisions"><button onClick={onVenue}><b>1</b><span>进入场地预演</span><small>→</small></button></div>
       </article>
     );
@@ -665,7 +787,7 @@ function VenueTest({ save, facilityId, onBack, onSpend, onComplete }) {
   const facility = facilityById.get(facilityId);
   function run(preset) {
     if (!onSpend(2, { type: '预演', title: `${facility?.name || '场地'} / ${preset.name}`, text: `测试 ${preset.spec}。` })) return;
-    onComplete();
+    onComplete(preset);
   }
   return (
     <section className="wf-page">
