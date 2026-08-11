@@ -31,9 +31,30 @@ test('v0.5 map uses a richer Shanghai place graph and keeps tools outside the ma
   await expect(nav.getByText('工作台', { exact: true })).toBeVisible();
   await expect(nav.getByText('联络', { exact: true })).toBeVisible();
   await expect(nav.getByText('档案库', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '安静的一周', exact: true })).toBeVisible();
 
   const noHorizontalPageOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalPageOverflow).toBe(true);
+});
+
+test('project actions visibly change stage and opportunity readiness', async ({ page }) => {
+  await reset(page);
+  await enterWorld(page, /系统 \/ 生成/);
+  await page.keyboard.press('p');
+
+  await expect(page.getByRole('heading', { name: '项目', exact: true })).toBeVisible();
+  await expect(page.getByText('ACTIVE / 线索', { exact: true })).toBeVisible();
+  await expect(page.locator('.wf-opportunity')).toHaveCount(12);
+
+  await page.getByRole('button', { name: '收缩问题 / -1', exact: true }).click();
+  await expect(page.getByText('ACTIVE / 原型', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '跑完整版本 / -2', exact: true }).click();
+  await expect(page.getByText('ACTIVE / 可测试', { exact: true })).toBeVisible();
+
+  const blackbox = page.locator('.wf-opportunity').filter({ hasText: '两小时黑盒空档' });
+  await expect(blackbox.getByText('现在可进入', { exact: true })).toBeVisible();
+  const publicScreen = page.locator('.wf-opportunity').filter({ hasText: '滨江公共屏幕短片 / 实时试运行' });
+  await expect(publicScreen.getByText('条件不足', { exact: true })).toBeVisible();
 });
 
 test('archive is a readable encyclopedia and activity log is separate', async ({ page }) => {
@@ -62,7 +83,9 @@ test('contacts are actionable threads rather than relationship bars', async ({ p
   await page.getByRole('button', { name: /李工/ }).click();
   await expect(page.getByRole('heading', { name: '李工', exact: true })).toBeVisible();
   await expect(page.getByText(/等你补一版技术单/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /确认信号链/ })).toBeVisible();
+  await expect(page.getByText('0 次', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /确认信号链/ }).click();
+  await expect(page.getByText('1 次', { exact: true })).toBeVisible();
 });
 
 test('workbench specialist services are practice-dependent', async ({ page }) => {
@@ -79,7 +102,7 @@ test('workbench specialist services are practice-dependent', async ({ page }) =>
   await expect(page.getByText('离线预演', { exact: true })).toBeVisible();
 });
 
-test('venue preview is entered through a real venue and nested local map', async ({ page }) => {
+test('venue preview is entered through a real venue and feeds project site fit', async ({ page }) => {
   await reset(page);
   await enterWorld(page, /空间 \/ 装置/);
 
@@ -91,10 +114,11 @@ test('venue preview is entered through a real venue and nested local map', async
   await contextualPreview.click();
 
   await expect(page.getByRole('heading', { name: '场地预演', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: /平面屏/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /超宽屏/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /环形屏/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /球幕/ })).toBeVisible();
+  await page.getByRole('button', { name: /平面屏/ }).click();
+  await page.keyboard.press('p');
+  const metricRow = page.locator('.wf-metric-row');
+  await expect(metricRow.getByText('场地适配')).toBeVisible();
+  await expect(metricRow.getByText('1/4', { exact: true })).toBeVisible();
 
   const noHorizontalPageOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
   expect(noHorizontalPageOverflow).toBe(true);
