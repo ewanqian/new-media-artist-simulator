@@ -106,3 +106,13 @@ test('full method arc exposes a hidden prerequisite and generates a compact care
   assert.equal('level' in save, false);
   assert.equal('skillPoints' in save, false);
 });
+
+test('negative cash does not block a zero-cash method action', () => {
+  let save = run(matureSave(), 'story:stage4:enter');
+  save = { ...save, cash: -1200, attention: 6 };
+  const beforeCash = save.cash;
+  const next = run(save, 'story:stage4:source-recovery');
+  assert.ok(next.evidenceIds.includes('stage4:ep10:source:recovery'));
+  assert.equal(next.attention, 5);
+  assert.equal(next.cash, beforeCash);
+});
