@@ -13,9 +13,11 @@ test('pure story career can finish origin field network and method stages withou
   await clear(page);
   await page.reload({ waitUntil: 'networkidle' });
 
+  await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
+  await page.getByRole('button', { name: '开始生涯' }).click();
   await page.getByRole('button', { name: /从自己的桌面开始/ }).click();
   await page.getByRole('button', { name: /纯叙事/ }).click();
-  await page.getByRole('button', { name: /继续：查看起步档案/ }).click();
+  await page.getByRole('button', { name: '查看起步档案' }).click();
   await page.getByRole('button', { name: '进入第一周' }).click();
   await page.waitForURL(/mode=story/);
   await page.getByRole('button', { name: '进入第一周' }).click();
