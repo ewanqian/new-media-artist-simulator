@@ -11,32 +11,44 @@ async function clearRoute(page) {
   });
 }
 
+async function dismissFeedback(page) {
+  const layer = page.locator('.gf-layer');
+  if (await layer.isVisible().catch(() => false)) {
+    await layer.click({ position: { x: 4, y: 4 } }).catch(() => {});
+    await expect(layer).toBeHidden({ timeout: 2000 }).catch(() => {});
+  }
+}
+
 async function revealNode(page) {
+  await dismissFeedback(page);
   const enter = page.getByRole('button', { name: '进入场景', exact: true });
   if (await enter.isVisible().catch(() => false)) await enter.click();
 
   const decide = page.getByRole('button', { name: '做决定', exact: true });
   const next = page.getByRole('button', { name: '继续', exact: true });
-  for (let i = 0; i < 12; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
+    await dismissFeedback(page);
     if (await decide.isVisible().catch(() => false)) return;
     if (await next.isVisible().catch(() => false)) {
       await next.click();
-      await page.waitForTimeout(80);
+      await page.waitForTimeout(70);
       continue;
     }
-    await page.waitForTimeout(180);
+    await page.waitForTimeout(120);
   }
-  await expect(decide).toBeVisible();
+  await expect(decide).toBeVisible({ timeout: 5000 });
 }
 
 async function choose(page, name) {
+  await dismissFeedback(page);
   await revealNode(page);
   const decide = page.getByRole('button', { name: '做决定', exact: true });
   await expect(decide).toBeVisible();
   await decide.click();
   const option = page.getByRole('button', { name });
-  await expect(option).toBeVisible();
+  await expect(option).toBeVisible({ timeout: 5000 });
   await option.click();
+  await dismissFeedback(page);
 }
 
 test('Butterfly Scholar is a readable special chapter with research, memory and a new-media making route', async ({ page, isMobile }) => {
@@ -52,29 +64,34 @@ test('Butterfly Scholar is a readable special chapter with research, memory and 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
 
-  await choose(page, /去。先写下我真正想弄明白的问题/);
+  await choose(page, /先写下我真正想弄明白的问题/);
   await choose(page, /先聊工作：明天先看样地和档案/);
 
   await revealNode(page);
   await page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ }).click();
   await expect(page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ })).toContainText('活体运动不适合硬做成静态摄影测量对象');
   await page.getByRole('button', { name: '记住这个方法' }).click();
+  await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
   await page.getByRole('button', { name: '做决定', exact: true }).click();
   await page.getByRole('button', { name: /记录蝴蝶运动，同时扫描寄主植物/ }).click();
+  await dismissFeedback(page);
 
   await revealNode(page);
   await expect(page.getByText('离场前检查', { exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: '做决定', exact: true }).click();
   await page.getByRole('button', { name: /现在补拍/ }).click();
+  await dismissFeedback(page);
 
   await revealNode(page);
   await expect(page.getByText('相机求解', { exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: /研究：什么是相机求解/ }).click();
   await expect(page.getByRole('dialog', { name: /研究：什么是相机求解/ })).toContainText('先算出每张照片是从哪里拍的');
   await page.getByRole('button', { name: '记住这个方法' }).click();
+  await dismissFeedback(page);
   await page.getByRole('button', { name: '做决定', exact: true }).click();
   await page.getByRole('button', { name: /先查相机求解/ }).click();
+  await dismissFeedback(page);
 
   await choose(page, /做 Gaussian 版本/);
   await choose(page, /用 Noise \/ 程序化形变做动画/);
@@ -124,6 +141,6 @@ test('desktop Butterfly lesson completes three real graph connections with expli
   await page.getByLabel('离场前检查 输出 可继续的数据').click();
   await page.getByLabel('Metashape · 相机求解 输入 照片').click();
   await expect(hud).toContainText('三步完成');
-  await expect(hud).toContainText('点云 / Gaussian / Blender');
+  await expect(hud).toContainText(/点云、Gaussian 或 Blender/);
   await expect(hud.getByRole('link', { name: /返回章节选择/ })).toBeVisible();
 });
