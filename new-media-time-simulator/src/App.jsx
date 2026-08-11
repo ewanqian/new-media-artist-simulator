@@ -19,7 +19,7 @@ import {
 } from './engine/gameEngine.js';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
-const V05Experience = lazy(() => import('./v05/web/V05Experience.jsx'));
+const V05Experience = lazy(() => import('./v05/web/V05ExperienceHub.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
