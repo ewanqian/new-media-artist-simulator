@@ -26,8 +26,9 @@ const STORAGE_KEY = 'new-media-time-simulator-save';
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
+  const corePreview = params.get('core');
   const pathPreview = window.location.pathname.includes('/v05/') ? 'v05' : window.location.pathname.includes('/v03/') ? 'v03' : null;
-  const preview = params.get('core') || pathPreview;
+  const preview = corePreview || pathPreview;
   const lab = params.get('lab');
   const mode = params.get('mode');
 
@@ -38,7 +39,7 @@ export default function App() {
       </Suspense>
     );
   }
-  if (preview === 'v05' && mode === 'story') {
+  if (preview === 'v05' && (mode === 'story' || (corePreview === 'v05' && !mode && !lab))) {
     return (
       <Suspense fallback={<main className="app-shell"><section className="panel">正在载入新媒体艺术家模拟器…</section></main>}>
         <V05Experience />
