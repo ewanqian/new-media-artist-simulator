@@ -8,7 +8,7 @@ async function clearRoute(page) {
   });
 }
 
-test('Butterfly Scholar special route is reachable from home, completes narrative, and opens its real Blueprint preset', async ({ page }) => {
+test('Butterfly Scholar special route is reachable from home, completes narrative, and opens its real Blueprint preset', async ({ page, isMobile }) => {
   await page.goto('/?core=v05', { waitUntil: 'networkidle' });
   await clearRoute(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -43,6 +43,16 @@ test('Butterfly Scholar special route is reachable from home, completes narrativ
   await page.getByRole('link', { name: '打开最终工作图' }).click();
   await page.waitForURL(/core=v05.*lab=blueprint.*preset=butterfly|lab=blueprint.*preset=butterfly/);
   await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 第一次采集"]')).toBeVisible();
-  await expect(page.getByText('Gaussian Splatting', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('摄影测量采集', { exact: true }).first()).toBeVisible();
+
+  if (isMobile) {
+    const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
+    await tabs.getByRole('button', { name: '节点' }).click();
+    const library = page.getByLabel('节点库');
+    await expect(library).toBeVisible();
+    await expect(library.getByRole('button', { name: /Gaussian Splatting/ })).toBeVisible();
+    await expect(library.getByRole('button', { name: /摄影测量采集/ })).toBeVisible();
+  } else {
+    await expect(page.getByText('Gaussian Splatting', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('摄影测量采集', { exact: true }).first()).toBeVisible();
+  }
 });
