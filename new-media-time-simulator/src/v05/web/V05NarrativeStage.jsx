@@ -39,10 +39,12 @@ export default function V05NarrativeStage({
   const done = visibleCount >= paragraphs.length;
 
   useEffect(() => {
-    if (!done || meta.holdChoices) return;
-    const timer = window.setTimeout(() => setChoicesVisible(true), instrument || minorActions.length ? 680 : 340);
+    if (!done || !node?.choices?.length) return;
+    const baseDelay = instrument || minorActions.length ? 650 : 300;
+    const delay = meta.holdChoices ? Math.max(baseDelay, 850) : baseDelay;
+    const timer = window.setTimeout(() => setChoicesVisible(true), delay);
     return () => window.clearTimeout(timer);
-  }, [done, instrument, minorActions.length, meta.holdChoices]);
+  }, [done, instrument, minorActions.length, meta.holdChoices, node?.choices?.length]);
 
   const locationLine = useMemo(() => [meta.time, scene?.location].filter(Boolean).join(' · '), [meta.time, scene?.location]);
 
