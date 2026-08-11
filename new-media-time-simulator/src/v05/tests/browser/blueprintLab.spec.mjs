@@ -22,12 +22,15 @@ async function openPalette(page, isMobile) {
   await expect(page.locator('.be-palette')).toBeVisible();
 }
 
-test('v05 home exposes practice free and blueprint modes', async ({ page }) => {
+test('v05 home exposes career and free-create modes while tools stay secondary', async ({ page }) => {
   await page.goto('/?core=v05&mode=home', { waitUntil: 'networkidle' });
   await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /实践模式/ })).toBeVisible();
-  await expect(page.getByRole('link', { name: /自由模式/ })).toBeVisible();
-  await expect(page.getByRole('link', { name: /节点编辑器/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /生涯模式/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /新建空白/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /打开最近工作图/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /内容管理/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /设置/ }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /节点编辑器/ })).toHaveCount(0);
 });
 
 test('editor opens a production graph and nodes really drag', async ({ page }) => {
