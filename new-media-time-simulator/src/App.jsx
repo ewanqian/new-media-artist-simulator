@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import Assessment from './components/Assessment.jsx';
 import ArchetypePicker from './components/ArchetypePicker.jsx';
 import Dashboard from './components/Dashboard.jsx';
+import './v05/onboardingPolicy.ts';
+import './v05/web/v05-mobile-fix.css';
 import {
   createInitialState,
   equipSkill,
