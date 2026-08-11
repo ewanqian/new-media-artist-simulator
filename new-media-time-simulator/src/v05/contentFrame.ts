@@ -176,5 +176,45 @@ export const opportunitySeeds: OpportunitySeed[] = [
     deadline: '两周后',
     value: '提供住宿和工作空间。',
     risk: '交通自理，公开展示要求不清楚。'
+  },
+  {
+    id: 'opp-emergency-live',
+    title: '临时替场：20 分钟现场系统',
+    source: '同行群里转来的紧急消息',
+    place: '黄浦 / 小型现场空间',
+    status: '可判断',
+    deadline: '明晚',
+    value: '现金 ¥2600；能直接测试备用状态和临场决策。',
+    risk: '没有彩排；对方说“设备应该都一样”。'
+  },
+  {
+    id: 'opp-public-screen',
+    title: '滨江公共屏幕短片 / 实时试运行',
+    source: '制作方询价',
+    place: '西岸 / 公共屏幕',
+    status: '暂不适合',
+    deadline: '10 天后',
+    value: '大尺度、真实公共观看距离，可能留下长期运行记录。',
+    risk: '分辨率、亮度、审核和播控窗口都比效果图复杂。'
+  },
+  {
+    id: 'opp-artist-run-show',
+    title: '艺术家自组织三人展',
+    source: '林',
+    place: '苏河 / 临时项目房',
+    status: '可判断',
+    deadline: '两周后',
+    value: '没有大机构背书，但可以连续安装三天并自己修改。',
+    risk: '制作费接近没有；每个人都说自己可以帮搬东西。'
+  },
+  {
+    id: 'opp-workshop',
+    title: '两小时方法工作坊',
+    source: '陈',
+    place: '杨浦 / 学院开放教室',
+    status: '待回复',
+    deadline: '下周五',
+    value: '能把方法拆成可传递结构；有少量讲课费。',
+    risk: '你会发现“会做”不等于“会解释”。'
   }
 ];
