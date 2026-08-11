@@ -37,7 +37,7 @@ export default function V05Home() {
           </a>
           <div className="vh-free-card">
             <small>FREE CREATE</small><strong>自由创作</strong><span>从空白开始搭节点，或者继续最近一次工作图。</span>
-            <div><a href={v05Href('lab=blueprint&mode=free&blank=1')}>新建空白</a><a href={v05Href('lab=blueprint')}>最近工作图</a></div>
+            <div><a href={v05Href('lab=blueprint&mode=free&blank=1')}>新建空白</a><a href={v05Href('lab=blueprint')}>打开最近工作图</a></div>
           </div>
         </div>
 
