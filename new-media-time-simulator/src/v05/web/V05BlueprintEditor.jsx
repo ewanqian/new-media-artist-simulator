@@ -25,7 +25,7 @@ function augmentFieldChecklist() {
     { id: 'conditionsReady', label: '现场条件已记录', kind: 'toggle', defaultValue: false },
     { id: 'questionReady', label: '观察问题已写下', kind: 'toggle', defaultValue: false }
   ].filter((item) => !existing.has(item.id));
-  field.params = [...(field.params || []), ...additions];
+  if (additions.length) field.params = [...(field.params || []), ...additions];
 }
 
 function loadRequestedPreset() {
@@ -67,23 +67,28 @@ export default function V05BlueprintEditor() {
 
       document.querySelectorAll('.be-edge-types button').forEach((button) => {
         const raw = button.dataset.edgeKind || button.textContent?.trim();
-        if (!raw || !RELATION_LABELS[raw]) return;
-        button.dataset.edgeKind = raw;
-        button.textContent = RELATION_LABELS[raw];
-        button.setAttribute('title', raw === 'signal' ? '数据或信号从一个节点进入另一个节点' : raw === 'physical' ? '制作顺序、工序或空间步骤关系' : raw === 'dependency' ? '没有这个条件，后面的节点就不能成立' : '概念、知识、来源或方法引用关系');
+        const translated = raw ? RELATION_LABELS[raw] : null;
+        if (!raw || !translated) return;
+        if (button.dataset.edgeKind !== raw) button.dataset.edgeKind = raw;
+        if (button.textContent?.trim() !== translated) button.textContent = translated;
+        const explanation = raw === 'signal' ? '数据或信号从一个节点进入另一个节点' : raw === 'physical' ? '制作顺序、工序或空间步骤关系' : raw === 'dependency' ? '没有这个条件，后面的节点就不能成立' : '概念、知识、来源或方法引用关系';
+        if (button.getAttribute('title') !== explanation) button.setAttribute('title', explanation);
       });
       document.querySelectorAll('.be-inspector .be-hint').forEach((hint) => {
-        if (hint.closest('.be-inspector')?.querySelector('.be-edge-types')) hint.textContent = '连接不是一根万能线：数据线传资料，步骤线表达工序，条件线表达前提，引用线表达知识、来源或方法关系。';
+        if (!hint.closest('.be-inspector')?.querySelector('.be-edge-types')) return;
+        const copy = '连接不是一根万能线：数据线传资料，步骤线表达工序，条件线表达前提，引用线表达知识、来源或方法关系。';
+        if (hint.textContent !== copy) hint.textContent = copy;
       });
 
       if (trainingMode && allowedLabels) {
         document.querySelectorAll('.be-library button,.be-palette button').forEach((button) => {
           const label = button.querySelector('b,strong')?.textContent?.trim();
           if (!label) return;
-          button.style.display = allowedLabels.has(label) ? '' : 'none';
+          const display = allowedLabels.has(label) ? '' : 'none';
+          if (button.style.display !== display) button.style.display = display;
         });
         const returnLink = [...document.querySelectorAll('.be-topbar nav a')].find((link) => link.textContent?.trim() === '返回');
-        if (returnLink) returnLink.setAttribute('href', careerHref());
+        if (returnLink && returnLink.getAttribute('href') !== careerHref()) returnLink.setAttribute('href', careerHref());
       }
     };
 
