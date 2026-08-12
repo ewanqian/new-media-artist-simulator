@@ -7,7 +7,8 @@ async function clearCareer(page) {
       'nmas-v05-world-hub-preview',
       'nmas-v05-ui-settings',
       'nmas-blueprint-library-v2',
-      'nmas-blueprint-editor-autosave-v2'
+      'nmas-blueprint-editor-autosave-v2',
+      'nmas-special-carryovers-v1'
     ]) localStorage.removeItem(key);
     for (const key of Object.keys(localStorage)) if (key.startsWith('nmas-career-intro-seen:')) localStorage.removeItem(key);
   });
@@ -86,6 +87,60 @@ test('five-question role model reaches the same career shell without creating a 
     await expect(brief.getByRole('heading', { name: '桌上先有一个东西开始运行' })).toBeVisible();
     await expect(brief.getByText('现在真正需要决定的事', { exact: true })).toBeVisible();
   }
+});
+
+test('Costa Rica carryover enters a new career and becomes a reusable Stage 2 method', async ({ page }) => {
+  await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
+  await clearCareer(page);
+  await page.evaluate(() => {
+    localStorage.setItem('nmas-special-carryovers-v1', JSON.stringify([{
+      sourceId: 'special-01-costa-rica', title: '哥斯达黎加', completed: true,
+      assetIds: ['CR-PHOTOSET-01'],
+      assets: [{ id: 'CR-PHOTOSET-01', kind: 'dataset', title: 'CR-PHOTOSET-01 / 现场采集包', detail: '80 张照片', use: '离场检查' }],
+      mementoIds: ['M-CR-TICKET'],
+      mementos: [{ id: 'M-CR-TICKET', kind: 'travel', title: '哥斯达黎加往返电子行程单', detail: '一次驻地' }],
+      methodIds: ['method-check-before-leave'],
+      knowledgeIds: ['research-overlap'],
+      nodeIds: ['capture-quality-check'],
+      evidenceIds: ['ev-field-recapture']
+    }]));
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await openNewCareer(page);
+  await page.getByRole('button', { name: /从自己的桌面开始/ }).click();
+  await page.getByRole('button', { name: /纯叙事/ }).click();
+  await page.getByRole('button', { name: '查看起步档案' }).click();
+  await page.getByRole('button', { name: '进入第一周' }).click();
+  await page.waitForURL(/mode=story/);
+
+  let careerSave = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05-world-hub-preview') || '{}'));
+  expect(careerSave.methodIds).toContain('method-check-before-leave');
+  expect(careerSave.specialAssetIds).toContain('CR-PHOTOSET-01');
+  expect(careerSave.mementoIds).toContain('M-CR-TICKET');
+  await enterWeekOne(page);
+
+  await page.evaluate(() => {
+    const save = JSON.parse(localStorage.getItem('nmas-v05-world-hub-preview') || '{}');
+    save.careerStageId = 'stage-2';
+    save.careerEpisodeId = 'ep-04-blackbox';
+    save.evidenceIds = [...new Set([...(save.evidenceIds || []), 'stage2:ep4:goal:recovery'])];
+    localStorage.setItem('nmas-v05-world-hub-preview', JSON.stringify(save));
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+
+  await expect(page.getByRole('heading', { name: /时间短的时候/ })).toBeVisible();
+  const carryoverPanel = page.getByLabel('哥斯达黎加携带记录');
+  await expect(carryoverPanel).toContainText('CR-PHOTOSET-01');
+  const reuse = page.getByRole('button', { name: /调用哥斯达黎加的“离场前检查”/ });
+  await expect(reuse).toContainText('旧经验复用');
+  await reuse.click();
+  await expect(page.getByText('旧经验被调用', { exact: true })).toBeVisible();
+  await expect(carryoverPanel).toContainText('已经在当前生涯里被再次调用');
+
+  careerSave = await page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05-world-hub-preview') || '{}'));
+  expect(careerSave.evidenceIds).toContain('special:costarica:preflight-reused');
+  expect(careerSave.contextActionIds).toContain('action-reuse-costa-rica-field-check');
+  expect(careerSave.projectMetrics.documentation).toBeGreaterThanOrEqual(1);
 });
 
 test('settings opens from home and persists real interface preferences', async ({ page }) => {
