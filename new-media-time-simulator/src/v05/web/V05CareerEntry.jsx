@@ -82,10 +82,10 @@ export default function V05CareerEntry() {
         <div><small>MAIN CAREER</small><h2>新媒体艺术家生涯</h2><p>从第一个能运行的版本开始，经过现场、网络、方法沉淀与长期实践。当前主线从 Episode 01 开始。</p><div className="vc-tags"><span>EPISODE 01</span><span>第一个能被别人看见的版本</span></div></div>
         <div className="vc-chapter-actions">{existing.profile && existing.save ? <><a className="primary-link" href={v05Href('story')}>继续生涯 · 第 {existing.save.week || 1} 周</a><button onClick={() => setPhase('origin')}>新建生涯</button></> : <button className="primary" onClick={() => setPhase('origin')}>开始生涯</button>}</div>
       </section>
-      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩，不影响当前主线进度。</p></div>
+      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩。章节里产生的知识、Assets 和纪念品将逐步接入长期生涯。</p></div>
       <div className="vc-chapters">
-        <a href={v05Href('butterfly')} className="vc-chapter-card featured"><small>SPECIAL 01 · TRAINING / NARRATIVE</small><strong>哥斯达黎加的蝴蝶学者</strong><p>从真实蝴蝶与寄主植物观察开始，练习摄影测量、相机求解、点云 / Gaussian 与 Blender 动画，并处理来源、署名和研究数据的公开边界。</p><span>进入章节 →</span></a>
-        <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续章节继续复用同一套叙事演出、知识获取、节点训练、成就与档案系统。</p></article>
+        <a href={v05Href('costarica')} className="vc-chapter-card featured"><small>SPECIAL 01 · RESIDENCY / TRAINING</small><strong>哥斯达黎加</strong><p>你确认一份海外驻地邀请，真正出发、进入样地、生成数据、回到临时工作室，再处理“做蝴蝶算抄袭吗？”这种业内人才会会心一笑的问题。</p><div className="vc-tags"><span>中美洲驻地</span><span>扫描 / 点云 / Gaussian</span><span>知识 → 节点 → Assets</span></div><span>进入章节 →</span></a>
+        <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续章节继续复用同一套叙事演出、知识获取、节点训练、纪念品、Assets 与档案系统。</p></article>
       </div>
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </section></main>;
