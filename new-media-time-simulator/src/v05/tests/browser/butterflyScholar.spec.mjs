@@ -1,15 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-const STATE_KEY = 'nmas-special-butterfly-narrative-v2';
+const STATE_KEY = 'nmas-special-costarica-narrative-v1';
 
 async function clearRoute(page) {
   await page.evaluate(() => {
     for (const key of [
       'nmas-special-butterfly-narrative-v1', 'nmas-special-butterfly-world-v1',
       'nmas-special-butterfly-narrative-v2', 'nmas-special-butterfly-world-v2',
+      'nmas-special-costarica-narrative-v1', 'nmas-special-costarica-world-v1',
       'nmas-blueprint-editor-autosave-v2',
       'nmas-butterfly-training-complete-v1', 'nmas-butterfly-training-complete-v2',
-      'nmas-butterfly-training-complete-v3', 'nmas-butterfly-training-complete-v4'
+      'nmas-butterfly-training-complete-v3', 'nmas-butterfly-training-complete-v4',
+      'nmas-costarica-training-complete-v1'
     ]) localStorage.removeItem(key);
   });
 }
@@ -53,7 +55,7 @@ async function seedNode(page, currentNodeId, flags = []) {
   await page.reload({ waitUntil: 'networkidle' });
 }
 
-test('Butterfly Scholar browser smoke covers briefing, first meeting, research memory, visible consequences and Blueprint handoff', async ({ page, isMobile }) => {
+test('Costa Rica chapter covers invitation, route state, knowledge, assets, consequences and work-graph handoff', async ({ page, isMobile }) => {
   test.setTimeout(45000);
   await page.goto('/?core=v05', { waitUntil: 'networkidle' });
   await clearRoute(page);
@@ -61,16 +63,22 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
 
   await page.getByRole('link', { name: /生涯 \/ 章节/ }).click();
   await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
-  await page.getByRole('link', { name: /哥斯达黎加的蝴蝶学者/ }).click();
-  await page.waitForURL(/core=v05.*mode=butterfly|mode=butterfly/);
+  const costaRicaChapter = page.getByRole('link', { name: /哥斯达黎加/ });
+  await expect(costaRicaChapter).toContainText('知识 → 节点 → Assets');
+  await costaRicaChapter.click();
+  await page.waitForURL(/core=v05.*mode=costarica|mode=costarica/);
 
+  await expect(page.getByText('SPECIAL 01 · COSTA RICA', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('哥斯达黎加任务进度')).toContainText('等待确认是否出发');
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
   const firstChoice = page.getByRole('button', { name: /接。先写下一个问题再出发/ });
   await advanceUntil(page, firstChoice);
-  await expect(firstChoice).toContainText('影响：项目方向');
+  await expect(firstChoice).toContainText('项目方向');
   await firstChoice.click();
   await dismissFeedback(page);
+  await expect(page.getByLabel('哥斯达黎加任务进度')).toContainText('哥斯达黎加驻地行程已建立');
+  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('哥斯达黎加往返电子行程单');
 
   const inesIntro = page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/);
   await advanceUntil(page, inesIntro);
@@ -82,27 +90,28 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await fieldNote.click();
   await dismissFeedback(page);
   await expect(page.getByRole('button', { name: /小操作：记下这 1.8 秒/ })).toHaveCount(0);
+  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('CR-FIELD-1.8S');
 
   const researchButterfly = page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ });
   await researchButterfly.click();
-  const butterflyDialog = page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ });
-  await expect(butterflyDialog).toContainText('活体运动不适合硬做成静态摄影测量对象');
-  await expect(butterflyDialog).toContainText('时间里的行为');
-  await butterflyDialog.getByRole('button', { name: '记住这个方法' }).click();
+  const researchDialog = page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ });
+  await expect(researchDialog).toContainText('活体运动不适合硬做成静态摄影测量对象');
+  await expect(researchDialog).toContainText('理解以后可进入工作台');
+  await expect(researchDialog).toContainText('节点 · 活体运动记录');
+  await researchDialog.getByRole('button', { name: '理解并写入知识库' }).click();
   await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
 
   await seedNode(page, 'bs-04-process', ['field-recapture']);
   await advanceUntil(page, page.getByText('76 / 80 张照片已定位', { exact: true }));
+  await expect(page.getByText('CR-SOLVE-01 / 相机求解', { exact: true })).toBeVisible();
   await expect(page.getByText('76 / 80 张照片已定位', { exact: true })).toBeVisible();
   await expect(page.getByText(/补拍起作用了/)).toBeVisible();
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('缺口已在现场补拍');
 
   await seedNode(page, 'bs-04-process', ['capture-gap-debt']);
   await advanceUntil(page, page.getByText('61 / 80 张照片已定位', { exact: true }));
   await expect(page.getByText('61 / 80 张照片已定位', { exact: true })).toBeVisible();
   await expect(page.getByText(/白天没补的缺口晚上回来了/)).toBeVisible();
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('已知缺口带回工作室');
 
   await seedNode(page, 'bs-04x-failure', ['capture-gap-debt', 'forced-reconstruct-bad-solve']);
   const repairChoice = page.getByRole('button', { name: /保留失败版本，然后回去修相机求解/ });
@@ -111,12 +120,12 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await expect(repairChoice).toContainText('失败版本留作 Evidence');
   await expect(page.getByRole('button', { name: /不修干净，把断裂本身带进作品/ })).toContainText('技术脆弱性不会被自动消除');
 
-  await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
-  await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 三步采集训练"]')).toBeVisible();
-  const hud = page.getByLabel('蝴蝶学者训练任务');
+  await page.goto('/?core=v05&lab=blueprint&preset=costarica', { waitUntil: 'networkidle' });
+  await expect(page.locator('input[value="哥斯达黎加 / 三步采集工作图"]')).toBeVisible();
+  const hud = page.getByLabel('哥斯达黎加工作图训练');
   await expect(hud).toContainText('任务 1 / 3');
-  await expect(hud).toContainText('这条线传递：采集对象');
-  await expect(hud).toContainText('【现场调查】右侧');
+  await expect(hud).toContainText('数据线传递：采集对象');
+  await expect(hud).toContainText('步骤线 = 制作顺序');
 
   if (isMobile) {
     const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
@@ -130,25 +139,51 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   }
 });
 
-test('desktop Butterfly lesson completes three real graph connections and explains each data type', async ({ page, isMobile }) => {
+test('desktop Costa Rica work graph uses checkable field state and four readable relationship lines', async ({ page, isMobile }) => {
   test.skip(isMobile, 'port-connection training is locked on desktop in this regression');
-  await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
+  await page.goto('/?core=v05&lab=blueprint&preset=costarica', { waitUntil: 'networkidle' });
   await clearRoute(page);
   await page.reload({ waitUntil: 'networkidle' });
 
-  const hud = page.getByLabel('蝴蝶学者训练任务');
+  const hud = page.getByLabel('哥斯达黎加工作图训练');
   await expect(hud).toContainText('任务 1 / 3');
   await expect(hud).toContainText('采集对象：寄主植物');
+
+  const fieldNode = page.locator('.be-node').filter({ hasText: '现场调查' }).first();
+  await fieldNode.click();
+  const subjectReady = page.getByRole('checkbox', { name: '采集对象已确认' });
+  const conditionsReady = page.getByRole('checkbox', { name: '现场条件已记录' });
+  const questionReady = page.getByRole('checkbox', { name: '观察问题已写下' });
+  await expect(subjectReady).toBeVisible();
+  await expect(conditionsReady).toBeVisible();
+  await expect(questionReady).toBeVisible();
+  await subjectReady.check();
+  await conditionsReady.check();
+  await questionReady.check();
+  await expect(subjectReady).toBeChecked();
+  await expect(conditionsReady).toBeChecked();
+  await expect(questionReady).toBeChecked();
 
   await page.getByLabel('现场调查 输出 采集对象').click();
   await page.getByLabel('摄影测量采集 输入 要扫描的对象').click();
   await expect(hud).toContainText('任务 2 / 3');
-  await expect(hud).toContainText('照片序列');
+
+  const firstWire = page.locator('.be-wires .wire-hit').first();
+  await firstWire.click({ force: true });
+  const edgeInspector = page.getByLabel('连线检查器');
+  await expect(edgeInspector.getByRole('button', { name: '数据线' })).toBeVisible();
+  await expect(edgeInspector.getByRole('button', { name: '步骤线' })).toBeVisible();
+  await expect(edgeInspector.getByRole('button', { name: '条件线' })).toBeVisible();
+  await expect(edgeInspector.getByRole('button', { name: '引用线' })).toBeVisible();
+  await expect(edgeInspector).toContainText('连接不是一根万能线');
+
+  await edgeInspector.getByRole('button', { name: '步骤线' }).click();
+  await expect(edgeInspector.getByRole('button', { name: '步骤线' })).toHaveClass(/active/);
+  await edgeInspector.getByRole('button', { name: '数据线' }).click();
 
   await page.getByLabel('摄影测量采集 输出 照片序列').click();
   await page.getByLabel('离场前检查 输入 照片 / 扫描').click();
   await expect(hud).toContainText('任务 3 / 3');
-  await expect(hud).toContainText('可用照片');
 
   await page.getByLabel('离场前检查 输出 可继续的数据').click();
   await page.getByLabel('Metashape · 相机求解 输入 照片').click();
