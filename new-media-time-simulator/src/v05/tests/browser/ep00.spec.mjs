@@ -43,7 +43,7 @@ test('EP00 turns a scan choice into a three-node work graph, archive, and career
   await page.getByRole('button', { name: /扫下来/ }).click();
   await dismissFeedback(page);
   await expect(page.getByRole('heading', { name: 'SCAN_SET_001' })).toBeVisible();
-  await expect(page.getByText('1 个空间采集 · 1.8 GB', { exact: true })).toBeVisible();
+  await expect(page.getByText('1 个空间采集 · 1.8 GB', { exact: true }).first()).toBeVisible();
   await page.getByRole('button', { name: /把它接成第一张工作图/ }).click();
   await page.waitForURL(/lab=blueprint.*preset=ep00.*capture=scan/);
 
