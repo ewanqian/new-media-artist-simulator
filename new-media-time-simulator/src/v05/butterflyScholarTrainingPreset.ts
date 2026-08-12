@@ -14,7 +14,7 @@ export const BUTTERFLY_TRAINING_OBJECTIVES = [
     id: 'field-to-capture',
     title: '把现场调查交给摄影测量',
     dataType: '采集对象：寄主植物 + 周围小片空间',
-    why: '这条线不是“启动下一个软件”。它是在告诉摄影测量节点：这次到底要采什么对象。',
+    why: '这是一条数据线：把已经确认的采集对象送给摄影测量节点，不代表“自动进入下一步”。',
     from: ['field-capture-session'],
     to: ['capture-photo-sequence'],
     fromLabel: '现场调查',
@@ -52,11 +52,11 @@ export function buildButterflyScholarTrainingPreset() {
   return {
     schema: 'nmas-blueprint-v1' as const,
     id: BUTTERFLY_TRAINING_BLUEPRINT_ID,
-    title: '哥斯达黎加的蝴蝶学者 / 三步采集训练',
-    revision: 4,
-    tutorialId: 'butterfly-capture-01',
+    title: '哥斯达黎加 / 三步采集工作图',
+    revision: 5,
+    tutorialId: 'costa-rica-capture-01',
     nodes: [
-      { id: 'bt0', definitionId: 'field-capture-session', x: 60, y: 160, params: { location: '云雾林样地 A', question: '先扫描寄主植物和它周围的小片空间', weather: '风小 / 散射光' } },
+      { id: 'bt0', definitionId: 'field-capture-session', x: 60, y: 160, params: { location: '云雾林样地 A', question: '先扫描寄主植物和它周围的小片空间', weather: '风小 / 散射光', subjectReady: false, conditionsReady: false, questionReady: false } },
       { id: 'bt1', definitionId: 'capture-photo-sequence', x: 330, y: 160, params: { photos: 80, overlap: '高', lighting: '较小', viewpoints: '充分' } },
       { id: 'bt2', definitionId: 'capture-quality-check', x: 600, y: 160, params: { blur: false, missing: true, specular: false, lightingShift: true } },
       { id: 'bt3', definitionId: 'process-metashape-align', x: 870, y: 160, params: { accuracy: '中', aligned: 76 } },
@@ -65,6 +65,6 @@ export function buildButterflyScholarTrainingPreset() {
     ],
     edges: [],
     groups: [],
-    notes: ['只完成三条数据流：采集对象 → 照片序列 → 可用照片 → 相机位置。完成以后，再自由选择点云或 Gaussian；Blender 等创作节点在后续内容里解锁。']
+    notes: ['先把现场调查中的对象、条件、问题确认，再完成三条数据线：采集对象 → 照片序列 → 可用照片 → 相机位置。步骤线、条件线、引用线在后续项目中继续使用。']
   };
 }
