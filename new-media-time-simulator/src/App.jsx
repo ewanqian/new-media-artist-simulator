@@ -26,7 +26,7 @@ const V05BlueprintEditor = lazy(() => import('./v05/web/V05BlueprintEditor.jsx')
 const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
 const V05CareerEntry = lazy(() => import('./v05/web/V05CareerEntry.jsx'));
 const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
-const V05ButterflyScholarRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
+const V05CostaRicaRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 function V05Frame({ children }) {
@@ -46,9 +46,9 @@ export default function App() {
       <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入节点编辑器…</section></main>}><V05BlueprintEditor /></Suspense></V05Frame>
     );
   }
-  if (preview === 'v05' && mode === 'butterfly') {
+  if (preview === 'v05' && (mode === 'costarica' || mode === 'butterfly')) {
     return (
-      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入《哥斯达黎加的蝴蝶学者》…</section></main>}><V05ButterflyScholarRoute /></Suspense></V05Frame>
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入哥斯达黎加驻地…</section></main>}><V05CostaRicaRoute /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'career') {
