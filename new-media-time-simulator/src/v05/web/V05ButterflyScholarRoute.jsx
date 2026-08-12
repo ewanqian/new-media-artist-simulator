@@ -12,7 +12,9 @@ import {
   butterflyResearchCards,
   butterflyScholarIdentity,
   butterflyScholarNarrativePack,
-  butterflyWorldEffectsByChoice
+  butterflyWorldEffectsByChoice,
+  deriveButterflyWorldEffect,
+  resolveButterflyNodeText
 } from '../butterflyScholarPack.ts';
 import { butterflyChoiceOutcomeHints, deriveButterflyOutcome } from '../butterflyScholarOutcome.ts';
 import V05NarrativeStage from './V05NarrativeStage.jsx';
@@ -34,11 +36,12 @@ const metaByNode = {
   'bs-03-field': { kicker: 'FIELD / CAPTURE', time: 'DAY 02 · 09:40', objective: '把活体运动和静态空间拆开采集', pacing: [200, 'hold', 'hold'], holdChoices: true },
   'bs-03b-audit': { kicker: 'FIELD / CHECK', time: 'DAY 02 · 16:50', objective: '离场前决定要不要补拍', pacing: [180, 'hold'], holdChoices: true },
   'bs-04-process': { kicker: 'WORKBENCH / CAMERA SOLVE', time: 'DAY 02 · 22:35', objective: '先确认照片之间的相机关系', pacing: [180, 'hold'], holdChoices: true },
+  'bs-04x-failure': { kicker: 'WORKBENCH / FAILED BUILD', time: 'DAY 02 · 23:20', objective: '失败已经出现：决定修、留，还是把它带进作品', pacing: [160, 'hold'], holdChoices: true },
   'bs-04a-represent': { kicker: 'WORKBENCH / REPRESENTATION', time: 'DAY 03 · 00:10', objective: '选一种适合作品的空间表示', pacing: [160, 'hold'], holdChoices: true },
   'bs-04e-compose': { kicker: 'WORKBENCH / MAKE THE WORK', time: 'DAY 03 · 01:20', objective: '扫描结束以后，决定它怎么动', pacing: [160, 'hold'], holdChoices: true },
-  'bs-04f-authorship': { kicker: 'NETWORK / PEER MESSAGE', time: 'DAY 03 · 01:55', objective: '回应“蝴蝶题材”带来的作者性问题', pacing: [180, 'hold'], holdChoices: true },
-  'bs-04b-reveal': { kicker: 'NARRATIVE / DISCLOSURE', time: 'DAY 03 · 02:30', objective: '听完，再决定关系怎么继续', pacing: [180, 'hold', 'hold'], holdChoices: true },
-  'bs-05-public': { kicker: 'PUBLIC TEST / ARCHIVE', time: 'DAY 06 · 19:00', objective: '把这次方法和关系真正留下来', pacing: [180, 'hold', 'hold'], holdChoices: true }
+  'bs-04f-authorship': { kicker: 'NETWORK / PEER MESSAGE', time: 'DAY 03 · 01:55', objective: '分清视觉母题、方法来源和数据来源', pacing: [180, 'hold', 'hold'], holdChoices: true },
+  'bs-04b-reveal': { kicker: 'NETWORK / ROLE CONFLICT', time: 'DAY 03 · 02:30', objective: '处理协作者同时也是评估者的角色冲突', pacing: [180, 'hold', 'hold'], holdChoices: true },
+  'bs-05-public': { kicker: 'PUBLIC TEST / ARCHIVE', time: 'DAY 06 · 19:00', objective: '把这次方法、失败和机构边界真正留下来', pacing: [180, 'hold', 'hold'], holdChoices: true }
 };
 
 const methodNames = {
@@ -56,7 +59,11 @@ const methodNames = {
 
 const achievementNames = {
   'ach-field-check': '离开之前，再看一眼',
+  'ach-clean-solve': '补拍真的有用',
+  'ach-keep-the-failure': '失败也算 Evidence',
   'ach-butterfly-as-system': '蝴蝶不是贴图',
+  'ach-observation-to-system': '观察变成规则',
+  'ach-butterfly-without-icon': '没有蝴蝶图标的蝴蝶作品',
   'ach-credit-without-panic': '把来源说清楚',
   'ach-special-butterfly-complete': 'SPECIAL 01 COMPLETE'
 };
@@ -83,12 +90,17 @@ function mergeWorld(current, effect = {}) {
 }
 function added(next, previous, key) { return (next[key] || []).filter((item) => !(previous[key] || []).includes(item)); }
 
-function TrainingInstrument({ nodeId }) {
-  if (nodeId === 'bs-03b-audit') return <div className="bs-instrument audit"><header><small>离场前检查</small><strong>80 张照片</strong></header><div className="bs-readout"><span><b>重叠</b><i>有缺口</i></span><span><b>模糊</b><i>正常</i></span><span><b>曝光</b><i>后段变暗</i></span><span><b>视角</b><i>转角不足</i></span></div><p>意思很简单：现在补拍成本最低。带着这些缺口回去，后面可能直接导致相机求解失败。</p></div>;
-  if (nodeId === 'bs-04-process') return <div className="bs-instrument solve"><header><small>相机求解</small><strong>61 / 80 张照片已定位</strong></header><div className="bs-track"><i/><i/><i className="broken"/><i/><i/></div><p>每个点代表一段相机轨迹。中间断开，说明两组照片没有被可靠地接成同一个空间。</p></div>;
-  if (nodeId === 'bs-04a-represent') return <div className="bs-instrument representation"><div><small>点云</small><strong>直接看到点、密度和孔洞</strong><p>适合把“扫描过程”也留在画面里。</p></div><div><small>Gaussian</small><strong>移动视角时更连续</strong><p>适合浏览照片里的空间外观。</p></div></div>;
+function TrainingInstrument({ nodeId, flags = [] }) {
+  const has = new Set(flags);
+  if (nodeId === 'bs-03b-audit') return <div className="bs-instrument audit"><header><small>离场前检查</small><strong>80 张照片</strong></header><div className="bs-readout"><span><b>重叠</b><i>有缺口</i></span><span><b>模糊</b><i>正常</i></span><span><b>曝光</b><i>后段变暗</i></span><span><b>视角</b><i>转角不足</i></span></div><p>现在补拍只要十分钟。回到工作室再发现缺口，代价会直接进入相机求解。</p></div>;
+  if (nodeId === 'bs-04-process') {
+    const repairedByField = has.has('field-recapture');
+    return <div className="bs-instrument solve"><header><small>相机求解</small><strong>{repairedByField ? '76 / 80 张照片已定位' : '61 / 80 张照片已定位'}</strong></header><div className={`bs-track ${repairedByField ? 'healthy' : ''}`}><i/><i/><i className={repairedByField ? '' : 'broken'}/><i/><i/></div><p>{repairedByField ? '白天补拍的转角已经接上。还有少量未注册照片，但不在关键区域。' : '白天留下的缺口现在变成了断开的相机轨迹。它不是抽象扣分，而是空间关系真的没算出来。'}</p></div>;
+  }
+  if (nodeId === 'bs-04x-failure') return <div className="bs-instrument failure"><header><small>FAILED BUILD / 已保存</small><strong>叶片双层 · 转角断裂 · 错位相机</strong></header><div className="bs-readout"><span><b>版本</b><i>FAIL_01</i></span><span><b>原因</b><i>覆盖不足</i></span><span><b>可修</b><i>是</i></span><span><b>可留作 Evidence</b><i>是</i></span></div><p>这里没有“正确答案”。关键是别把一次技术失败事后伪装成原本就计划好的艺术效果。</p></div>;
+  if (nodeId === 'bs-04a-represent') return <div className="bs-instrument representation"><div><small>点云</small><strong>直接看到点、密度和孔洞</strong><p>适合把采集和失败痕迹继续留在画面里。</p></div><div><small>Gaussian</small><strong>移动视角时更连续</strong><p>适合浏览照片形成的空间外观，但不会自动修复底层缺口。</p></div></div>;
   if (nodeId === 'bs-04e-compose') return <div className="bs-instrument representation"><div><small>程序化</small><strong>Noise / Geometry Nodes</strong><p>不模拟真实物理，直接按规则形变。</p></div><div><small>物理 / 实时</small><strong>风、碰撞、观众位置</strong><p>让环境或观众真的参与运动。</p></div></div>;
-  if (nodeId === 'bs-04b-reveal') return <div className="bs-instrument identity"><small>信息更新</small><strong>Inés 的工作身份比第一次自我介绍多一层。</strong><p>这不是“抓到卧底”。真正的问题是：数据许可、合作关系和私人信任现在要重新判断。</p></div>;
+  if (nodeId === 'bs-04b-reveal') return <div className="bs-instrument identity"><small>角色冲突</small><strong>Inés 同时负责现场协作和长期合作评估。</strong><p>问题不是“她真实身份是谁”，而是一个协作者是否应该同时决定这套合作以后还给不给你机会。</p></div>;
   return null;
 }
 
@@ -162,7 +174,11 @@ export default function V05ButterflyScholarRoute() {
   const speaker = butterflyScholarNarrativePack.actors.find((item) => item.id === node?.speakerId);
   const knownFacts = useMemo(() => narrativeKnownFacts(state), [state]);
   const contradictions = useMemo(() => narrativeContradictions(state), [state]);
-  const stageNode = useMemo(() => node ? ({ ...node, choices: node.choices.map((choice) => ({ ...choice, outcomeHint: butterflyChoiceOutcomeHints[choice.id] || choice.outcomeHint })) }) : node, [node]);
+  const stageNode = useMemo(() => node ? ({
+    ...node,
+    text: resolveButterflyNodeText(node.id, state.flags, node.text),
+    choices: node.choices.map((choice) => ({ ...choice, outcomeHint: butterflyChoiceOutcomeHints[choice.id] || choice.outcomeHint }))
+  }) : node, [node, state.flags]);
   const blueprintHref = v05Href('lab=blueprint&preset=butterfly');
   const chaptersHref = v05Href('mode=career');
   const researchCards = (butterflyResearchByNode[node?.id] || []).map((id) => researchById.get(id)).filter(Boolean);
@@ -180,12 +196,15 @@ export default function V05ButterflyScholarRoute() {
     if (methods.length) emitGlobalFeedback({ kind: 'method', title: methodNames[methods[0]] || methods[0], detail: methods.length > 1 ? `同时获得 ${methods.length - 1} 个相关方法` : '方法已进入你的记录。' });
     if (evidence.length && !nodes.length && !methods.length) emitGlobalFeedback({ kind: 'evidence', title: '记录已保存', detail: `${evidence.length} 条 Evidence 写入当前章节。` });
     if (achievements.length) emitGlobalFeedback({ kind: 'achievement', code: 'TRIUMPH', title: achievementNames[achievements[0]] || achievements[0], detail: '这个结果已进入成就与章节档案。' });
-    if (choiceId === 'bs-reveal-listen') emitGlobalFeedback({ kind: 'relationship', title: 'Inés / 关系继续', detail: '你先听完了完整信息。这个回应被她记住。' });
-    if (choiceId === 'bs-reveal-distance') emitGlobalFeedback({ kind: 'relationship', title: 'Inés / 保持距离', detail: '合作继续，私人关系暂时停在这里。' });
+    if (choiceId === 'bs-reveal-listen') emitGlobalFeedback({ kind: 'relationship', title: '机构边界 / 已写清', detail: '材料来源、许可与公开范围已经进入项目记录。' });
+    if (choiceId === 'bs-reveal-distance') emitGlobalFeedback({ kind: 'relationship', title: '机构角色 / 已拆分', detail: '现场协作与长期合作评估不再由同一个人承担。' });
   }
   function choose(choice) {
     const nextState = applyNarrativeChoice(butterflyScholarNarrativePack, state, choice.id); if (nextState === state) return;
-    const nextWorld = mergeWorld(world, butterflyWorldEffectsByChoice[choice.id]); localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); persistWorld(nextWorld); notifyWorldChanges(world, nextWorld, choice.id); setState(nextState); window.scrollTo({ top: 0, behavior: 'instant' });
+    const baseEffect = butterflyWorldEffectsByChoice[choice.id] || {};
+    const contextualEffect = deriveButterflyWorldEffect(state.flags, choice.id);
+    const nextWorld = mergeWorld(mergeWorld(world, baseEffect), contextualEffect);
+    localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); persistWorld(nextWorld); notifyWorldChanges(world, nextWorld, choice.id); setState(nextState); window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function reset() {
     const nextState = createNarrativeState(butterflyScholarNarrativePack); const nextWorld = emptyWorld(); localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); localStorage.setItem(WORLD_KEY, JSON.stringify(nextWorld)); setState(nextState); setWorld(nextWorld); setActiveResearch(null);
@@ -196,5 +215,5 @@ export default function V05ButterflyScholarRoute() {
 
   const minorActions = researchCards.map((card) => ({ id: card.id, label: `${(world.researchIds || []).includes(card.id) ? '复习' : '研究'}：${card.title}`, onClick: () => setActiveResearch(card) }));
 
-  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={stageNode} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
+  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={stageNode} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id} flags={state.flags}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
 }
