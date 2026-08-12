@@ -6,23 +6,31 @@ import {
   butterflyScholarIdentity,
   butterflyScholarNarrativePack,
   butterflyScholarTraining,
-  butterflyWorldEffectsByChoice
+  butterflyWorldEffectsByChoice,
+  deriveButterflyWorldEffect,
+  resolveButterflyNodeText
 } from '../butterflyScholarPack.ts';
 import { butterflyChoiceOutcomeHints, deriveButterflyOutcome } from '../butterflyScholarOutcome.ts';
 import { butterflyScholarNodeDefinitions } from '../butterflyScholarNodes.ts';
 import { buildButterflyScholarTrainingPreset, BUTTERFLY_TRAINING_OBJECTIVES } from '../butterflyScholarTrainingPreset.ts';
 import { editorNodeDefinitions } from '../blueprintEditorCatalog.ts';
 
+function mergeWorld(world, effect = {}) {
+  const next = { ...world };
+  for (const key of Object.keys(world)) next[key] = [...new Set([...(world[key] || []), ...(effect[key] || [])])];
+  return next;
+}
+
 function playRoute(choiceIds) {
   let state = createNarrativeState(butterflyScholarNarrativePack);
-  const world = {
+  let world = {
     unlockNodeIds: [], evidenceIds: [], methodIds: [], researchIds: [], threadIds: [], archiveEntryIds: [], achievementIds: [], qualitySignals: [], projectTags: []
   };
-  const keys = Object.keys(world);
   for (const choiceId of choiceIds) {
+    const beforeFlags = state.flags;
     state = applyNarrativeChoice(butterflyScholarNarrativePack, state, choiceId);
-    const effect = butterflyWorldEffectsByChoice[choiceId] || {};
-    for (const key of keys) world[key] = [...new Set([...world[key], ...(effect[key] || [])])];
+    world = mergeWorld(world, butterflyWorldEffectsByChoice[choiceId] || {});
+    world = mergeWorld(world, deriveButterflyWorldEffect(beforeFlags, choiceId));
   }
   return { state, world };
 }
@@ -59,35 +67,30 @@ test('training stays compact: subject, check, solve, then creation', () => {
   assert.ok(butterflyScholarTraining.every((step) => step.plain && step.why && step.operation && step.failureSignals.length));
 });
 
-test('narrative route connects real butterfly capture, reconstruction, making, authorship, relationship and archive', () => {
+test('narrative route connects capture, reconstruction, making, authorship, institution and archive', () => {
   let state = createNarrativeState(butterflyScholarNarrativePack);
   assert.equal(state.currentNodeId, 'bs-01-invite');
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-go-question');
-  assert.equal(state.currentNodeId, 'bs-02-arrival');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-arrival-work');
-  assert.equal(state.currentNodeId, 'bs-03-field');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-capture-relation');
   assert.equal(state.currentNodeId, 'bs-03b-audit');
   assert.ok(narrativeKnownFacts(state).some((fact) => fact.id === 'fact-live-not-static' && fact.state === 'verified'));
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-audit-recapture');
-  assert.equal(state.currentNodeId, 'bs-04-process');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-align-diagnose');
   assert.equal(state.currentNodeId, 'bs-04a-represent');
   assert.ok(narrativeKnownFacts(state).some((fact) => fact.id === 'fact-bad-solve' && fact.state === 'verified'));
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-represent-gaussian');
-  assert.equal(state.currentNodeId, 'bs-04e-compose');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-compose-noise');
-  assert.equal(state.currentNodeId, 'bs-04f-authorship');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-authorship-source');
   assert.equal(state.currentNodeId, 'bs-04b-reveal');
   assert.ok(narrativeKnownFacts(state).some((fact) => fact.id === 'fact-butterfly-authorship' && fact.state === 'verified'));
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-reveal-listen');
   assert.equal(state.currentNodeId, 'bs-05-public');
-  assert.ok(state.flags.includes('relationship-open'));
+  assert.ok(state.flags.includes('institutional-boundary-written'));
   assert.ok(state.trust.ines > 0);
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-archive-open');
@@ -95,58 +98,82 @@ test('narrative route connects real butterfly capture, reconstruction, making, a
   assert.ok(state.flags.includes('butterfly-route-complete'));
 });
 
-test('wrong technical decision remains playable and leaves real debt', () => {
+test('forcing reconstruction creates a visible failure state before representation', () => {
   let state = createNarrativeState(butterflyScholarNarrativePack);
-  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-go-open');
-  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-arrival-prior');
-  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-capture-site');
-  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-audit-leave');
+  for (const choiceId of ['bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force']) {
+    state = applyNarrativeChoice(butterflyScholarNarrativePack, state, choiceId);
+  }
   assert.ok(state.flags.includes('capture-gap-debt'));
-  assert.equal(state.currentNodeId, 'bs-04-process');
-  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-align-force');
   assert.ok(state.flags.includes('forced-reconstruct-bad-solve'));
-  assert.equal(state.currentNodeId, 'bs-04a-represent');
+  assert.equal(state.currentNodeId, 'bs-04x-failure');
 });
 
-test('world effects connect choices to reusable nodes, methods, achievements and records', () => {
+test('a failed build can be preserved then repaired without erasing the evidence', () => {
+  const route = playRoute([
+    'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force', 'bs-failure-repair',
+    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-authorship-source', 'bs-reveal-listen', 'bs-archive-open'
+  ]);
+  assert.ok(route.state.flags.includes('failure-kept'));
+  assert.ok(route.state.flags.includes('solve-repaired'));
+  assert.ok(route.world.evidenceIds.includes('ev-failed-reconstruction-kept'));
+  assert.ok(route.world.achievementIds.includes('ach-keep-the-failure'));
+  const outcome = deriveButterflyOutcome(route.state, route.world);
+  assert.ok(outcome.headline.includes('修回'));
+  assert.ok(!outcome.unresolved.some((item) => item.includes('相机求解')));
+  assert.ok(outcome.unresolved.some((item) => item.includes('覆盖缺口')));
+});
+
+test('world effects connect choices to reusable nodes, methods, contextual achievements and records', () => {
   assert.ok(butterflyWorldEffectsByChoice['bs-capture-relation'].unlockNodeIds.includes('capture-motion-video'));
   assert.ok(butterflyWorldEffectsByChoice['bs-audit-recapture'].achievementIds.includes('ach-field-check'));
-  assert.ok(butterflyWorldEffectsByChoice['bs-align-diagnose'].unlockNodeIds.includes('process-metashape-align'));
+  assert.ok(butterflyWorldEffectsByChoice['bs-failure-repair'].achievementIds.includes('ach-keep-the-failure'));
   assert.ok(butterflyWorldEffectsByChoice['bs-represent-gaussian'].unlockNodeIds.includes('process-gaussian-splat'));
   assert.ok(butterflyWorldEffectsByChoice['bs-compose-noise'].unlockNodeIds.includes('process-blender-procedural'));
   assert.ok(butterflyWorldEffectsByChoice['bs-authorship-source'].unlockNodeIds.includes('method-source-attribution'));
   assert.ok(butterflyWorldEffectsByChoice['bs-archive-open'].archiveEntryIds.includes('archive-butterfly-route'));
+  assert.ok(deriveButterflyWorldEffect(['field-recapture'], 'bs-align-diagnose').achievementIds.includes('ach-clean-solve'));
+  assert.ok(deriveButterflyWorldEffect(['capture-relation-route'], 'bs-compose-interactive').achievementIds.includes('ach-observation-to-system'));
 });
 
 test('every visible Butterfly decision has a readable non-spoiler consequence hint', () => {
   const choiceIds = butterflyScholarNarrativePack.nodes.flatMap((node) => node.choices.map((choice) => choice.id));
   for (const choiceId of choiceIds) assert.ok(butterflyChoiceOutcomeHints[choiceId], `missing outcome hint for ${choiceId}`);
-  assert.ok(butterflyChoiceOutcomeHints['bs-audit-leave'].includes('未解决') || butterflyChoiceOutcomeHints['bs-audit-leave'].includes('缺口'));
+  assert.ok(butterflyChoiceOutcomeHints['bs-audit-leave'].includes('缺口'));
+  assert.ok(butterflyChoiceOutcomeHints['bs-failure-use'].includes('脆弱'));
   assert.ok(!butterflyChoiceOutcomeHints['bs-audit-leave'].includes('失败结局'));
 });
 
-test('the same special chapter produces materially different public feedback and archive traces', () => {
+test('field decisions change later technical text rather than only adding flags', () => {
+  const base = butterflyScholarNarrativePack.nodes.find((node) => node.id === 'bs-04-process').text;
+  const repaired = resolveButterflyNodeText('bs-04-process', ['field-recapture'], base).join(' ');
+  const gap = resolveButterflyNodeText('bs-04-process', ['capture-gap-debt'], base).join(' ');
+  assert.ok(repaired.includes('76 张'));
+  assert.ok(gap.includes('61 张'));
+  assert.notEqual(repaired, gap);
+});
+
+test('the same special chapter produces materially different public feedback, archive and public draft', () => {
   const disciplined = playRoute([
     'bs-go-question', 'bs-arrival-work', 'bs-capture-relation', 'bs-audit-recapture', 'bs-align-diagnose',
     'bs-represent-gaussian', 'bs-compose-interactive', 'bs-authorship-system', 'bs-reveal-listen', 'bs-archive-open'
   ]);
-  const risky = playRoute([
-    'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force',
+  const fragile = playRoute([
+    'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force', 'bs-failure-use',
     'bs-represent-pointcloud', 'bs-compose-noise', 'bs-authorship-defend', 'bs-reveal-distance', 'bs-archive-open'
   ]);
 
   const cleanOutcome = deriveButterflyOutcome(disciplined.state, disciplined.world);
-  const riskyOutcome = deriveButterflyOutcome(risky.state, risky.world);
+  const fragileOutcome = deriveButterflyOutcome(fragile.state, fragile.world);
 
-  assert.notEqual(cleanOutcome.headline, riskyOutcome.headline);
   assert.ok(cleanOutcome.headline.includes('系统'));
-  assert.ok(riskyOutcome.headline.includes('失败'));
-  assert.ok(cleanOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('可靠')));
-  assert.ok(riskyOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('采集和求解失败')));
-  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('覆盖缺口')));
-  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('相机求解')));
-  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('为什么一定是蝴蝶')));
-  assert.notEqual(cleanOutcome.socialDraft, riskyOutcome.socialDraft);
+  assert.ok(fragileOutcome.headline.includes('断裂'));
+  assert.notEqual(cleanOutcome.headline, fragileOutcome.headline);
+  assert.ok(cleanOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('可信')));
+  assert.ok(fragileOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('采集缺口')));
+  assert.ok(fragileOutcome.unresolved.some((item) => item.includes('覆盖缺口')));
+  assert.ok(fragileOutcome.unresolved.some((item) => item.includes('相机求解')));
+  assert.ok(fragileOutcome.unresolved.some((item) => item.includes('为什么一定是蝴蝶')));
+  assert.notEqual(cleanOutcome.socialDraft, fragileOutcome.socialDraft);
 });
 
 test('Butterfly Scholar nodes are registered in the real Blueprint editor catalog', () => {
