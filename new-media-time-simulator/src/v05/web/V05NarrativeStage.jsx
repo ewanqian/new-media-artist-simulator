@@ -104,7 +104,11 @@ function NarrativeStageInner({
         {node.choices.map((choice, index) => (
           <button key={choice.id} onClick={() => onChoose(choice)}>
             <small>{String(index + 1).padStart(2, '0')}</small>
-            <span><strong>{choice.label}</strong>{choice.subtext && <em>{choice.subtext}</em>}</span>
+            <span>
+              <strong>{choice.label}</strong>
+              {choice.subtext && <em>{choice.subtext}</em>}
+              {choice.outcomeHint && <i className="narrative-outcome-hint">影响：{choice.outcomeHint}</i>}
+            </span>
           </button>
         ))}
       </div>}
