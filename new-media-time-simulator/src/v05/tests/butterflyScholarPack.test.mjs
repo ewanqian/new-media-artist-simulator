@@ -8,9 +8,24 @@ import {
   butterflyScholarTraining,
   butterflyWorldEffectsByChoice
 } from '../butterflyScholarPack.ts';
+import { butterflyChoiceOutcomeHints, deriveButterflyOutcome } from '../butterflyScholarOutcome.ts';
 import { butterflyScholarNodeDefinitions } from '../butterflyScholarNodes.ts';
 import { buildButterflyScholarTrainingPreset, BUTTERFLY_TRAINING_OBJECTIVES } from '../butterflyScholarTrainingPreset.ts';
 import { editorNodeDefinitions } from '../blueprintEditorCatalog.ts';
+
+function playRoute(choiceIds) {
+  let state = createNarrativeState(butterflyScholarNarrativePack);
+  const world = {
+    unlockNodeIds: [], evidenceIds: [], methodIds: [], researchIds: [], threadIds: [], archiveEntryIds: [], achievementIds: [], qualitySignals: [], projectTags: []
+  };
+  const keys = Object.keys(world);
+  for (const choiceId of choiceIds) {
+    state = applyNarrativeChoice(butterflyScholarNarrativePack, state, choiceId);
+    const effect = butterflyWorldEffectsByChoice[choiceId] || {};
+    for (const key of keys) world[key] = [...new Set([...world[key], ...(effect[key] || [])])];
+  }
+  return { state, world };
+}
 
 test('Butterfly Scholar makes the player a new-media artist with butterfly and scanning practice', () => {
   assert.equal(butterflyScholarIdentity.title, '哥斯达黎加的蝴蝶学者');
@@ -101,6 +116,37 @@ test('world effects connect choices to reusable nodes, methods, achievements and
   assert.ok(butterflyWorldEffectsByChoice['bs-compose-noise'].unlockNodeIds.includes('process-blender-procedural'));
   assert.ok(butterflyWorldEffectsByChoice['bs-authorship-source'].unlockNodeIds.includes('method-source-attribution'));
   assert.ok(butterflyWorldEffectsByChoice['bs-archive-open'].archiveEntryIds.includes('archive-butterfly-route'));
+});
+
+test('every visible Butterfly decision has a readable non-spoiler consequence hint', () => {
+  const choiceIds = butterflyScholarNarrativePack.nodes.flatMap((node) => node.choices.map((choice) => choice.id));
+  for (const choiceId of choiceIds) assert.ok(butterflyChoiceOutcomeHints[choiceId], `missing outcome hint for ${choiceId}`);
+  assert.ok(butterflyChoiceOutcomeHints['bs-audit-leave'].includes('未解决') || butterflyChoiceOutcomeHints['bs-audit-leave'].includes('缺口'));
+  assert.ok(!butterflyChoiceOutcomeHints['bs-audit-leave'].includes('失败结局'));
+});
+
+test('the same special chapter produces materially different public feedback and archive traces', () => {
+  const disciplined = playRoute([
+    'bs-go-question', 'bs-arrival-work', 'bs-capture-relation', 'bs-audit-recapture', 'bs-align-diagnose',
+    'bs-represent-gaussian', 'bs-compose-interactive', 'bs-authorship-system', 'bs-reveal-listen', 'bs-archive-open'
+  ]);
+  const risky = playRoute([
+    'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force',
+    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-authorship-defend', 'bs-reveal-distance', 'bs-archive-open'
+  ]);
+
+  const cleanOutcome = deriveButterflyOutcome(disciplined.state, disciplined.world);
+  const riskyOutcome = deriveButterflyOutcome(risky.state, risky.world);
+
+  assert.notEqual(cleanOutcome.headline, riskyOutcome.headline);
+  assert.ok(cleanOutcome.headline.includes('系统'));
+  assert.ok(riskyOutcome.headline.includes('失败'));
+  assert.ok(cleanOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('可靠')));
+  assert.ok(riskyOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('采集和求解失败')));
+  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('覆盖缺口')));
+  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('相机求解')));
+  assert.ok(riskyOutcome.unresolved.some((item) => item.includes('为什么一定是蝴蝶')));
+  assert.notEqual(cleanOutcome.socialDraft, riskyOutcome.socialDraft);
 });
 
 test('Butterfly Scholar nodes are registered in the real Blueprint editor catalog', () => {
