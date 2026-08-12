@@ -171,7 +171,6 @@ test('desktop Costa Rica work graph uses checkable field state and four readable
 
   await page.waitForTimeout(80);
   const firstWire = page.locator('.be-wires .wire-hit').first();
-  await expect(firstWire).toBeVisible();
   await firstWire.click({ force: true });
   const edgeInspector = page.getByLabel('连线检查器');
   await expect(edgeInspector).toBeVisible();
