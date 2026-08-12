@@ -195,6 +195,6 @@ test('desktop Costa Rica work graph uses checkable field state and four readable
   await page.getByLabel('离场前检查 输出 可继续的数据').click();
   await page.getByLabel('Metashape · 相机求解 输入 照片').click();
   await expect(hud).toContainText('三步完成');
-  await expect(hud).toContainText(/点云 \/ Gaussian/);
+  await expect(hud).toContainText('第一条采集链已经接通');
   await expect(hud.getByRole('link', { name: /返回章节选择/ })).toBeVisible();
 });
