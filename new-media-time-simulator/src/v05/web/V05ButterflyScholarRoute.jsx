@@ -21,27 +21,27 @@ import V05NarrativeStage from './V05NarrativeStage.jsx';
 import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-scholar.css';
 
-const STATE_KEY = 'nmas-special-butterfly-narrative-v1';
-const WORLD_KEY = 'nmas-special-butterfly-world-v1';
+const STATE_KEY = 'nmas-special-butterfly-narrative-v2';
+const WORLD_KEY = 'nmas-special-butterfly-world-v2';
 const nodeLabels = new Map(editorNodeDefinitions.map((item) => [item.id, item.label]));
 const researchById = new Map(butterflyResearchCards.map((item) => [item.id, item]));
 
 const emptyWorld = () => ({ unlockNodeIds: [], evidenceIds: [], methodIds: [], researchIds: [], threadIds: [], archiveEntryIds: [], achievementIds: [], qualitySignals: [], projectTags: [] });
 const unique = (values) => [...new Set(values.filter(Boolean))];
-const fullLoadNodes = new Set(['bs-01-invite', 'bs-02-arrival', 'bs-03-field', 'bs-05-public']);
+const fullLoadNodes = new Set(['bs-01-invite', 'bs-03-field', 'bs-05-public']);
 
 const metaByNode = {
-  'bs-01-invite': { kicker: 'SPECIAL 01 / VOICE MESSAGE', time: 'DAY -03 · 22:10', objective: '先听清楚这次合作要你做什么', pacing: [180, 'hold', 'hold'], holdChoices: true },
-  'bs-02-arrival': { kicker: 'SPECIAL 01 / ARRIVAL', time: 'DAY 01 · 14:20', objective: '先认识合作的人', pacing: [160, 'hold', 'hold'], holdChoices: true },
-  'bs-03-field': { kicker: 'FIELD / CAPTURE', time: 'DAY 02 · 09:40', objective: '把活体运动和静态空间拆开采集', pacing: [200, 'hold', 'hold'], holdChoices: true },
-  'bs-03b-audit': { kicker: 'FIELD / CHECK', time: 'DAY 02 · 16:50', objective: '离场前决定要不要补拍', pacing: [180, 'hold'], holdChoices: true },
-  'bs-04-process': { kicker: 'WORKBENCH / CAMERA SOLVE', time: 'DAY 02 · 22:35', objective: '先确认照片之间的相机关系', pacing: [180, 'hold'], holdChoices: true },
-  'bs-04x-failure': { kicker: 'WORKBENCH / FAILED BUILD', time: 'DAY 02 · 23:20', objective: '失败已经出现：决定修、留，还是把它带进作品', pacing: [160, 'hold'], holdChoices: true },
-  'bs-04a-represent': { kicker: 'WORKBENCH / REPRESENTATION', time: 'DAY 03 · 00:10', objective: '选一种适合作品的空间表示', pacing: [160, 'hold'], holdChoices: true },
-  'bs-04e-compose': { kicker: 'WORKBENCH / MAKE THE WORK', time: 'DAY 03 · 01:20', objective: '扫描结束以后，决定它怎么动', pacing: [160, 'hold'], holdChoices: true },
-  'bs-04f-authorship': { kicker: 'NETWORK / PEER MESSAGE', time: 'DAY 03 · 01:55', objective: '分清视觉母题、方法来源和数据来源', pacing: [180, 'hold', 'hold'], holdChoices: true },
-  'bs-04b-reveal': { kicker: 'NETWORK / ROLE CONFLICT', time: 'DAY 03 · 02:30', objective: '处理协作者同时也是评估者的角色冲突', pacing: [180, 'hold', 'hold'], holdChoices: true },
-  'bs-05-public': { kicker: 'PUBLIC TEST / ARCHIVE', time: 'DAY 06 · 19:00', objective: '把这次方法、失败和机构边界真正留下来', pacing: [180, 'hold', 'hold'], holdChoices: true }
+  'bs-01-invite': { kicker: 'SPECIAL 01 / VOICE MESSAGE', time: 'DAY -03 · 22:10', objective: '先听懂：对方到底邀请你来做什么', pacing: ['short', 'long', 'hold'], holdChoices: true },
+  'bs-02-arrival': { kicker: 'ARRIVAL / BRIEFING', time: 'DAY 01 · 14:20', objective: '先把人、现场和权限说清楚', pacing: ['short', 'beat', 'hold'], holdChoices: true },
+  'bs-03-field': { kicker: 'FIELD / CAPTURE', time: 'DAY 02 · 09:40', objective: '先观察，再决定什么东西该怎么采', pacing: ['short', 'long', 'hold'], holdChoices: true },
+  'bs-03b-audit': { kicker: 'FIELD / CHECK', time: 'DAY 02 · 16:50', objective: '离场前检查一次，决定要不要补拍', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04-process': { kicker: 'WORKBENCH / CAMERA SOLVE', time: 'DAY 02 · 22:35', objective: '先确认照片之间的相机关系', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04x-failure': { kicker: 'WORKBENCH / FAILED BUILD', time: 'DAY 02 · 23:20', objective: '失败已经出现：决定修、留，还是把它带进作品', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04a-represent': { kicker: 'WORKBENCH / REPRESENTATION', time: 'DAY 03 · 00:10', objective: '决定观众看到的是采样，还是连续空间外观', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04e-compose': { kicker: 'WORKBENCH / MAKE THE WORK', time: 'DAY 03 · 01:20', objective: '重建只是原料：现在决定它怎么动', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04f-authorship': { kicker: 'NETWORK / PEER FEEDBACK', time: 'DAY 03 · 01:55', objective: '分清视觉母题、方法来源和数据来源', pacing: ['short', 'long', 'hold'], holdChoices: true },
+  'bs-04b-reveal': { kicker: 'INSTITUTION / ROLE CONFLICT', time: 'DAY 03 · 02:30', objective: '处理协作者同时也是评估者的角色冲突', pacing: ['short', 'long', 'hold'], holdChoices: true },
+  'bs-05-public': { kicker: 'PUBLIC TEST / ARCHIVE', time: 'DAY 06 · 19:00', objective: '把这次方法、失败和机构边界真正留下来', pacing: ['short', 'beat', 'hold'], holdChoices: true }
 };
 
 const methodNames = {
@@ -90,6 +90,17 @@ function mergeWorld(current, effect = {}) {
 }
 function added(next, previous, key) { return (next[key] || []).filter((item) => !(previous[key] || []).includes(item)); }
 
+function projectSnapshot(state) {
+  const flags = new Set(state.flags || []);
+  const capture = flags.has('capture-relation-route') ? '运动 + 空间分开采集' : flags.has('capture-ethical-trace') ? '非侵入痕迹 / 寄主关系' : flags.has('capture-space-route') ? '样地空间优先' : '未决定';
+  const data = flags.has('field-recapture') ? '缺口已在现场补拍' : flags.has('capture-gap-debt') ? '已知缺口带回工作室' : '尚未离场检查';
+  const solve = flags.has('failure-used-as-form') ? '脆弱重建 / 断裂作为形式' : flags.has('solve-repaired') ? '失败版保留 / 可用版已修' : flags.has('forced-reconstruct-bad-solve') ? '错误重建已生成' : flags.has('diagnosed-camera-solve') ? '相机关系已检查' : '尚未处理';
+  const representation = flags.has('representation-pointcloud') ? '点云' : flags.has('representation-gaussian') ? 'Gaussian' : '未选择';
+  const motion = flags.has('motion-interactive-butterfly') ? '互动行为' : flags.has('motion-physics') ? '物理规则' : flags.has('motion-procedural') ? '程序化形变' : '未进入动画';
+  const publicState = flags.has('authorship-unresolved') ? '“为什么是蝴蝶”仍待反馈' : flags.has('authorship-system-shift') ? '蝴蝶从图像退为行为规则' : flags.has('authorship-attributed') ? '来源与差异已写清' : '未处理作者性';
+  return [['采集', capture], ['数据', data], ['重建', solve], ['作品', `${representation} / ${motion}`], ['公开', publicState]];
+}
+
 function TrainingInstrument({ nodeId, flags = [] }) {
   const has = new Set(flags);
   if (nodeId === 'bs-03b-audit') return <div className="bs-instrument audit"><header><small>离场前检查</small><strong>80 张照片</strong></header><div className="bs-readout"><span><b>重叠</b><i>有缺口</i></span><span><b>模糊</b><i>正常</i></span><span><b>曝光</b><i>后段变暗</i></span><span><b>视角</b><i>转角不足</i></span></div><p>现在补拍只要十分钟。回到工作室再发现缺口，代价会直接进入相机求解。</p></div>;
@@ -104,12 +115,13 @@ function TrainingInstrument({ nodeId, flags = [] }) {
   return null;
 }
 
-function MemoryPanel({ knownFacts, contradictions, world, collapsed, onToggle }) {
+function MemoryPanel({ knownFacts, contradictions, world, state, collapsed, onToggle }) {
   const learned = (world.researchIds || []).map((id) => researchById.get(id)).filter(Boolean);
   return <aside className={`bs-memory ${collapsed ? 'collapsed' : ''}`} aria-label="临时记忆与已知信息">
     <header><div><small>TEMP MEMORY</small><strong>已知信息</strong></div><button onClick={onToggle}>{collapsed ? '展开' : '收起'}</button></header>
     {!collapsed && <>
       <section><small>当前问题</small><p>{butterflyScholarIdentity.currentQuestion}</p></section>
+      <section className="bs-current-build"><small>CURRENT BUILD / 当前版本</small>{projectSnapshot(state).map(([label, value]) => <p key={label}><b>{label}</b><span>{value}</span></p>)}</section>
       <section><small>已经确认</small>{knownFacts.slice(-4).map((fact) => <p key={fact.id}><b>{fact.state === 'verified' || fact.state === 'revealed' ? '✓' : '·'}</b>{fact.label}</p>)}</section>
       {contradictions.length > 0 && <section className="warning"><small>还没解释清楚</small>{contradictions.slice(-2).map((fact) => <p key={fact.id}>? {fact.label}</p>)}</section>}
       <section><small>研究过</small>{learned.length ? learned.slice(-4).map((card) => <p key={card.id}>+ {card.title}</p>) : <p className="muted">还没有。遇到不懂的词，可以先点“研究”。</p>}</section>
@@ -132,34 +144,15 @@ function ResearchSheet({ card, learned, onRemember, onClose }) {
 function Ending({ state, world, blueprintHref, chaptersHref, onReset }) {
   const [openPanel, setOpenPanel] = useState('');
   const outcome = useMemo(() => deriveButterflyOutcome(state, world), [state, world]);
-  const carryover = [
-    `节点 ${world.unlockNodeIds?.length || 0}`,
-    `方法 ${world.methodIds?.length || 0}`,
-    `研究 ${world.researchIds?.length || 0}`,
-    `Evidence ${world.evidenceIds?.length || 0}`,
-    `成就 ${world.achievementIds?.length || 0}`
-  ];
-
+  const carryover = [`节点 ${world.unlockNodeIds?.length || 0}`, `方法 ${world.methodIds?.length || 0}`, `研究 ${world.researchIds?.length || 0}`, `Evidence ${world.evidenceIds?.length || 0}`, `成就 ${world.achievementIds?.length || 0}`];
   return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={chaptersHref}>章节选择</a></nav></header><section className="bs-ending">
     <div className="bs-ending-head"><div className="bs-seal"><span>SPECIAL 01</span><strong>COMPLETE</strong></div><div><small>CHAPTER ARCHIVED</small><h1>终于做完了。</h1><p>{outcome.headline}</p></div></div>
-
-    <section className="bs-public-result" aria-label="公开测试反馈">
-      <header><small>PUBLIC TEST / 这次真的发生了什么</small><strong>{outcome.summary}</strong></header>
-      <div className="bs-public-notes">{outcome.publicNotes.map((note) => <article key={note.speaker}><small>{note.speaker}</small><p>{note.text}</p></article>)}</div>
-    </section>
-
-    <section className="bs-archive-result" aria-label="本次章节归档">
-      <header><small>THIS RUN / ARCHIVE</small><strong>不是评分，是这次路线留下的东西</strong></header>
-      <div>{outcome.archiveLines.map((line) => <article key={line.label} data-state={line.state}><small>{line.label}</small><p>{line.value}</p><span>{line.state === 'open' ? '未解决' : line.state === 'learned' ? '已形成方法' : '已保留'}</span></article>)}</div>
-    </section>
-
+    <section className="bs-public-result" aria-label="公开测试反馈"><header><small>PUBLIC TEST / 这次真的发生了什么</small><strong>{outcome.summary}</strong></header><div className="bs-public-notes">{outcome.publicNotes.map((note) => <article key={note.speaker}><small>{note.speaker}</small><p>{note.text}</p></article>)}</div></section>
+    <section className="bs-archive-result" aria-label="本次章节归档"><header><small>THIS RUN / ARCHIVE</small><strong>不是评分，是这次路线留下的东西</strong></header><div>{outcome.archiveLines.map((line) => <article key={line.label} data-state={line.state}><small>{line.label}</small><p>{line.value}</p><span>{line.state === 'open' ? '未解决' : line.state === 'learned' ? '已形成方法' : '已保留'}</span></article>)}</div></section>
     {outcome.unresolved.length > 0 && <section className="bs-open-threads"><small>还没结束</small>{outcome.unresolved.map((item) => <p key={item}>→ {item}</p>)}</section>}
-
     <section className="bs-carryover"><small>带出 SPECIAL 01</small><div>{carryover.map((item) => <span key={item}>{item}</span>)}</div><p>这些不是本章专用分数。节点、方法、研究和 Evidence 会继续进入全局工作台与记录系统。</p></section>
-
     {openPanel === 'journal' && <div className="bs-project-log"><small>创作记录 / 私人归档</small><p>{outcome.journal}</p></div>}
     {openPanel === 'social' && <div className="bs-project-log public"><small>公开发布 / 草稿</small><p>{outcome.socialDraft}</p></div>}
-
     <div className="bs-ending-actions"><a className="primary" href={blueprintHref}>进入三步训练工作图</a><button onClick={() => setOpenPanel((value) => value === 'journal' ? '' : 'journal')}>{openPanel === 'journal' ? '收起创作记录' : '生成创作记录'}</button><button onClick={() => setOpenPanel((value) => value === 'social' ? '' : 'social')}>{openPanel === 'social' ? '收起公开草稿' : '生成公开发布草稿'}</button><a href={chaptersHref}>返回章节选择</a><button onClick={onReset}>重新游玩</button></div>
   </section></main>;
 }
@@ -174,11 +167,7 @@ export default function V05ButterflyScholarRoute() {
   const speaker = butterflyScholarNarrativePack.actors.find((item) => item.id === node?.speakerId);
   const knownFacts = useMemo(() => narrativeKnownFacts(state), [state]);
   const contradictions = useMemo(() => narrativeContradictions(state), [state]);
-  const stageNode = useMemo(() => node ? ({
-    ...node,
-    text: resolveButterflyNodeText(node.id, state.flags, node.text),
-    choices: node.choices.map((choice) => ({ ...choice, outcomeHint: butterflyChoiceOutcomeHints[choice.id] || choice.outcomeHint }))
-  }) : node, [node, state.flags]);
+  const stageNode = useMemo(() => node ? ({ ...node, text: resolveButterflyNodeText(node.id, state.flags, node.text), choices: node.choices.map((choice) => ({ ...choice, outcomeHint: butterflyChoiceOutcomeHints[choice.id] || choice.outcomeHint })) }) : node, [node, state.flags]);
   const blueprintHref = v05Href('lab=blueprint&preset=butterfly');
   const chaptersHref = v05Href('mode=career');
   const researchCards = (butterflyResearchByNode[node?.id] || []).map((id) => researchById.get(id)).filter(Boolean);
@@ -189,6 +178,12 @@ export default function V05ButterflyScholarRoute() {
     const effect = { researchIds: [card.id], unlockNodeIds: card.unlockNodeIds || [], methodIds: card.methodId ? [card.methodId] : [] };
     const next = mergeWorld(world, effect); persistWorld(next);
     emitGlobalFeedback({ kind: 'method', code: 'RESEARCHED', title: card.title, detail: card.short }); setActiveResearch(null);
+  }
+  function recordButterflyMoment() {
+    if ((world.evidenceIds || []).includes('ev-butterfly-two-second')) return;
+    const next = mergeWorld(world, { unlockNodeIds: ['butterfly-observation'], evidenceIds: ['ev-butterfly-two-second'], qualitySignals: ['behavior-noted-before-capture'] });
+    persistWorld(next);
+    emitGlobalFeedback({ kind: 'evidence', code: 'FIELD NOTE', title: '00:01.8 / 停留记录', detail: '蓝色个体停在寄主植物叶面约 1.8 秒，随后向画面右上离开。先记行为，不急着把它变成 3D。' });
   }
   function notifyWorldChanges(previous, next, choiceId) {
     const nodes = added(next, previous, 'unlockNodeIds'); const methods = added(next, previous, 'methodIds'); const evidence = added(next, previous, 'evidenceIds'); const achievements = added(next, previous, 'achievementIds');
@@ -210,10 +205,12 @@ export default function V05ButterflyScholarRoute() {
     const nextState = createNarrativeState(butterflyScholarNarrativePack); const nextWorld = emptyWorld(); localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); localStorage.setItem(WORLD_KEY, JSON.stringify(nextWorld)); setState(nextState); setWorld(nextWorld); setActiveResearch(null);
   }
 
-  if (!node) return <main className="bs-shell"><section className="bs-error"><h1>路线状态损坏</h1><button onClick={reset}>重置路线</button></section></main>;
+  if (!node || !stageNode) return <main className="bs-shell"><section className="bs-error"><h1>路线状态损坏</h1><button onClick={reset}>重置路线</button></section></main>;
   if (!node.choices.length) return <Ending state={state} world={world} blueprintHref={blueprintHref} chaptersHref={chaptersHref} onReset={reset}/>;
 
-  const minorActions = researchCards.map((card) => ({ id: card.id, label: `${(world.researchIds || []).includes(card.id) ? '复习' : '研究'}：${card.title}`, onClick: () => setActiveResearch(card) }));
+  const contextualActions = [];
+  if (node.id === 'bs-03-field' && !(world.evidenceIds || []).includes('ev-butterfly-two-second')) contextualActions.push({ id: 'field-note-two-second', label: '小操作：记下这 1.8 秒', onClick: recordButterflyMoment });
+  const minorActions = [...contextualActions, ...researchCards.map((card) => ({ id: card.id, label: `${(world.researchIds || []).includes(card.id) ? '复习' : '研究'}：${card.title}`, onClick: () => setActiveResearch(card) }))];
 
-  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={stageNode} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id} flags={state.flags}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
+  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={stageNode} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id} flags={state.flags}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} state={state} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
 }

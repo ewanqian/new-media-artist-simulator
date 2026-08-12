@@ -1,15 +1,16 @@
 import { test, expect } from '@playwright/test';
 
-const STATE_KEY = 'nmas-special-butterfly-narrative-v1';
+const STATE_KEY = 'nmas-special-butterfly-narrative-v2';
 
 async function clearRoute(page) {
   await page.evaluate(() => {
-    localStorage.removeItem('nmas-special-butterfly-narrative-v1');
-    localStorage.removeItem('nmas-special-butterfly-world-v1');
-    localStorage.removeItem('nmas-blueprint-editor-autosave-v2');
-    localStorage.removeItem('nmas-butterfly-training-complete-v1');
-    localStorage.removeItem('nmas-butterfly-training-complete-v2');
-    localStorage.removeItem('nmas-butterfly-training-complete-v3');
+    for (const key of [
+      'nmas-special-butterfly-narrative-v1', 'nmas-special-butterfly-world-v1',
+      'nmas-special-butterfly-narrative-v2', 'nmas-special-butterfly-world-v2',
+      'nmas-blueprint-editor-autosave-v2',
+      'nmas-butterfly-training-complete-v1', 'nmas-butterfly-training-complete-v2',
+      'nmas-butterfly-training-complete-v3', 'nmas-butterfly-training-complete-v4'
+    ]) localStorage.removeItem(key);
   });
 }
 
@@ -52,7 +53,7 @@ async function seedNode(page, currentNodeId, flags = []) {
   await page.reload({ waitUntil: 'networkidle' });
 }
 
-test('Butterfly Scholar browser smoke covers briefing, first meeting, research memory and Blueprint handoff', async ({ page, isMobile }) => {
+test('Butterfly Scholar browser smoke covers briefing, first meeting, research memory, visible consequences and Blueprint handoff', async ({ page, isMobile }) => {
   test.setTimeout(45000);
   await page.goto('/?core=v05', { waitUntil: 'networkidle' });
   await clearRoute(page);
@@ -71,18 +72,22 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await firstChoice.click();
   await dismissFeedback(page);
 
-  await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
-  await page.getByRole('button', { name: '进入场景' }).click();
-  await advanceUntil(page, page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/));
-  await expect(page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/)).toBeVisible();
+  const inesIntro = page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/);
+  await advanceUntil(page, inesIntro);
+  await expect(inesIntro).toBeVisible();
 
   await seedNode(page, 'bs-03-field');
+  const fieldNote = page.getByRole('button', { name: /小操作：记下这 1.8 秒/ });
+  await advanceUntil(page, fieldNote);
+  await fieldNote.click();
+  await dismissFeedback(page);
+  await expect(page.getByRole('button', { name: /小操作：记下这 1.8 秒/ })).toHaveCount(0);
+
   const researchButterfly = page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ });
-  await advanceUntil(page, researchButterfly);
   await researchButterfly.click();
   const butterflyDialog = page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ });
   await expect(butterflyDialog).toContainText('活体运动不适合硬做成静态摄影测量对象');
-  await expect(butterflyDialog).toContainText('运动记录');
+  await expect(butterflyDialog).toContainText('时间里的行为');
   await butterflyDialog.getByRole('button', { name: '记住这个方法' }).click();
   await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
@@ -91,11 +96,13 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await advanceUntil(page, page.getByText('76 / 80 张照片已定位', { exact: true }));
   await expect(page.getByText('76 / 80 张照片已定位', { exact: true })).toBeVisible();
   await expect(page.getByText(/补拍起作用了/)).toBeVisible();
+  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('缺口已在现场补拍');
 
   await seedNode(page, 'bs-04-process', ['capture-gap-debt']);
   await advanceUntil(page, page.getByText('61 / 80 张照片已定位', { exact: true }));
   await expect(page.getByText('61 / 80 张照片已定位', { exact: true })).toBeVisible();
   await expect(page.getByText(/白天没补的缺口晚上回来了/)).toBeVisible();
+  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('已知缺口带回工作室');
 
   await seedNode(page, 'bs-04x-failure', ['capture-gap-debt', 'forced-reconstruct-bad-solve']);
   const repairChoice = page.getByRole('button', { name: /保留失败版本，然后回去修相机求解/ });
@@ -108,6 +115,7 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 三步采集训练"]')).toBeVisible();
   const hud = page.getByLabel('蝴蝶学者训练任务');
   await expect(hud).toContainText('任务 1 / 3');
+  await expect(hud).toContainText('这条线传递：采集对象');
   await expect(hud).toContainText('【现场调查】右侧');
 
   if (isMobile) {
@@ -122,7 +130,7 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   }
 });
 
-test('desktop Butterfly lesson completes three real graph connections with explicit I/O', async ({ page, isMobile }) => {
+test('desktop Butterfly lesson completes three real graph connections and explains each data type', async ({ page, isMobile }) => {
   test.skip(isMobile, 'port-connection training is locked on desktop in this regression');
   await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
   await clearRoute(page);
@@ -130,18 +138,21 @@ test('desktop Butterfly lesson completes three real graph connections with expli
 
   const hud = page.getByLabel('蝴蝶学者训练任务');
   await expect(hud).toContainText('任务 1 / 3');
+  await expect(hud).toContainText('采集对象：寄主植物');
 
   await page.getByLabel('现场调查 输出 采集对象').click();
   await page.getByLabel('摄影测量采集 输入 要扫描的对象').click();
   await expect(hud).toContainText('任务 2 / 3');
+  await expect(hud).toContainText('照片序列');
 
   await page.getByLabel('摄影测量采集 输出 照片序列').click();
   await page.getByLabel('离场前检查 输入 照片 / 扫描').click();
   await expect(hud).toContainText('任务 3 / 3');
+  await expect(hud).toContainText('可用照片');
 
   await page.getByLabel('离场前检查 输出 可继续的数据').click();
   await page.getByLabel('Metashape · 相机求解 输入 照片').click();
   await expect(hud).toContainText('三步完成');
-  await expect(hud).toContainText(/点云 \/ Gaussian \/ Blender/);
+  await expect(hud).toContainText(/点云 \/ Gaussian/);
   await expect(hud.getByRole('link', { name: /返回章节选择/ })).toBeVisible();
 });

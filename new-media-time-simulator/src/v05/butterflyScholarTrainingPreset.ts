@@ -1,4 +1,4 @@
-export const BUTTERFLY_TRAINING_BLUEPRINT_ID = 'bp-butterfly-scholar-training-v3';
+export const BUTTERFLY_TRAINING_BLUEPRINT_ID = 'bp-butterfly-scholar-training-v4';
 
 export const BUTTERFLY_TRAINING_ALLOWED_NODES = [
   'field-capture-session',
@@ -13,7 +13,8 @@ export const BUTTERFLY_TRAINING_OBJECTIVES = [
   {
     id: 'field-to-capture',
     title: '把现场调查交给摄影测量',
-    why: '先告诉采集节点“你到底要扫什么”。没有明确对象，后面只会得到一堆互不相关的素材。',
+    dataType: '采集对象：寄主植物 + 周围小片空间',
+    why: '这条线不是“启动下一个软件”。它是在告诉摄影测量节点：这次到底要采什么对象。',
     from: ['field-capture-session'],
     to: ['capture-photo-sequence'],
     fromLabel: '现场调查',
@@ -24,7 +25,8 @@ export const BUTTERFLY_TRAINING_OBJECTIVES = [
   {
     id: 'capture-to-check',
     title: '让照片先经过离场检查',
-    why: '检查漏拍、模糊和曝光变化。现场能补的问题，不要留到工作室。',
+    dataType: '照片序列：有重叠的现场照片',
+    why: '这里传的是刚拍完的照片。先检查漏拍、模糊和曝光变化；现场能补的问题，不要留到工作室。',
     from: ['capture-photo-sequence'],
     to: ['capture-quality-check'],
     fromLabel: '摄影测量采集',
@@ -35,7 +37,8 @@ export const BUTTERFLY_TRAINING_OBJECTIVES = [
   {
     id: 'check-to-solve',
     title: '把可用照片送进相机求解',
-    why: 'Metashape 先算出每张照片从哪里拍的。相机关系可靠以后，才轮到点云或 Gaussian。',
+    dataType: '可用照片：已排除明显缺口后的采集结果',
+    why: 'Metashape 先算每张照片从哪里拍的。相机关系可靠以后，才轮到点云或 Gaussian。',
     from: ['capture-quality-check'],
     to: ['process-metashape-align'],
     fromLabel: '离场前检查',
@@ -50,7 +53,7 @@ export function buildButterflyScholarTrainingPreset() {
     schema: 'nmas-blueprint-v1' as const,
     id: BUTTERFLY_TRAINING_BLUEPRINT_ID,
     title: '哥斯达黎加的蝴蝶学者 / 三步采集训练',
-    revision: 3,
+    revision: 4,
     tutorialId: 'butterfly-capture-01',
     nodes: [
       { id: 'bt0', definitionId: 'field-capture-session', x: 60, y: 160, params: { location: '云雾林样地 A', question: '先扫描寄主植物和它周围的小片空间', weather: '风小 / 散射光' } },
@@ -62,6 +65,6 @@ export function buildButterflyScholarTrainingPreset() {
     ],
     edges: [],
     groups: [],
-    notes: ['只完成三条线：现场调查 → 摄影测量采集 → 离场前检查 → 相机求解。完成以后，再自由选择点云或 Gaussian；Blender 等创作节点在后续内容里解锁。']
+    notes: ['只完成三条数据流：采集对象 → 照片序列 → 可用照片 → 相机位置。完成以后，再自由选择点云或 Gaussian；Blender 等创作节点在后续内容里解锁。']
   };
 }
