@@ -29,26 +29,26 @@ async function advanceUntil(page, target) {
     if (await enter.isVisible().catch(() => false)) { await enter.click(); continue; }
     const next = page.getByRole('button', { name: '继续', exact: true });
     if (await next.isVisible().catch(() => false)) { await next.click(); continue; }
-    const decide = page.getByRole('button', { name: '做决定', exact: true });
-    if (await decide.isVisible().catch(() => false)) { await decide.click(); continue; }
+    const early = page.getByRole('button', { name: '提前看选择', exact: true });
+    if (await early.isVisible().catch(() => false)) { await early.click(); continue; }
     await page.waitForTimeout(120);
   }
   await expect(target).toBeVisible({ timeout: 3000 });
 }
 
-async function seedNode(page, currentNodeId) {
-  await page.evaluate(([key, nodeId]) => {
+async function seedNode(page, currentNodeId, flags = []) {
+  await page.evaluate(([key, nodeId, stateFlags]) => {
     localStorage.setItem(key, JSON.stringify({
       packId: 'narrative-butterfly-scholar-v3',
       currentNodeId: nodeId,
       visitedNodeIds: [],
-      flags: [],
+      flags: stateFlags,
       facts: [],
       memories: [],
       trust: {},
       history: []
     }));
-  }, [STATE_KEY, currentNodeId]);
+  }, [STATE_KEY, currentNodeId, flags]);
   await page.reload({ waitUntil: 'networkidle' });
 }
 
@@ -65,15 +65,16 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
-  const firstChoice = page.getByRole('button', { name: /先写下我真正想弄明白的问题/ });
+  const firstChoice = page.getByRole('button', { name: /接。先写下一个问题再出发/ });
   await advanceUntil(page, firstChoice);
+  await expect(firstChoice).toContainText('影响：项目方向');
   await firstChoice.click();
   await dismissFeedback(page);
 
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await page.getByRole('button', { name: '进入场景' }).click();
-  await advanceUntil(page, page.getByText(/我是 Inés，负责这次驻地和研究站之间的协调/));
-  await expect(page.getByText(/我是 Inés，负责这次驻地和研究站之间的协调/)).toBeVisible();
+  await advanceUntil(page, page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/));
+  await expect(page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/)).toBeVisible();
 
   await seedNode(page, 'bs-03-field');
   const researchButterfly = page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ });
@@ -86,11 +87,22 @@ test('Butterfly Scholar browser smoke covers briefing, first meeting, research m
   await dismissFeedback(page);
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
 
-  await seedNode(page, 'bs-04-process');
-  const researchSolve = page.getByRole('button', { name: /研究：什么是相机求解/ });
-  await advanceUntil(page, researchSolve);
-  await researchSolve.click();
-  await expect(page.getByRole('dialog', { name: /研究：什么是相机求解/ })).toContainText('先算出每张照片是从哪里拍的');
+  await seedNode(page, 'bs-04-process', ['field-recapture']);
+  await advanceUntil(page, page.getByText('76 / 80 张照片已定位', { exact: true }));
+  await expect(page.getByText('76 / 80 张照片已定位', { exact: true })).toBeVisible();
+  await expect(page.getByText(/补拍起作用了/)).toBeVisible();
+
+  await seedNode(page, 'bs-04-process', ['capture-gap-debt']);
+  await advanceUntil(page, page.getByText('61 / 80 张照片已定位', { exact: true }));
+  await expect(page.getByText('61 / 80 张照片已定位', { exact: true })).toBeVisible();
+  await expect(page.getByText(/白天没补的缺口晚上回来了/)).toBeVisible();
+
+  await seedNode(page, 'bs-04x-failure', ['capture-gap-debt', 'forced-reconstruct-bad-solve']);
+  const repairChoice = page.getByRole('button', { name: /保留失败版本，然后回去修相机求解/ });
+  await advanceUntil(page, repairChoice);
+  await expect(page.getByText('FAIL_01', { exact: true })).toBeVisible();
+  await expect(repairChoice).toContainText('失败版本留作 Evidence');
+  await expect(page.getByRole('button', { name: /不修干净，把断裂本身带进作品/ })).toContainText('技术脆弱性不会被自动消除');
 
   await page.goto('/?core=v05&lab=blueprint&preset=butterfly', { waitUntil: 'networkidle' });
   await expect(page.locator('input[value="哥斯达黎加的蝴蝶学者 / 三步采集训练"]')).toBeVisible();
