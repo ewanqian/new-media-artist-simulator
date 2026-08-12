@@ -48,10 +48,14 @@ test('EP00 turns a scan choice into a three-node work graph, archive, and career
   await page.waitForURL(/lab=blueprint.*preset=ep00.*capture=scan/);
 
   const hud = page.getByLabel('EP00 工作图训练');
+  const canvasNodes = page.locator('.be-node');
   await expect(hud).toBeVisible();
-  await expect(page.locator('.be-node')).toHaveCount(3);
-  await expect(page.getByText('照片素材', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('声音素材', { exact: true })).toHaveCount(0);
+  await expect(canvasNodes).toHaveCount(3);
+  await expect(canvasNodes.filter({ hasText: '空间采集' })).toHaveCount(1);
+  await expect(canvasNodes.filter({ hasText: '空间重建' })).toHaveCount(1);
+  await expect(canvasNodes.filter({ hasText: '三维场景' })).toHaveCount(1);
+  await expect(canvasNodes.filter({ hasText: '照片素材' })).toHaveCount(0);
+  await expect(canvasNodes.filter({ hasText: '声音素材' })).toHaveCount(0);
 
   await page.getByLabel('空间采集 输出 空间数据').click();
   await page.getByLabel('空间重建 输入 空间数据').click();
