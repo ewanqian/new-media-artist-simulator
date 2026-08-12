@@ -24,6 +24,7 @@ import {
   deriveCostaRicaRouteStages,
   emphasizeChoiceHint
 } from '../costaRicaRouteState.ts';
+import { buildCostaRicaCarryover, persistSpecialCarryover } from '../specialCarryover.ts';
 import V05NarrativeStage from './V05NarrativeStage.jsx';
 import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-scholar.css';
@@ -236,7 +237,16 @@ export default function V05ButterflyScholarRoute() {
     const baseEffect = butterflyWorldEffectsByChoice[choice.id] || {};
     const contextualEffect = deriveButterflyWorldEffect(state.flags, choice.id);
     const nextWorld = mergeWorld(mergeWorld(world, baseEffect), contextualEffect);
-    localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); persistWorld(nextWorld); notifyWorldChanges(world, nextWorld, choice.id); setState(nextState); window.scrollTo({ top: 0, behavior: 'instant' });
+    localStorage.setItem(STATE_KEY, JSON.stringify(nextState));
+    persistWorld(nextWorld);
+    notifyWorldChanges(world, nextWorld, choice.id);
+    if ((nextState.flags || []).includes('butterfly-route-complete')) {
+      const carryover = buildCostaRicaCarryover(nextState, nextWorld);
+      persistSpecialCarryover(carryover);
+      emitGlobalFeedback({ kind: 'achievement', code: 'CARRYOVER', title: '哥斯达黎加 / 已进入长期生涯', detail: `${carryover.assetIds.length} 个 Assets · ${carryover.methodIds.length} 个方法 · ${carryover.mementoIds.length} 件纪念碎片现在可以被后续任务调用。` });
+    }
+    setState(nextState);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function reset() {
     const nextState = createNarrativeState(butterflyScholarNarrativePack); const nextWorld = emptyWorld();
