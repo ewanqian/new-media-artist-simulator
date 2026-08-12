@@ -5,15 +5,35 @@ import {
   BUTTERFLY_TRAINING_ALLOWED_NODES,
   BUTTERFLY_TRAINING_BLUEPRINT_ID
 } from '../butterflyScholarTrainingPreset.ts';
+import { EP00_STATE_KEY, ep00CaptureById } from '../ep00Onboarding.ts';
+import { buildEp00TrainingPreset, EP00_ALLOWED_NODES_BY_CAPTURE, EP00_BLUEPRINT_ID } from '../ep00Nodes.ts';
 import V05BlueprintEditorV2 from './V05BlueprintEditorV2.jsx';
 import V05ButterflyTrainingHUD from './V05ButterflyTrainingHUD.jsx';
+import V05Ep00TrainingHUD from './V05Ep00TrainingHUD.jsx';
 
 const AUTOSAVE_KEY = 'nmas-blueprint-editor-autosave-v2';
 const RELATION_LABELS = { signal: '数据线', physical: '步骤线', dependency: '条件线', concept: '引用线' };
 
-function isCostaRicaPreset() {
-  const preset = new URLSearchParams(window.location.search).get('preset');
-  return preset === 'costarica' || preset === 'butterfly';
+function requestedPreset() {
+  return new URLSearchParams(window.location.search).get('preset');
+}
+
+function trainingKind() {
+  const preset = requestedPreset();
+  if (preset === 'costarica' || preset === 'butterfly') return 'costarica';
+  if (preset === 'ep00') return 'ep00';
+  return null;
+}
+
+function readEp00Capture() {
+  const query = new URLSearchParams(window.location.search).get('capture');
+  if (query) return ep00CaptureById(query).id;
+  try {
+    const state = JSON.parse(localStorage.getItem(EP00_STATE_KEY) || 'null');
+    return ep00CaptureById(state?.capture).id;
+  } catch {
+    return 'photo';
+  }
 }
 
 function augmentFieldChecklist() {
@@ -28,33 +48,57 @@ function augmentFieldChecklist() {
   if (additions.length) field.params = [...(field.params || []), ...additions];
 }
 
-function loadRequestedPreset() {
-  if (!isCostaRicaPreset()) return;
-  augmentFieldChecklist();
+function loadRequestedPreset(kind) {
+  if (!kind) return;
+  if (kind === 'costarica') {
+    augmentFieldChecklist();
+    try {
+      const current = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
+      if (current?.id === BUTTERFLY_TRAINING_BLUEPRINT_ID && Number(current.revision || 0) >= 5) return;
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
+    } catch {
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
+    }
+    return;
+  }
+
+  const capture = readEp00Capture();
   try {
     const current = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
-    if (current?.id === BUTTERFLY_TRAINING_BLUEPRINT_ID && Number(current.revision || 0) >= 5) return;
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
+    const captureMatches = current?.notes?.includes?.(`EP00_CAPTURE:${capture}`);
+    if (current?.id === EP00_BLUEPRINT_ID && captureMatches) return;
+    const preset = buildEp00TrainingPreset(capture);
+    preset.notes = [...(preset.notes || []), `EP00_CAPTURE:${capture}`];
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(preset));
   } catch {
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildButterflyScholarTrainingPreset()));
+    const preset = buildEp00TrainingPreset(capture);
+    preset.notes = [...(preset.notes || []), `EP00_CAPTURE:${capture}`];
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(preset));
   }
 }
 
-function careerHref() {
+function destinationHref(kind) {
   const params = new URLSearchParams(window.location.search);
   const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/');
-  return rootPreview ? './?core=v05&mode=career' : './?mode=career';
+  const mode = kind === 'ep00' ? 'ep00' : 'career';
+  return rootPreview ? `./?core=v05&mode=${mode}` : `./?mode=${mode}`;
 }
 
 export default function V05BlueprintEditor() {
-  const trainingMode = isCostaRicaPreset();
-  loadRequestedPreset();
+  const kind = trainingKind();
+  const ep00Capture = kind === 'ep00' ? readEp00Capture() : null;
+  loadRequestedPreset(kind);
 
   useEffect(() => {
     let nodePointerActive = false;
     let releaseTimer = null;
     const mobileTabs = () => document.querySelector('.be-mobile-tabs');
-    const allowedLabels = trainingMode ? new Set(BUTTERFLY_TRAINING_ALLOWED_NODES.map((id) => editorNodeById.get(id)?.label).filter(Boolean)) : null;
+    const allowedNodeIds = kind === 'costarica'
+      ? BUTTERFLY_TRAINING_ALLOWED_NODES
+      : kind === 'ep00' && ep00Capture
+        ? EP00_ALLOWED_NODES_BY_CAPTURE[ep00Capture]
+        : null;
+    const allowedLabels = allowedNodeIds ? new Set(allowedNodeIds.map((id) => editorNodeById.get(id)?.label).filter(Boolean)) : null;
 
     const refreshEditorChrome = () => {
       const input = document.getElementById('be-import-code');
@@ -76,11 +120,13 @@ export default function V05BlueprintEditor() {
       });
       document.querySelectorAll('.be-inspector .be-hint').forEach((hint) => {
         if (!hint.closest('.be-inspector')?.querySelector('.be-edge-types')) return;
-        const copy = '连接不是一根万能线：数据线传资料，步骤线表达工序，条件线表达前提，引用线表达知识、来源或方法关系。';
+        const copy = kind === 'ep00'
+          ? 'EP00 先只学数据线：材料从输入经过处理，到达输出。后面的章节才会逐渐加入步骤线、条件线和引用线。'
+          : '连接不是一根万能线：数据线传资料，步骤线表达工序，条件线表达前提，引用线表达知识、来源或方法关系。';
         if (hint.textContent !== copy) hint.textContent = copy;
       });
 
-      if (trainingMode && allowedLabels) {
+      if (kind && allowedLabels) {
         document.querySelectorAll('.be-library button,.be-palette button').forEach((button) => {
           const label = button.querySelector('b,strong')?.textContent?.trim();
           if (!label) return;
@@ -88,7 +134,8 @@ export default function V05BlueprintEditor() {
           if (button.style.display !== display) button.style.display = display;
         });
         const returnLink = [...document.querySelectorAll('.be-topbar nav a')].find((link) => link.textContent?.trim() === '返回');
-        if (returnLink && returnLink.getAttribute('href') !== careerHref()) returnLink.setAttribute('href', careerHref());
+        const destination = destinationHref(kind);
+        if (returnLink && returnLink.getAttribute('href') !== destination) returnLink.setAttribute('href', destination);
       }
     };
 
@@ -129,7 +176,7 @@ export default function V05BlueprintEditor() {
       window.removeEventListener('pointerup', releaseNodePointer, true);
       window.removeEventListener('pointercancel', releaseNodePointer, true);
     };
-  }, [trainingMode]);
+  }, [kind, ep00Capture]);
 
-  return <>{trainingMode && <V05ButterflyTrainingHUD />}<V05BlueprintEditorV2 /></>;
+  return <>{kind === 'costarica' && <V05ButterflyTrainingHUD />}{kind === 'ep00' && <V05Ep00TrainingHUD />}<V05BlueprintEditorV2 /></>;
 }
