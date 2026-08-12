@@ -68,7 +68,8 @@ test('Costa Rica chapter covers invitation, route state, knowledge, assets, cons
   await costaRicaChapter.click();
   await page.waitForURL(/core=v05.*mode=costarica|mode=costarica/);
 
-  await expect(page.getByText('SPECIAL 01 · COSTA RICA', { exact: true })).toBeVisible();
+  await expect(page.locator('.bs-topbar')).toContainText('SPECIAL 01 · COSTA RICA');
+  await expect(page.locator('.bs-topbar')).toContainText('哥斯达黎加');
   await expect(page.getByLabel('哥斯达黎加任务进度')).toContainText('等待确认是否出发');
   await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
   await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
@@ -168,9 +169,12 @@ test('desktop Costa Rica work graph uses checkable field state and four readable
   await page.getByLabel('摄影测量采集 输入 要扫描的对象').click();
   await expect(hud).toContainText('任务 2 / 3');
 
+  await page.waitForTimeout(80);
   const firstWire = page.locator('.be-wires .wire-hit').first();
+  await expect(firstWire).toBeVisible();
   await firstWire.click({ force: true });
   const edgeInspector = page.getByLabel('连线检查器');
+  await expect(edgeInspector).toBeVisible();
   await expect(edgeInspector.getByRole('button', { name: '数据线' })).toBeVisible();
   await expect(edgeInspector.getByRole('button', { name: '步骤线' })).toBeVisible();
   await expect(edgeInspector.getByRole('button', { name: '条件线' })).toBeVisible();
