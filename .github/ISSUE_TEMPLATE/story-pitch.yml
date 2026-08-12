@@ -1,0 +1,83 @@
+name: 剧情 / 行业故事提案
+description: 把业内经验、技术事故、争议或小物件提案成可玩的《新媒体艺术家模拟器》内容
+title: "[故事提案] "
+labels: ["content-pitch"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        不需要写完整剧本。重点是把一个真实或典型的新媒体艺术情境说明白：玩家要判断什么、后果留下什么、以后还能怎么被再次调用。
+  - type: dropdown
+    id: source
+    attributes:
+      label: 来源层级
+      options:
+        - A / PUBLIC：有公开新闻、论文、采访、作品或软件文档
+        - B / FIRST-HAND：本人亲历或直接参与，可匿名化
+        - C / HEARSAY：二手听闻，只适合作为游戏里的传闻层
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 这更像哪类内容？
+      multiple: true
+      options:
+        - 业内故事 / 人物关系
+        - 制作事故 / 技术问题
+        - 工作方法 / 技巧
+        - 艺术史 / 媒介史
+        - 署名 / 借鉴 / 抄袭争议
+        - 机构 / 商业 / 权力关系
+        - 小物件 / 纪念品 / 记忆碎片
+        - 黑色幽默 / 荒诞瞬间
+    validations:
+      required: true
+  - type: textarea
+    id: event
+    attributes:
+      label: 发生了什么？
+      description: 100–500 字即可。真实人物与机构可以直接匿名化。
+      placeholder: "例如：撤展前两小时，策展人突然要求把一个原本离线运行的作品接入公网……"
+    validations:
+      required: true
+  - type: textarea
+    id: insider
+    attributes:
+      label: 为什么这个点值得做进游戏？
+      description: 哪个细节是业内人会立刻懂、外行玩完也能 get 到的？
+    validations:
+      required: true
+  - type: textarea
+    id: choices
+    attributes:
+      label: 玩家可以怎么选？
+      description: 最好给 2–3 个都说得通的选择，不必有标准答案。
+      placeholder: |
+        A. 当场改结构，承担稳定性风险
+        B. 拒绝临时需求，承担关系风险
+        C. 做一个降级版本，把限制写进作品说明
+    validations:
+      required: true
+  - type: textarea
+    id: consequences
+    attributes:
+      label: 这些选择应该留下什么？
+      description: 可以是关系、未解决线程、方法、知识、节点、Asset、失败版本、纪念品、后续机会。
+    validations:
+      required: true
+  - type: textarea
+    id: unlock
+    attributes:
+      label: 可以解锁什么？
+      description: 知识、节点、方法、材料、空间、行动、资产或纪念品都可以。
+  - type: textarea
+    id: callback
+    attributes:
+      label: 以后还能在哪里再次出现？
+      description: 日常任务、另一个项目、旧失败复发、机构回访、Remix 等。
+  - type: textarea
+    id: sources
+    attributes:
+      label: 公开出处 / 匿名化说明
+      description: A 类请给出处；B/C 类可说明哪些信息需要匿名化。不要提交未经证实的真实个人指控。
