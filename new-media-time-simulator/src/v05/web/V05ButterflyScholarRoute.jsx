@@ -14,6 +14,7 @@ import {
   butterflyScholarNarrativePack,
   butterflyWorldEffectsByChoice
 } from '../butterflyScholarPack.ts';
+import { butterflyChoiceOutcomeHints, deriveButterflyOutcome } from '../butterflyScholarOutcome.ts';
 import V05NarrativeStage from './V05NarrativeStage.jsx';
 import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-scholar.css';
@@ -116,22 +117,38 @@ function ResearchSheet({ card, learned, onRemember, onClose }) {
   </div>;
 }
 
-function Ending({ state, blueprintHref, chaptersHref, onReset }) {
-  const [showLog, setShowLog] = useState(false);
-  const learned = [];
-  if (state.flags.includes('capture-relation-route')) learned.push('活蝴蝶的运动和植物/空间要分开采，再重新组合');
-  if (state.flags.includes('field-recapture')) learned.push('离场前检查能直接避免后面很多失败');
-  if (state.flags.includes('diagnosed-camera-solve')) learned.push('先看相机求解，再决定点云或 Gaussian');
-  if (state.flags.includes('motion-procedural')) learned.push('扫描可以继续进入程序化动画');
-  if (state.flags.includes('motion-physics')) learned.push('运动规则可以来自真实物理');
-  if (state.flags.includes('motion-interactive-butterfly')) learned.push('蝴蝶可以从图像变成观众驱动的行为系统');
-  if (state.flags.includes('authorship-attributed') || state.flags.includes('authorship-system-shift')) learned.push('题材相同不等于抄袭，但具体来源和方法要说清楚');
+function Ending({ state, world, blueprintHref, chaptersHref, onReset }) {
+  const [openPanel, setOpenPanel] = useState('');
+  const outcome = useMemo(() => deriveButterflyOutcome(state, world), [state, world]);
+  const carryover = [
+    `节点 ${world.unlockNodeIds?.length || 0}`,
+    `方法 ${world.methodIds?.length || 0}`,
+    `研究 ${world.researchIds?.length || 0}`,
+    `Evidence ${world.evidenceIds?.length || 0}`,
+    `成就 ${world.achievementIds?.length || 0}`
+  ];
+
   return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={chaptersHref}>章节选择</a></nav></header><section className="bs-ending">
-    <div className="bs-seal"><span>SPECIAL 01</span><strong>COMPLETE</strong></div><small>CHAPTER ARCHIVED</small><h1>终于做完了。</h1>
-    <p>这次你留下的不只是一个扫描版本。你已经能说清楚哪些现场方法以后还会继续用。</p>
-    <ul>{(learned.length ? learned : ['把现场采集、重建和作品判断放进同一条工作流']).map((item) => <li key={item}>{item}</li>)}</ul>
-    {showLog && <div className="bs-project-log"><small>创作记录 / 草稿</small><p>这周在研究站做完了第一版。最重要的不是最后用了点云还是 Gaussian，而是我终于把“活体运动”和“空间扫描”拆开了：先记录蝴蝶怎么出现，再扫描植物和现场，最后才在 Blender / 实时系统里把它们重新组织。失败的相机求解和没有被公开的数据也一起留进了档案。</p></div>}
-    <div><a className="primary" href={blueprintHref}>进入三步训练工作图</a><button onClick={() => setShowLog((value) => !value)}>{showLog ? '收起创作记录' : '生成一条创作记录'}</button><a href={chaptersHref}>返回章节选择</a><button onClick={onReset}>重新游玩</button></div>
+    <div className="bs-ending-head"><div className="bs-seal"><span>SPECIAL 01</span><strong>COMPLETE</strong></div><div><small>CHAPTER ARCHIVED</small><h1>终于做完了。</h1><p>{outcome.headline}</p></div></div>
+
+    <section className="bs-public-result" aria-label="公开测试反馈">
+      <header><small>PUBLIC TEST / 这次真的发生了什么</small><strong>{outcome.summary}</strong></header>
+      <div className="bs-public-notes">{outcome.publicNotes.map((note) => <article key={note.speaker}><small>{note.speaker}</small><p>{note.text}</p></article>)}</div>
+    </section>
+
+    <section className="bs-archive-result" aria-label="本次章节归档">
+      <header><small>THIS RUN / ARCHIVE</small><strong>不是评分，是这次路线留下的东西</strong></header>
+      <div>{outcome.archiveLines.map((line) => <article key={line.label} data-state={line.state}><small>{line.label}</small><p>{line.value}</p><span>{line.state === 'open' ? '未解决' : line.state === 'learned' ? '已形成方法' : '已保留'}</span></article>)}</div>
+    </section>
+
+    {outcome.unresolved.length > 0 && <section className="bs-open-threads"><small>还没结束</small>{outcome.unresolved.map((item) => <p key={item}>→ {item}</p>)}</section>}
+
+    <section className="bs-carryover"><small>带出 SPECIAL 01</small><div>{carryover.map((item) => <span key={item}>{item}</span>)}</div><p>这些不是本章专用分数。节点、方法、研究和 Evidence 会继续进入全局工作台与记录系统。</p></section>
+
+    {openPanel === 'journal' && <div className="bs-project-log"><small>创作记录 / 私人归档</small><p>{outcome.journal}</p></div>}
+    {openPanel === 'social' && <div className="bs-project-log public"><small>公开发布 / 草稿</small><p>{outcome.socialDraft}</p></div>}
+
+    <div className="bs-ending-actions"><a className="primary" href={blueprintHref}>进入三步训练工作图</a><button onClick={() => setOpenPanel((value) => value === 'journal' ? '' : 'journal')}>{openPanel === 'journal' ? '收起创作记录' : '生成创作记录'}</button><button onClick={() => setOpenPanel((value) => value === 'social' ? '' : 'social')}>{openPanel === 'social' ? '收起公开草稿' : '生成公开发布草稿'}</button><a href={chaptersHref}>返回章节选择</a><button onClick={onReset}>重新游玩</button></div>
   </section></main>;
 }
 
@@ -145,6 +162,7 @@ export default function V05ButterflyScholarRoute() {
   const speaker = butterflyScholarNarrativePack.actors.find((item) => item.id === node?.speakerId);
   const knownFacts = useMemo(() => narrativeKnownFacts(state), [state]);
   const contradictions = useMemo(() => narrativeContradictions(state), [state]);
+  const stageNode = useMemo(() => node ? ({ ...node, choices: node.choices.map((choice) => ({ ...choice, outcomeHint: butterflyChoiceOutcomeHints[choice.id] || choice.outcomeHint })) }) : node, [node]);
   const blueprintHref = v05Href('lab=blueprint&preset=butterfly');
   const chaptersHref = v05Href('mode=career');
   const researchCards = (butterflyResearchByNode[node?.id] || []).map((id) => researchById.get(id)).filter(Boolean);
@@ -174,9 +192,9 @@ export default function V05ButterflyScholarRoute() {
   }
 
   if (!node) return <main className="bs-shell"><section className="bs-error"><h1>路线状态损坏</h1><button onClick={reset}>重置路线</button></section></main>;
-  if (!node.choices.length) return <Ending state={state} blueprintHref={blueprintHref} chaptersHref={chaptersHref} onReset={reset}/>;
+  if (!node.choices.length) return <Ending state={state} world={world} blueprintHref={blueprintHref} chaptersHref={chaptersHref} onReset={reset}/>;
 
   const minorActions = researchCards.map((card) => ({ id: card.id, label: `${(world.researchIds || []).includes(card.id) ? '复习' : '研究'}：${card.title}`, onClick: () => setActiveResearch(card) }));
 
-  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={node} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
+  return <main className="bs-shell"><header className="bs-topbar"><div><small>SPECIAL 01</small><strong>哥斯达黎加的蝴蝶学者</strong></div><nav><a href={blueprintHref}>工作图</a><a href={chaptersHref}>章节选择</a><button onClick={reset}>重置</button></nav></header><section className="bs-play"><div className="bs-main"><V05NarrativeStage contentKey={node.id} scene={scene} speaker={speaker} node={stageNode} meta={metaByNode[node.id]} showLoad={fullLoadNodes.has(node.id)} instrument={<TrainingInstrument nodeId={node.id}/>} minorActions={minorActions} onChoose={choose}/></div><MemoryPanel knownFacts={knownFacts} contradictions={contradictions} world={world} collapsed={memoryCollapsed} onToggle={() => setMemoryCollapsed((value) => !value)}/></section><ResearchSheet card={activeResearch} learned={activeResearch ? (world.researchIds || []).includes(activeResearch.id) : false} onRemember={rememberResearch} onClose={() => setActiveResearch(null)}/></main>;
 }
