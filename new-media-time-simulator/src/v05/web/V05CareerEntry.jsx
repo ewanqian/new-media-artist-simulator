@@ -9,6 +9,7 @@ import {
   resourcePackById
 } from '../careerContent.ts';
 import { buildAssessmentCareerProfile } from '../careerProfileRuntime.ts';
+import { mergeStoredSpecialCarryoversIntoCareer } from '../specialCarryover.ts';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
 import './v05-career-entry.css';
 
@@ -27,7 +28,7 @@ function v05Href(mode) {
 
 function seedCareerSave(profile) {
   const pack = resourcePackById(profile.resourcePackId);
-  return {
+  const save = {
     schema: 'triad-field-workbench-records-20260811', screen: 'play', week: 1,
     attention: 6, attentionMax: 6, cash: pack.cash, primaryLayer: 'workbench', fieldTab: 'places', workbenchTab: 'actions', recordsTab: 'quests',
     currentPlaceId: null, completedCardIds: [], visitedPlaceIds: [], discoveredContactIds: profile.knownNpcIds, contactThreads: {}, pendingReplies: [], receivedFeedbackCount: 0,
@@ -36,6 +37,7 @@ function seedCareerSave(profile) {
     seenEventIds: [], activeEventId: null, actionLog: [{ week: 1, type: '生涯', title: '档案建立', text: profile.firstProjectPrompt }],
     careerStageId: 'stage-1', careerEpisodeId: 'ep-01-runnable', careerProfileId: profile.id
   };
+  return mergeStoredSpecialCarryoversIntoCareer(save);
 }
 
 export default function V05CareerEntry() {
@@ -77,12 +79,12 @@ export default function V05CareerEntry() {
 
   if (phase === 'chapters') {
     return <main className="vc-shell"><section className="vc-panel vc-chapter-select">
-      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>主线生涯保存长期状态；特殊章节是独立训练与故事，目前不会自动修改主线存档。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
+      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>主线生涯保存长期状态；特殊章节是独立故事，但完成后得到的知识、Assets、方法和纪念品可以进入长期生涯。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
       <section className="vc-chapter-main">
         <div><small>MAIN CAREER</small><h2>新媒体艺术家生涯</h2><p>从第一个能运行的版本开始，经过现场、网络、方法沉淀与长期实践。当前主线从 Episode 01 开始。</p><div className="vc-tags"><span>EPISODE 01</span><span>第一个能被别人看见的版本</span></div></div>
         <div className="vc-chapter-actions">{existing.profile && existing.save ? <><a className="primary-link" href={v05Href('story')}>继续生涯 · 第 {existing.save.week || 1} 周</a><button onClick={() => setPhase('origin')}>新建生涯</button></> : <button className="primary" onClick={() => setPhase('origin')}>开始生涯</button>}</div>
       </section>
-      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩。章节里产生的知识、Assets 和纪念品将逐步接入长期生涯。</p></div>
+      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩。完成后产生的知识、Assets 和纪念品会进入长期生涯。</p></div>
       <div className="vc-chapters">
         <a href={v05Href('costarica')} className="vc-chapter-card featured"><small>SPECIAL 01 · RESIDENCY / TRAINING</small><strong>哥斯达黎加</strong><p>你确认一份海外驻地邀请，真正出发、进入样地、生成数据、回到临时工作室，再处理“做蝴蝶算抄袭吗？”这种业内人才会会心一笑的问题。</p><div className="vc-tags"><span>中美洲驻地</span><span>扫描 / 点云 / Gaussian</span><span>知识 → 节点 → Assets</span></div><span>进入章节 →</span></a>
         <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续章节继续复用同一套叙事演出、知识获取、节点训练、纪念品、Assets 与档案系统。</p></article>
