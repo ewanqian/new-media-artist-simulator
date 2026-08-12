@@ -102,7 +102,7 @@ export default function V05BlueprintEditor() {
     const onClickCapture = (event) => {
       if (!nodePointerActive) return;
       const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest('.be-node')) return;
+      if (target?.closest('.be-node,.be-wires')) return;
       if (target?.closest('.be-viewport')) event.stopPropagation();
     };
     const releaseNodePointer = () => {
