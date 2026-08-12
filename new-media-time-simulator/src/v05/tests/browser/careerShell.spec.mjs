@@ -8,7 +8,10 @@ async function clearCareer(page) {
       'nmas-v05-ui-settings',
       'nmas-blueprint-library-v2',
       'nmas-blueprint-editor-autosave-v2',
-      'nmas-special-carryovers-v1'
+      'nmas-special-carryovers-v1',
+      'nmas-ep00-onboarding-v1',
+      'nmas-ep00-blueprint-complete-v1',
+      'nmas-ep00-archive-v1'
     ]) localStorage.removeItem(key);
     for (const key of Object.keys(localStorage)) if (key.startsWith('nmas-career-intro-seen:')) localStorage.removeItem(key);
   });
@@ -16,8 +19,9 @@ async function clearCareer(page) {
 
 async function openNewCareer(page) {
   await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
-  await page.getByRole('button', { name: '开始生涯' }).click();
-  await expect(page.getByRole('heading', { name: '建立起步档案' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /开始 EP00/ })).toBeVisible();
+  await page.getByRole('button', { name: '跳过引导 · 高级开局' }).click();
+  await expect(page.getByRole('heading', { name: '跳过 EP00，建立起步档案' })).toBeVisible();
 }
 
 async function enterWeekOne(page) {
@@ -29,7 +33,7 @@ async function enterWeekOne(page) {
   await expect(page.getByLabel('生涯工具')).toBeVisible();
 }
 
-test('career preset creates a real starting dossier and seeds stage one', async ({ page }) => {
+test('advanced career preset still creates a real starting dossier and seeds stage one', async ({ page }) => {
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -56,7 +60,7 @@ test('career preset creates a real starting dossier and seeds stage one', async 
   await expect(page.getByLabel('生涯工具').getByRole('link', { name: '工作图' })).toHaveCount(0);
 });
 
-test('five-question role model reaches the same career shell without creating a class', async ({ page, isMobile }) => {
+test('five-question advanced start reaches the same career shell without creating a class', async ({ page, isMobile }) => {
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.reload({ waitUntil: 'networkidle' });
@@ -64,7 +68,7 @@ test('five-question role model reaches the same career shell without creating a 
   await page.getByRole('button', { name: /开始 5 题建模/ }).click();
 
   for (let index = 1; index <= 5; index += 1) {
-    await expect(page.getByText(`ROLE MODEL / ${index} OF 5`, { exact: true })).toBeVisible();
+    await expect(page.getByText(`ADVANCED START / ${index} OF 5`, { exact: true })).toBeVisible();
     await page.locator('.vc-options button').first().click();
   }
   await expect(page.getByRole('heading', { name: '制作环节怎么操作？' })).toBeVisible();
@@ -89,7 +93,7 @@ test('five-question role model reaches the same career shell without creating a 
   }
 });
 
-test('Costa Rica carryover enters a new career and becomes a reusable Stage 2 method', async ({ page }) => {
+test('Costa Rica carryover enters a new advanced career and becomes a reusable Stage 2 method', async ({ page }) => {
   await page.goto('/?core=v05&mode=career', { waitUntil: 'networkidle' });
   await clearCareer(page);
   await page.evaluate(() => {
