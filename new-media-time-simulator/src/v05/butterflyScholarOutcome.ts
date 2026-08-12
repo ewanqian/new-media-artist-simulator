@@ -34,6 +34,31 @@ export type ButterflyOutcome = {
   socialDraft: string;
 };
 
+export const butterflyChoiceOutcomeHints: Record<string, string> = {
+  'bs-go-question': '项目方向：先建立创作问题；不会锁定最终媒介',
+  'bs-go-open': '项目方向：保持媒介开放；现场之后再决定',
+  'bs-arrival-work': '关系：建立正常合作信任',
+  'bs-arrival-prior': '信息：留下一个关于 Inés 的未解线索',
+  'bs-capture-relation': '方法：获得双轨采集；解锁观察 / 视频 / 摄影测量相关节点',
+  'bs-capture-site': '方法：获得空间采集路线；蝴蝶行为留到后面处理',
+  'bs-capture-trace': '方法：强化非侵入式采集和材料伦理',
+  'bs-audit-recapture': '现场：改善覆盖；获得离场检查方法',
+  'bs-audit-leave': '现场：留下采集缺口；后面仍然可以继续',
+  'bs-align-diagnose': '技术：获得相机求解诊断方法',
+  'bs-align-force': '技术：保留失败重建；新增一个未解决问题',
+  'bs-represent-pointcloud': '作品方向：保留采样点、孔洞和扫描痕迹',
+  'bs-represent-gaussian': '作品方向：强调连续视角和空间外观',
+  'bs-compose-noise': '作品能力：解锁程序化动画方法',
+  'bs-compose-physics': '作品能力：解锁物理运动方法',
+  'bs-compose-interactive': '作品能力：解锁观众驱动行为；可能触发成就',
+  'bs-authorship-source': '作者性：来源说明进入档案；争议大幅收束',
+  'bs-authorship-system': '作者性：把题材转成行为系统；作品结构会改变',
+  'bs-authorship-defend': '作者性：争议保持开放；公开反馈会继续追问',
+  'bs-reveal-listen': '关系：保持开放；数据公开边界变清楚',
+  'bs-reveal-distance': '关系：项目继续；私人关系保持距离',
+  'bs-archive-open': '全局：归档方法 / Evidence / 成就，并保留未解决线程'
+};
+
 const threadNames: Record<string, string> = {
   'thread-ines-prior-work': 'Inés 为什么提前看过你的旧作品',
   'thread-capture-gap-debt': '现场采集仍有覆盖缺口',
