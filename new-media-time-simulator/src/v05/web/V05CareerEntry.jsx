@@ -8,6 +8,7 @@ import {
   profileFromPreset,
   resourcePackById
 } from '../careerContent.ts';
+import { learningEpisodes } from '../learningEpisodeCatalog.ts';
 import { buildAssessmentCareerProfile } from '../careerProfileRuntime.ts';
 import { mergeStoredSpecialCarryoversIntoCareer } from '../specialCarryover.ts';
 import V05SettingsPanel from './V05SettingsPanel.jsx';
@@ -18,6 +19,8 @@ const workModes = [
   { id: 'hybrid', code: 'HYBRID', title: '混合', note: '默认。剧情推进到制作节点时，可以打开工作图自己改。' },
   { id: 'blueprint', code: 'BLUEPRINT', title: '工作图优先', note: '项目关键节点默认使用工作图，但仍然共享同一套剧情和后果。' }
 ];
+
+const learningPreview = learningEpisodes.filter((item) => item.status === 'planned').slice(0, 3);
 
 function v05Href(mode) {
   const params = new URLSearchParams(window.location.search);
@@ -79,15 +82,22 @@ export default function V05CareerEntry() {
 
   if (phase === 'chapters') {
     return <main className="vc-shell"><section className="vc-panel vc-chapter-select">
-      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>主线生涯保存长期状态；特殊章节是独立故事，但完成后得到的知识、Assets、方法和纪念品可以进入长期生涯。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
+      <header className="vc-head"><div><small>PLAY / CHAPTER SELECT</small><h1>选择游玩内容</h1><p>章节不是独立小游戏。学到的知识、方法、节点、Assets 和记忆会回到同一份生涯里，之后继续使用。</p></div><div className="vc-head-actions"><a href={v05Href('home')}>首页</a><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
+
+      {!existing.profile && <section className="vc-chapter-main vc-onboarding-main">
+        <div><small>START HERE · EP00</small><h2>建立你的工作台</h2><p>第一次玩从这里开始。选一种观察方式，生成第一个 Asset，接通最小的 INPUT → PROCESS → OUTPUT 工作图，再留下第一份创作记录。</p><div className="vc-tags"><span>约 10 分钟</span><span>照片 / 扫描 / 声音三选一</span><span>3 节点 · 2 条线</span></div></div>
+        <div className="vc-chapter-actions"><a className="primary-link" href={v05Href('ep00')}>开始 EP00 →</a><button onClick={() => setPhase('origin')}>跳过引导 · 高级开局</button></div>
+      </section>}
+
       <section className="vc-chapter-main">
-        <div><small>MAIN CAREER</small><h2>新媒体艺术家生涯</h2><p>从第一个能运行的版本开始，经过现场、网络、方法沉淀与长期实践。当前主线从 Episode 01 开始。</p><div className="vc-tags"><span>EPISODE 01</span><span>第一个能被别人看见的版本</span></div></div>
-        <div className="vc-chapter-actions">{existing.profile && existing.save ? <><a className="primary-link" href={v05Href('story')}>继续生涯 · 第 {existing.save.week || 1} 周</a><button onClick={() => setPhase('origin')}>新建生涯</button></> : <button className="primary" onClick={() => setPhase('origin')}>开始生涯</button>}</div>
+        <div><small>MAIN CAREER</small><h2>新媒体艺术家生涯</h2><p>不是升级等级，而是不断积累可以再次调用的方法、关系、资料和失败经验。主线从第一个真正能被别人看到的版本开始。</p><div className="vc-tags"><span>EPISODE 01</span><span>FIELD → WORKBENCH → RECORDS</span></div></div>
+        <div className="vc-chapter-actions">{existing.profile && existing.save ? <><a className="primary-link" href={v05Href('story')}>继续生涯 · 第 {existing.save.week || 1} 周</a><a href={v05Href('ep00')}>重玩 EP00</a></> : <button onClick={() => setPhase('origin')}>直接建立高级档案</button>}</div>
       </section>
-      <div className="vc-section-head"><small>SPECIAL CHAPTERS</small><h2>特殊章节</h2><p>用独立章节学习一组新方法、节点或叙事机制；可以重复游玩。完成后产生的知识、Assets 和纪念品会进入长期生涯。</p></div>
+
+      <div className="vc-section-head"><small>EXPERIENTIAL CHAPTERS</small><h2>体验式学习章节</h2><p>不是看一场“大师传记”。玩家被放进一个真实媒介问题里，亲手重做一次关键决策；史料与人物谱系进入 Knowledge / Archive。</p></div>
       <div className="vc-chapters">
-        <a href={v05Href('costarica')} className="vc-chapter-card featured"><small>SPECIAL 01 · RESIDENCY / TRAINING</small><strong>哥斯达黎加</strong><p>你确认一份海外驻地邀请，真正出发、进入样地、生成数据、回到临时工作室，再处理“做蝴蝶算抄袭吗？”这种业内人才会会心一笑的问题。</p><div className="vc-tags"><span>中美洲驻地</span><span>扫描 / 点云 / Gaussian</span><span>知识 → 节点 → Assets</span></div><span>进入章节 →</span></a>
-        <article className="vc-chapter-card muted"><small>SPECIAL 02</small><strong>待加入</strong><p>后续章节继续复用同一套叙事演出、知识获取、节点训练、纪念品、Assets 与档案系统。</p></article>
+        <a href={v05Href('costarica')} className="vc-chapter-card featured"><small>SPECIAL 01 · RESIDENCY</small><strong>哥斯达黎加</strong><p>驻地、野外采集、摄影测量、Camera Solve、点云 / Gaussian、数据伦理与作者性，最后全部回到长期生涯。</p><div className="vc-tags"><span>扫描 / 重建</span><span>知识 → 节点 → Assets</span><span>可重复游玩</span></div><span>进入章节 →</span></a>
+        {learningPreview.map((episode) => <article className="vc-chapter-card muted" key={episode.id}><small>{episode.code} · {episode.format.toUpperCase()}</small><strong>{episode.title}</strong><p>{episode.subtitle}</p><div className="vc-tags">{episode.layers.map((layer) => <span key={layer}>{layer}</span>)}</div><span>开发中</span></article>)}
       </div>
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </section></main>;
@@ -95,11 +105,11 @@ export default function V05CareerEntry() {
 
   if (phase === 'assessment') {
     const question = careerAssessmentQuestions[questionIndex];
-    return <main className="vc-shell"><section className="vc-panel vc-question"><header><button className="vc-back" onClick={() => setPhase('origin')}>← 返回</button><small>ROLE MODEL / {questionIndex + 1} OF {careerAssessmentQuestions.length}</small><h1>{question.title}</h1><p>答案只决定起始资源、早期人物和事件权重，不锁职业。</p></header><div className="vc-options">{question.options.map((option) => <button key={option.id} onClick={() => chooseAnswer(option.id)}><strong>{option.label}</strong><span>{option.signals.join(' · ')}</span></button>)}</div></section></main>;
+    return <main className="vc-shell"><section className="vc-panel vc-question"><header><button className="vc-back" onClick={() => setPhase('origin')}>← 返回</button><small>ADVANCED START / {questionIndex + 1} OF {careerAssessmentQuestions.length}</small><h1>{question.title}</h1><p>这是跳过 EP00 的高级起点设置。答案只决定起始资源、早期人物和事件权重，不锁职业。</p></header><div className="vc-options">{question.options.map((option) => <button key={option.id} onClick={() => chooseAnswer(option.id)}><strong>{option.label}</strong><span>{option.signals.join(' · ')}</span></button>)}</div></section></main>;
   }
 
   if (phase === 'workmode') {
-    return <main className="vc-shell"><section className="vc-panel"><header className="vc-head"><div><button className="vc-back" onClick={() => setPhase(entryType === 'assessment' ? 'assessment' : 'origin')}>← 返回</button><small>PLAY STYLE</small><h1>制作环节怎么操作？</h1><p>三种方式共享同一份世界状态，之后可以在设置里改。</p></div></header><div className="vc-workmodes">{workModes.map((mode) => <button className={workMode === mode.id ? 'active' : ''} key={mode.id} onClick={() => setWorkMode(mode.id)}><small>{mode.code}</small><strong>{mode.title}</strong><span>{mode.note}</span></button>)}</div><div className="vc-actions"><button onClick={() => setPhase('confirm')} className="primary">查看起步档案</button></div></section></main>;
+    return <main className="vc-shell"><section className="vc-panel"><header className="vc-head"><div><button className="vc-back" onClick={() => setPhase(entryType === 'assessment' ? 'assessment' : 'origin')}>← 返回</button><small>ADVANCED START / PLAY STYLE</small><h1>制作环节怎么操作？</h1><p>三种方式共享同一份世界状态，之后可以在设置里改。</p></div></header><div className="vc-workmodes">{workModes.map((mode) => <button className={workMode === mode.id ? 'active' : ''} key={mode.id} onClick={() => setWorkMode(mode.id)}><small>{mode.code}</small><strong>{mode.title}</strong><span>{mode.note}</span></button>)}</div><div className="vc-actions"><button onClick={() => setPhase('confirm')} className="primary">查看起步档案</button></div></section></main>;
   }
 
   if (phase === 'confirm') {
@@ -108,10 +118,10 @@ export default function V05CareerEntry() {
 
   return (
     <main className="vc-shell"><section className="vc-panel">
-      <header className="vc-head"><div><button className="vc-back" onClick={() => setPhase('chapters')}>← 章节选择</button><small>NEW CAREER</small><h1>建立起步档案</h1><p>先决定从什么资源、关系和习惯开始。</p></div><div className="vc-head-actions"><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
-      <div className="vc-section-head"><small>QUICK START</small><h2>预置起点</h2><p>描述你现在的处境，不是永久职业。</p></div>
+      <header className="vc-head"><div><button className="vc-back" onClick={() => setPhase('chapters')}>← 章节选择</button><small>ADVANCED START</small><h1>跳过 EP00，建立起步档案</h1><p>适合已经理解 Assets / Knowledge / Work Graph 的玩家。这里描述当前处境，不创建永久职业。</p></div><div className="vc-head-actions"><button onClick={() => setSettingsOpen(true)}>设置</button></div></header>
+      <div className="vc-section-head"><small>QUICK START</small><h2>预置起点</h2><p>直接从一种现实处境进入主线。</p></div>
       <div className="vc-presets">{careerPresets.map((preset) => { const presetPack = careerResourcePacks.find((item) => item.id === preset.resourcePackId); return <button key={preset.id} onClick={() => startPreset(preset.id)}><small>{preset.signalTags.join(' / ')}</small><strong>{preset.title}</strong><p>{preset.summary}</p><span>{presetPack?.title}</span></button>; })}</div>
-      <div className="vc-assessment-call"><div><small>ROLE MODEL</small><strong>或者，用 5 题建模自己的起点</strong><p>问手上有什么、别人为什么找你、最怕什么失败、想先进入什么环境。</p></div><button onClick={startAssessment}>开始 5 题建模 →</button></div>
+      <div className="vc-assessment-call"><div><small>ADVANCED START</small><strong>或者，用 5 题描述自己的当前起点</strong><p>问手上有什么、别人为什么找你、最怕什么失败、想先进入什么环境。</p></div><button onClick={startAssessment}>开始 5 题建模 →</button></div>
       <V05SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)}/>
     </section></main>
   );
