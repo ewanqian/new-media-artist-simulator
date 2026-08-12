@@ -39,7 +39,7 @@ async function advanceUntil(page, target) {
 async function seedNode(page, currentNodeId, flags = []) {
   await page.evaluate(([key, nodeId, stateFlags]) => {
     localStorage.setItem(key, JSON.stringify({
-      packId: 'narrative-butterfly-scholar-v3',
+      packId: 'narrative-butterfly-scholar-v4',
       currentNodeId: nodeId,
       visitedNodeIds: [],
       flags: stateFlags,
