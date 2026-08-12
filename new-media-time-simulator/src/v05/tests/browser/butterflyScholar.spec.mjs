@@ -170,8 +170,8 @@ test('desktop Costa Rica work graph uses checkable field state and four readable
   await expect(hud).toContainText('任务 2 / 3');
 
   await page.waitForTimeout(80);
-  const firstWire = page.locator('.be-wires .wire-hit').first();
-  await firstWire.click({ force: true });
+  const firstWirePath = page.locator('.be-wire-control .wire').first();
+  await firstWirePath.click({ force: true });
   const edgeInspector = page.getByLabel('连线检查器');
   await expect(edgeInspector).toBeVisible();
   await expect(edgeInspector.getByRole('button', { name: '数据线' })).toBeVisible();
@@ -182,6 +182,10 @@ test('desktop Costa Rica work graph uses checkable field state and four readable
 
   await edgeInspector.getByRole('button', { name: '步骤线' }).click();
   await expect(edgeInspector.getByRole('button', { name: '步骤线' })).toHaveClass(/active/);
+  const semanticWire = page.getByRole('button', { name: /步骤线 ·/ }).first();
+  await semanticWire.evaluate((element) => element.focus());
+  await page.keyboard.press('Enter');
+  await expect(edgeInspector).toBeVisible();
   await edgeInspector.getByRole('button', { name: '数据线' }).click();
 
   await page.getByLabel('摄影测量采集 输出 照片序列').click();
