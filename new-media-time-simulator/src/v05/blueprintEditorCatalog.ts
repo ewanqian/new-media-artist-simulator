@@ -1,5 +1,6 @@
 import { blueprintNodeDefinitions } from './blueprintSystem.ts';
 import { butterflyScholarNodeDefinitions, buildButterflyScholarPreset } from './butterflyScholarNodes.ts';
+import { ep00NodeDefinitions } from './ep00Nodes.ts';
 
 export type EditorPortType = 'video' | 'audio' | 'data' | 'trigger' | 'control' | 'resource' | 'space' | 'concept' | 'power';
 export type EditorParamKind = 'number' | 'range' | 'text' | 'select' | 'toggle';
@@ -154,7 +155,8 @@ const productionDefinitions: EditorNodeDefinition[] = [
   }
 ];
 
-export const editorNodeDefinitions: EditorNodeDefinition[] = [...legacyDefinitions, ...productionDefinitions, ...butterflyScholarNodeDefinitions];
+const ep00Definitions = ep00NodeDefinitions as unknown as EditorNodeDefinition[];
+export const editorNodeDefinitions: EditorNodeDefinition[] = [...legacyDefinitions, ...productionDefinitions, ...butterflyScholarNodeDefinitions, ...ep00Definitions];
 export const editorNodeById = new Map(editorNodeDefinitions.map((item) => [item.id, item]));
 
 export const editorGroups: EditorNodeDefinition['group'][] = ['输入', '处理', '输出', '制作', '资源', '场域', '方法', '注释'];
