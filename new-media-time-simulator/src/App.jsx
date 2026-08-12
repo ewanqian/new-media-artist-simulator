@@ -27,6 +27,7 @@ const V05Home = lazy(() => import('./v05/web/V05Home.jsx'));
 const V05CareerEntry = lazy(() => import('./v05/web/V05CareerEntry.jsx'));
 const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
 const V05CostaRicaRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
+const V05Ep00Route = lazy(() => import('./v05/web/V05Ep00Route.jsx'));
 const STORAGE_KEY = 'new-media-time-simulator-save';
 
 function V05Frame({ children }) {
@@ -49,6 +50,11 @@ export default function App() {
   if (preview === 'v05' && (mode === 'costarica' || mode === 'butterfly')) {
     return (
       <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入哥斯达黎加驻地…</section></main>}><V05CostaRicaRoute /></Suspense></V05Frame>
+    );
+  }
+  if (preview === 'v05' && mode === 'ep00') {
+    return (
+      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在建立第一张工作台…</section></main>}><V05Ep00Route /></Suspense></V05Frame>
     );
   }
   if (preview === 'v05' && mode === 'career') {
