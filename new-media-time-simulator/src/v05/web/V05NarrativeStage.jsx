@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import './v05-narrative-stage.css';
 
 const DEFAULT_META = { kicker: 'EPISODE', time: '', objective: '', pacing: [], holdChoices: false };
+const PACING_MS = { short: 180, beat: 520, long: 980 };
+
+function resolvePace(value, fallback) {
+  if (value === 'hold') return 'hold';
+  if (typeof value === 'string' && PACING_MS[value]) return PACING_MS[value];
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
 
 export default function V05NarrativeStage(props) {
   return <NarrativeStageInner key={props.contentKey} {...props} />;
@@ -26,16 +34,25 @@ function NarrativeStageInner({
   useEffect(() => {
     if (phase !== 'dialogue' || visibleCount >= paragraphs.length) return;
     const pacing = Array.isArray(meta.pacing) ? meta.pacing : [];
-    const pace = pacing[visibleCount];
+    const fallback = visibleCount === 0 ? PACING_MS.short : PACING_MS.beat;
+    const pace = resolvePace(pacing[visibleCount], fallback);
     if (pace === 'hold') return;
-    const fallback = visibleCount === 0 ? 220 : 680;
-    const delay = Number(pace ?? fallback);
-    const timer = window.setTimeout(() => setVisibleCount((value) => Math.min(value + 1, paragraphs.length)), Math.max(100, delay));
+    const timer = window.setTimeout(
+      () => setVisibleCount((value) => Math.min(value + 1, paragraphs.length)),
+      Math.max(100, pace)
+    );
     return () => window.clearTimeout(timer);
   }, [phase, visibleCount, paragraphs.length, meta.pacing]);
 
   const done = visibleCount >= paragraphs.length;
   const locationLine = useMemo(() => [meta.time, scene?.location].filter(Boolean).join(' · '), [meta.time, scene?.location]);
+
+  useEffect(() => {
+    if (!done || choicesVisible || !node?.choices?.length) return;
+    const delay = Number(meta.choiceDelay ?? (meta.holdChoices ? 900 : 420));
+    const timer = window.setTimeout(() => setChoicesVisible(true), Math.max(180, delay));
+    return () => window.clearTimeout(timer);
+  }, [done, choicesVisible, node?.choices?.length, meta.choiceDelay, meta.holdChoices]);
 
   function revealNext() {
     if (phase === 'loading') {
@@ -92,7 +109,7 @@ function NarrativeStageInner({
         ))}
       </div>}
 
-      {done && !choicesVisible && node.choices.length > 0 && <button className="narrative-continue" onClick={() => setChoicesVisible(true)}>做决定</button>}
+      {done && !choicesVisible && node.choices.length > 0 && <button className="narrative-continue" onClick={() => setChoicesVisible(true)}>提前看选择</button>}
     </section>
   );
 }
