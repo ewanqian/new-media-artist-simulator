@@ -40,6 +40,7 @@ export type NarrativeChoice = {
   id: string;
   label: string;
   subtext?: string;
+  outcomeHint?: string;
   effects: NarrativeChoiceEffect;
   nextNodeId: string;
 };
