@@ -41,7 +41,7 @@ export default function App() {
   }
   if (preview === 'v05' && (mode === 'costarica' || mode === 'butterfly')) {
     return (
-      <V05Frame><Suspense fallback={<main className="app-shell"><section className="panel">正在载入哥斯达黎加驻地…</section></main>}><V05CostaRicaRoute /></Suspense></V05Frame>
+      <Suspense fallback={<main className="app-shell"><section className="panel">正在打开研究站的邀请…</section></main>}><V05CostaRicaRoute /></Suspense>
     );
   }
   if (preview === 'v05' && mode === 'ep00') {

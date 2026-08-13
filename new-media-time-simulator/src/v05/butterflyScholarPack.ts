@@ -100,51 +100,56 @@ export const butterflyScholarNarrativePack: NarrativePack = {
     { id: 'scene-public', title: '第一次公开版本', location: '研究站临时展厅', entryNodeId: 'bs-05-public', actorIds: ['player-butterfly-scholar', 'ines'], tags: ['public', 'archive'] }
   ],
   nodes: [
-    { id: 'bs-01-invite', sceneId: 'scene-studio', speakerId: 'field-lab', channel: 'message', text: ['晚上十点多，你收到 Bosque Field Lab 发来的一条 23 秒语音。', '“我们这里有几年蝴蝶观察、寄主植物记录和一些空间影像。想请你来一周，不是做宣传片，也没有规定必须做 VR。先看现场，再看这些材料能不能变成一件作品。”', '附件只有一页：住宿和样地权限由研究站提供；研究数据和个人观察记录，公开前要重新确认许可。'], choices: [
-      { id: 'bs-go-question', label: '接。先写下一个问题再出发', subtext: '蝴蝶一直在动——我要保存的是外形、运动，还是它和环境的关系？', effects: { setFlags: ['accepted-field-trip', 'question-before-trip'] }, nextNodeId: 'bs-02-arrival' },
-      { id: 'bs-go-open', label: '接。先去看现场，不提前定媒介', subtext: '不先决定做点云、Gaussian、VR 或屏幕。', effects: { setFlags: ['accepted-field-trip', 'open-medium'] }, nextNodeId: 'bs-02-arrival' }
+    { id: 'bs-01-invite', sceneId: 'scene-studio', speakerId: 'field-lab', channel: 'message', text: ['晚上十点，你收到一条语音。哥斯达黎加的一家研究站看过你去年做的植物网页，想请你去待一周。', '他们有蝴蝶观察、寄主植物照片和一片可以进入的样地。住宿和机票他们出；你做什么，还没定。', '明天中午前，要不要去？'], choices: [
+      { id: 'bs-go-question', label: '去。先写下自己想弄明白什么', subtext: '蝴蝶飞走以后，我到底想留下什么？', effects: { setFlags: ['accepted-field-trip', 'question-before-trip'] }, nextNodeId: 'bs-02-arrival' },
+      { id: 'bs-go-open', label: '去。先看现场再决定做什么', subtext: '先别在工作室里替一片森林做决定。', effects: { setFlags: ['accepted-field-trip', 'open-medium'] }, nextNodeId: 'bs-02-arrival' }
     ] },
-    { id: 'bs-02-arrival', sceneId: 'scene-arrival', speakerId: 'ines', channel: 'dialogue', text: ['Inés 在研究站门口接你，把门禁卡和一张样地地图递过来。', '“我是 Inés。这周交通、样地、植物档案和数据许可都找我。明天 Rojas 会带你走第一块样地。”', '她看了一眼你的项目简介：“你写自己是 butterfly scholar？”你说：“一半开玩笑。我会记录蝴蝶，但我通常扫描的是它周围的空间。”'], choices: [
+    { id: 'bs-02-arrival', sceneId: 'scene-arrival', speakerId: 'ines', channel: 'dialogue', text: ['研究站门口，一个人把门禁卡和样地地图递给你。', '“我叫 Inés，负责这周的交通、场地和资料许可。你想进哪块样地、哪些东西能公开，都先找我。”', '她指着地图：“明天技术员 Rojas 带你去第一块样地。今晚先决定，你最需要问清什么。”'], choices: [
       { id: 'bs-arrival-work', label: '先把明天的工作说清楚', subtext: '确认样地、能拍什么、能带走什么数据。', effects: { setFlags: ['ines-first-work'], trustDelta: { ines: 1 }, memories: [{ actorId: 'ines', about: 'first-meeting', value: '玩家先确认现场工作和数据边界', weight: 2 }] }, nextNodeId: 'bs-03-field' },
-      { id: 'bs-arrival-prior', label: '顺便问：你怎么知道我那件没怎么公开的旧作品？', subtext: '正常追问信息来源，不把第一次见面变成审问。', effects: { setFlags: ['ines-knows-prior-work'], trustDelta: { ines: 0 }, memories: [{ actorId: 'ines', about: 'first-meeting', value: '玩家注意到她对旧项目的信息来源不明', weight: 2 }] }, nextNodeId: 'bs-03-field' }
+      { id: 'bs-arrival-prior', label: '先问哪些资料不能公开', subtext: '能看到，不等于能带走，更不等于能发出去。', effects: { setFlags: ['ines-knows-prior-work'], trustDelta: { ines: 0 }, memories: [{ actorId: 'ines', about: 'first-meeting', value: '玩家先问资料公开边界', weight: 2 }] }, nextNodeId: 'bs-03-field' }
     ] },
-    { id: 'bs-03-field', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene', text: ['第二天早上，一只蓝色蝴蝶在寄主植物上停了不到两秒。你刚抬起相机，它已经飞到画面外。风一直在动叶片。', 'Rojas 看了一眼：“别把会飞的东西当成石膏像。蝴蝶记它怎么来、停在哪里、什么时候走；植物和这块空间，再做扫描。”', '这次采集第一次被拆成两种数据：一条发生在时间里，一条发生在空间里。'], choices: [
+    { id: 'bs-03-field', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene', text: ['第二天，研究站技术员 Rojas 带你进样地。一只蓝色蝴蝶停了不到两秒。你刚举起相机，它就飞了。', 'Rojas 说：“别追。记它从哪来、停在哪、往哪走。植物和小径不会飞，再慢慢拍。”', '风越来越大。你今天不可能什么都带走。'], choices: [
       { id: 'bs-capture-relation', label: '运动和空间分开采，最后再组合', subtext: '记录蝴蝶的停留/飞行 + 扫描寄主植物和周围空间。', effects: { setFlags: ['capture-relation-route'], factUpdates: [{ factId: 'fact-live-not-static', state: 'verified', sourceId: 'rojas' }], memories: [{ actorId: 'rojas', about: 'capture-plan', value: '把活体运动和静态空间拆成两套采集', weight: 3 }] }, nextNodeId: 'bs-03b-audit' },
       { id: 'bs-capture-site', label: '先把样地空间完整做下来', subtext: '先得到植物和路径的空间记录，蝴蝶行为以后再叠回去。', effects: { setFlags: ['capture-space-route'], factUpdates: [{ factId: 'fact-live-not-static', state: 'observed', sourceId: 'field' }] }, nextNodeId: 'bs-03b-audit' },
       { id: 'bs-capture-trace', label: '不追活体，只记录它留下的关系', subtext: '寄主植物、自然脱落材料、出现时间和“今天没出现”的记录。', effects: { setFlags: ['capture-ethical-trace'], factUpdates: [{ factId: 'fact-live-not-static', state: 'verified', sourceId: 'field' }, { factId: 'fact-data-rights', state: 'observed', sourceId: 'field' }] }, nextNodeId: 'bs-03b-audit' }
     ] },
-    { id: 'bs-03b-audit', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene', text: ['准备离场时，你翻了一遍照片：叶片背面几乎没拍到，小径转角只有一个角度，最后十几张也明显更暗。', '现在补拍只要十分钟。带回去以后，这些缺口可能会直接变成相机求解断裂。'], choices: [
+    { id: 'bs-03b-audit', sceneId: 'scene-field', speakerId: 'rojas', channel: 'scene', text: ['准备回去时，你翻了一遍照片：叶片背面没拍到，小径转角只有一个角度，最后十几张也明显更暗。', '现在补拍要十分钟。回到研究站再发现，就只能靠软件猜。'], choices: [
       { id: 'bs-audit-recapture', label: '现在补拍', subtext: '沿缺口再走一小段，保持相近曝光，把关键表面补到多个角度。', effects: { setFlags: ['field-recapture'], trustDelta: { rojas: 1 }, memories: [{ actorId: 'rojas', about: 'capture-discipline', value: '离场前发现缺口并补拍', weight: 3 }] }, nextNodeId: 'bs-04-process' },
       { id: 'bs-audit-leave', label: '先回去，接受这个风险', subtext: '可以这么做；晚上你会真的看到这个决定造成什么。', effects: { setFlags: ['capture-gap-debt'], trustDelta: { rojas: -1 }, memories: [{ actorId: 'rojas', about: 'capture-discipline', value: '明知覆盖不足仍然离开现场', weight: 2 }] }, nextNodeId: 'bs-04-process' }
     ] },
-    { id: 'bs-04-process', sceneId: 'scene-night', speakerId: 'rojas', channel: 'scene', text: ['晚上开始处理。先看相机求解，不急着点“生成”。', '这一步只回答一个问题：软件有没有正确算出这些照片分别从哪里拍的？'], choices: [
-      { id: 'bs-align-diagnose', label: '先查相机求解', subtext: '看未注册照片、断开的轨迹和缺口到底在哪里。', effects: { setFlags: ['diagnosed-camera-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'rojas' }] }, nextNodeId: 'bs-04a-represent' },
-      { id: 'bs-align-force', label: '先继续重建，看错误会变成什么', subtext: '不是“错误答案”。你会得到一个失败版本，再决定是修还是把失败留下。', effects: { setFlags: ['forced-reconstruct-bad-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'observed', sourceId: 'failed-reconstruction' }] }, nextNodeId: 'bs-04x-failure' }
+    { id: 'bs-04-process', sceneId: 'scene-night', speakerId: 'rojas', channel: 'scene', text: ['晚上，软件开始把照片拼成空间。结果一部分照片对不上，拍摄路线中间断了一截。', '现在可以先找出哪里没对上，也可以让软件继续算，看看错误会长成什么。'], choices: [
+      { id: 'bs-align-diagnose', label: '先查哪几张照片没对上', subtext: '找到断点，再决定要不要继续。', effects: { setFlags: ['diagnosed-camera-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'rojas' }] }, nextNodeId: 'bs-04a-represent' },
+      { id: 'bs-align-force', label: '让软件继续算出一个坏版本', subtext: '先看错误长什么样，再决定修不修。', effects: { setFlags: ['forced-reconstruct-bad-solve'], factUpdates: [{ factId: 'fact-bad-solve', state: 'observed', sourceId: 'failed-reconstruction' }] }, nextNodeId: 'bs-04x-failure' }
     ] },
     { id: 'bs-04x-failure', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['错误重建真的出来了：同一片叶子被拉成两层，转角像被切开，几张照片悬在错误的位置。', '它很难说是“好看”，但非常诚实地显示了白天缺了什么。现在你可以把失败留下，同时决定要不要修出一个可用版本。'], choices: [
-      { id: 'bs-failure-repair', label: '保留失败版本，然后回去修相机求解', subtext: '把失败当 Evidence，不把失败当成必须隐藏的废料。', effects: { setFlags: ['failure-kept', 'solve-repaired'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'failed-reconstruction' }] }, nextNodeId: 'bs-04a-represent' },
+      { id: 'bs-failure-repair', label: '把坏版本存下来，再回去修', subtext: '留一张证据。免得明天假装今晚很顺利。', effects: { setFlags: ['failure-kept', 'solve-repaired'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'failed-reconstruction' }] }, nextNodeId: 'bs-04a-represent' },
       { id: 'bs-failure-use', label: '不修干净，把断裂本身带进作品', subtext: '接受技术问题成为形式，但必须承认它来自采集缺口。', effects: { setFlags: ['failure-used-as-form', 'solve-still-fragile'] }, nextNodeId: 'bs-04a-represent' }
     ] },
     { id: 'bs-04a-represent', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['你终于把昨晚那堆坏数据弄成了一个能看的版本。问题来了：要不要把它最狼狈的地方给观众看？', '如果保留孔洞和断裂，观众会看到这次采集的不完整；如果把画面尽量做顺，观众更容易走进去，但未必知道你经历过什么。'], choices: [
       { id: 'bs-represent-pointcloud', label: '把缺口也给观众看', subtext: '让不完整成为作品的一部分：别把现场装成从没出过错。', effects: { setFlags: ['representation-pointcloud'] }, nextNodeId: 'bs-04e-compose' },
       { id: 'bs-represent-gaussian', label: '先让观众能舒服地走进去', subtext: '先把观看做顺；采集的麻烦留在作品记录里。', effects: { setFlags: ['representation-gaussian'] }, nextNodeId: 'bs-04e-compose' }
     ] },
-    { id: 'bs-04e-compose', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['重建完成以后，你才真正开始做作品。', '空间进 Blender / 实时系统。白天记录的蝴蝶运动现在可以回来：不一定变成一只写实蝴蝶，也可以变成形变、风、密度，或者观众靠近时才发生的行为。'], choices: [
-      { id: 'bs-compose-noise', label: '用 Noise / 程序化形变做动画', subtext: '让空间持续发生规则化形变，不假装是真实物理。', effects: { setFlags: ['motion-procedural'] }, nextNodeId: 'bs-04f-authorship' },
-      { id: 'bs-compose-physics', label: '让风和碰撞成为运动规则', subtext: '把叶片、粒子或扫描碎片交给物理条件。', effects: { setFlags: ['motion-physics'] }, nextNodeId: 'bs-04f-authorship' },
-      { id: 'bs-compose-interactive', label: '把蝴蝶的“停留 / 逃离 / 聚集”写成互动规则', subtext: '观众靠近时系统改变行为，不复制一只蝴蝶贴图。', effects: { setFlags: ['motion-interactive-butterfly'] }, nextNodeId: 'bs-04f-authorship' }
+    { id: 'bs-04e-compose', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['空间能看了，但现在还只是一份会动的现场资料。', '白天那只飞走的蝴蝶不一定要被画回来。你可以把“停下、逃开、被风推走”变成画面怎么动。'], choices: [
+      { id: 'bs-compose-noise', label: '让空间自己慢慢变形', subtext: '像一段记不牢的记忆，一直轻微走样。', effects: { setFlags: ['motion-procedural'] }, nextNodeId: 'bs-04d-feedback' },
+      { id: 'bs-compose-physics', label: '让风和碰撞推动碎片', subtext: '现场的风回来，继续把画面弄乱。', effects: { setFlags: ['motion-physics'] }, nextNodeId: 'bs-04d-feedback' },
+      { id: 'bs-compose-interactive', label: '观众靠近时，让它逃开', subtext: '把蝴蝶的反应留下，不把蝴蝶画回来。', effects: { setFlags: ['motion-interactive-butterfly'] }, nextNodeId: 'bs-04d-feedback' }
     ] },
-    { id: 'bs-04f-authorship', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'message', text: ['你把 20 秒测试发进同行群。很快来了三种回复。', '策展朋友：“蝴蝶很抓眼，但为什么非得是蝴蝶？” 技术同行：“别人也做过蝴蝶，你到底借了什么？” 研究站的人只问：“你用了哪一批观察数据？”', '三句话看起来都在问“蝴蝶”，其实分别在问视觉母题、方法来源和数据来源。'], choices: [
+    { id: 'bs-04d-feedback', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['第一版能动了。要不要给别人看？', '发给谁，决定你会收到什么样的回答。也可以先不发。'], choices: [
+      { id: 'bs-test-friend', label: '发给一个懂你旧作品的朋友', subtext: '对方能看出这次到底哪里变了。', effects: { setFlags: ['feedback-from-friend'] }, nextNodeId: 'bs-04f-authorship' },
+      { id: 'bs-test-social', label: '发十秒录屏到社交平台', subtext: '看谁真的停下来，不只看点赞。', effects: { setFlags: ['feedback-from-social'] }, nextNodeId: 'bs-04f-authorship' },
+      { id: 'bs-test-private', label: '先不发，直接带去现场试', subtext: '没有提前解释。明天让第一个观众自己反应。', effects: { setFlags: ['feedback-from-public-test'] }, nextNodeId: 'bs-04f-authorship' }
+    ] },
+    { id: 'bs-04f-authorship', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'message', text: ['朋友看完问：“这次为什么又是蝴蝶？”', '他还问了两件更具体的事：你借了谁的方法？研究站的照片能不能公开？', '现在可以改，也可以把问题留到现场。'], choices: [
       { id: 'bs-authorship-source', label: '把来源和差异写清楚', subtext: '真正参考过什么就写什么；同时说明你的核心是采集、行为和现场关系。', effects: { setFlags: ['authorship-attributed'], factUpdates: [{ factId: 'fact-butterfly-authorship', state: 'verified', sourceId: 'peer-group' }] }, nextNodeId: 'bs-04b-reveal' },
       { id: 'bs-authorship-system', label: '继续改：把“蝴蝶图像”退到后面', subtext: '让停留、逃离、迁移、寄主关系成为作品主结构。', effects: { setFlags: ['authorship-system-shift'], factUpdates: [{ factId: 'fact-butterfly-authorship', state: 'verified', sourceId: 'project-revision' }] }, nextNodeId: 'bs-04b-reveal' },
       { id: 'bs-authorship-defend', label: '先不改，把“为什么是蝴蝶”留给公开测试', subtext: '不假装争议已经解决；让观众和策展反馈继续追问。', effects: { setFlags: ['authorship-unresolved'], factUpdates: [{ factId: 'fact-butterfly-authorship', state: 'observed', sourceId: 'peer-group' }] }, nextNodeId: 'bs-04b-reveal' }
     ] },
-    { id: 'bs-04b-reveal', sceneId: 'scene-night', speakerId: 'ines', channel: 'dialogue', text: ['准备公开版本时，Inés 把数据许可表和一份合作评估附件放到桌上。', '“这件事应该更早写进 Brief：我不只是帮驻地协调，我也在替另一个研究网络做长期合作评估。也就是说，这几天我既在帮你拿资料，也在判断这套合作以后要不要继续。”', '问题不是她“真实身份是谁”，而是协作者同时也是评估者——这个角色冲突本来就应该提前说明。'], choices: [
+    { id: 'bs-04b-reveal', sceneId: 'scene-night', speakerId: 'ines', channel: 'dialogue', text: ['准备开放时，Inés 拿来一张你没见过的评估表。', '她说：“我除了帮你协调，也要替资助方判断以后还要不要继续请你。这个角色应该第一天就告诉你。”', '也就是说，帮你拿资料的人，同时在给这次合作打分。'], choices: [
       { id: 'bs-reveal-listen', label: '先把哪些数据能公开逐条列清楚', subtext: '项目继续；先把材料来源、许可和最终公开范围写进记录。', effects: { setFlags: ['ines-revealed', 'institutional-boundary-written'], factUpdates: [{ factId: 'fact-ines-network', state: 'revealed', sourceId: 'ines' }, { factId: 'fact-data-rights', state: 'verified', sourceId: 'ines' }], trustDelta: { ines: 1 }, memories: [{ actorId: 'ines', about: 'reveal', value: '玩家先把授权边界写清楚再继续', weight: 4 }] }, nextNodeId: 'bs-05-public' },
       { id: 'bs-reveal-distance', label: '要求把“协作”和“评估”两个角色拆开', subtext: '项目可以继续，但后续评估必须由另一个人负责。', effects: { setFlags: ['ines-revealed', 'role-conflict-separated'], factUpdates: [{ factId: 'fact-ines-network', state: 'revealed', sourceId: 'ines' }, { factId: 'fact-data-rights', state: 'verified', sourceId: 'ines' }], trustDelta: { ines: 0 }, memories: [{ actorId: 'ines', about: 'reveal', value: '玩家要求机构把协作与评估角色分开', weight: 4 }] }, nextNodeId: 'bs-05-public' }
     ] },
-    { id: 'bs-05-public', sceneId: 'scene-public', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['临时版本终于开放。它没有把森林包装成一个“完整数字复制品”。', '真实蝴蝶留下时间和行为，植物与空间留下扫描，失败版本留下采集过程；你再用动画或互动把这些材料重新组织。', '现在你能说清这件作品是怎么做出来的，也能说清哪些东西没有被放进去，以及为什么。'], choices: [
-      { id: 'bs-archive-open', label: '收工。把这次版本归档', subtext: '保存 Blueprint、失败版本、方法、人物/机构关系、来源说明和公开边界。', effects: { setFlags: ['butterfly-route-complete'] }, nextNodeId: 'bs-end' }
+    { id: 'bs-05-public', sceneId: 'scene-public', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['第一个观众走进来。', '如果你做了互动，画面会在他靠近时逃开；如果你保留断裂，他会直接看到现场没拍全的地方。', '研究站的人站在门口。没人替你解释。作品现在得自己活十分钟。'], choices: [
+      { id: 'bs-archive-open', label: '关掉投影。收工', subtext: '把能继续用的照片、坏版本和公开说明带回去。', effects: { setFlags: ['butterfly-route-complete'] }, nextNodeId: 'bs-end' }
     ] },
     { id: 'bs-end', sceneId: 'scene-public', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['终于做完了。', '这次不是“学会了一个软件”。真正留下来的是一套下次还能用的现场判断和制作方法。'], choices: [] }
   ]
@@ -169,6 +174,9 @@ export const butterflyWorldEffectsByChoice: Record<string, ButterflyWorldEffect>
   'bs-compose-noise': { unlockNodeIds: ['process-blender-procedural'], methodIds: ['method-motion-as-rule'], projectTags: ['procedural-motion'] },
   'bs-compose-physics': { unlockNodeIds: ['process-physics-motion'], methodIds: ['method-motion-as-rule'], projectTags: ['physics-motion'] },
   'bs-compose-interactive': { unlockNodeIds: ['process-butterfly-behavior'], methodIds: ['method-motion-as-rule'], projectTags: ['interactive-behavior'], achievementIds: ['ach-butterfly-as-system'] },
+  'bs-test-friend': { evidenceIds: ['ev-friend-test'], qualitySignals: ['feedback-from-known-viewer'] },
+  'bs-test-social': { evidenceIds: ['ev-social-test'], qualitySignals: ['feedback-from-scroll'] },
+  'bs-test-private': { evidenceIds: ['ev-unexplained-public-test'], qualitySignals: ['feedback-deferred-to-room'] },
   'bs-authorship-source': { unlockNodeIds: ['method-source-attribution'], methodIds: ['method-source-attribution'], archiveEntryIds: ['archive-source-note'], qualitySignals: ['source-clear'], achievementIds: ['ach-credit-without-panic'] },
   'bs-authorship-system': { unlockNodeIds: ['method-source-attribution', 'process-butterfly-behavior'], methodIds: ['method-source-attribution'], qualitySignals: ['motif-transformed-into-system'], achievementIds: ['ach-butterfly-as-system'] },
   'bs-authorship-defend': { threadIds: ['thread-butterfly-authorship'], evidenceIds: ['ev-peer-copy-question'], qualitySignals: ['authorship-question-open'] },
@@ -194,10 +202,10 @@ export function deriveButterflyWorldEffect(flags: string[], choiceId: string): B
 export function resolveButterflyNodeText(nodeId: string, flags: string[], fallback: string[]) {
   const has = new Set(flags);
   if (nodeId === 'bs-04-process' && has.has('field-recapture')) {
-    return ['补拍起作用了。80 张照片里 76 张成功定位，关键转角的相机轨迹已经接上。', '还有 4 张没注册，但不在关键区域。现在的问题不再是“能不能生成”，而是这组相机关系够不够可信。'];
+    return ['补拍起作用了。80 张照片里，软件对上了 76 张，关键转角也接上了。', '还有 4 张没对上，但不在要用的地方。可以继续。'];
   }
   if (nodeId === 'bs-04-process' && has.has('capture-gap-debt')) {
-    return ['白天没补的缺口晚上回来了。80 张照片里只有 61 张成功定位，叶片背面附近的相机轨迹直接断掉。', '现在你能看到那个决定的实际代价：不是扣一个抽象分数，而是这部分空间没有可靠的相机关系。'];
+    return ['白天没补的缺口晚上回来了。80 张照片里，软件只对上 61 张；叶片背面那一段完全接不上。', '不是扣分。是这部分空间现在只能靠猜。'];
   }
   if (nodeId === 'bs-04a-represent' && has.has('failure-kept')) {
     return ['失败版本已经单独保存。现在不是选一个听起来厉害的技术，而是决定要不要让观众看见这个失败。', '你可以让孔洞和断裂留在画面里；也可以先做一个更容易进入的版本，再把失败留在记录中。'];
@@ -205,11 +213,17 @@ export function resolveButterflyNodeText(nodeId: string, flags: string[], fallba
   if (nodeId === 'bs-04a-represent' && has.has('failure-used-as-form')) {
     return ['你决定不把断裂伪装成“修好了”。接下来只需要决定：观众第一眼是看见断裂，还是先走进这个空间。', '两种做法都会留下这次失败；区别只在于你把它放在画面里，还是放在作品记录里。'];
   }
+  if (nodeId === 'bs-04f-authorship' && has.has('feedback-from-social')) {
+    return ['录屏发出去以后，几个点赞很快到了。一个陌生人留言：“很漂亮，但为什么又是蝴蝶？”', '另一个人问你用了谁的做法。研究站的人只问：这些照片允许公开吗？', '现在可以改，也可以把问题留到现场。'];
+  }
+  if (nodeId === 'bs-04f-authorship' && has.has('feedback-from-public-test')) {
+    return ['你没把测试发出去。第二天，第一个观众站在画面前问：“我要做什么？”', 'Inés 随后问：哪些照片允许公开？你自己也还没回答，为什么非得是蝴蝶。', '现在可以当场改，也可以把这些问题留着。'];
+  }
   if (nodeId === 'bs-05-public') {
     const capture = has.has('capture-relation-route') ? '蝴蝶的运动和空间被分开采集再重新组合' : has.has('capture-ethical-trace') ? '作品没有捕捉活体，而是留下寄主、出现时间和痕迹' : '样地空间成为作品的主要底层';
-    const motion = has.has('motion-interactive-butterfly') ? '观众靠近时，“停留 / 逃离 / 聚集”会改变系统行为' : has.has('motion-physics') ? '扫描材料继续受风和碰撞影响' : '扫描空间通过程序化形变持续变化';
+    const motion = has.has('motion-interactive-butterfly') ? '观众靠近时，画面里的东西会停下、逃开或聚在一起' : has.has('motion-physics') ? '风和碰撞会继续改变画面' : '空间会一直轻微走样';
     const authorship = has.has('authorship-unresolved') ? '“为什么一定是蝴蝶”仍然被故意留在公开反馈里' : '来源、方法和数据边界被写进了作品记录';
-    return ['临时版本终于开放。它没有把森林包装成一个“完整数字复制品”。', `${capture}；${motion}。`, `${authorship}。你现在能说清楚这件作品怎么做出来，也能说清哪些东西没有被放进去。`];
+    return ['临时版本终于开放。它没有假装自己复制了整片森林。', `${capture}；${motion}。`, `${authorship}。你能说清它怎么做出来，也能说清哪些东西没有放进去。`];
   }
   return fallback;
 }

@@ -59,7 +59,7 @@ test('triumph collection can contain travel objects failures and memory fragment
   assert.ok(kinds.has('failure'));
   assert.ok(kinds.has('people'));
   assert.ok(mementos.some((item) => item.title.includes('行程单')));
-  assert.ok(mementos.some((item) => item.title.includes('FAIL_01')));
+  assert.ok(mementos.some((item) => item.title.includes('坏版本')));
 });
 
 test('serious choices are visibly marked without declaring one answer correct', () => {

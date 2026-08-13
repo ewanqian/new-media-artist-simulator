@@ -23,6 +23,7 @@ function NarrativeStageInner({
   meta = DEFAULT_META,
   onChoose,
   showLoad = false,
+  showOutcomeHints = true,
   instrument = null,
   minorActions = []
 }) {
@@ -107,7 +108,7 @@ function NarrativeStageInner({
             <span>
               <strong>{choice.label}</strong>
               {choice.subtext && <em>{choice.subtext}</em>}
-              {choice.outcomeHint && <i className="narrative-outcome-hint">影响：{choice.outcomeHint}</i>}
+              {showOutcomeHints && choice.outcomeHint && <i className="narrative-outcome-hint">{choice.outcomeHint}</i>}
             </span>
           </button>
         ))}

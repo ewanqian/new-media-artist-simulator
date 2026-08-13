@@ -36,5 +36,14 @@ export const v051ChangeRecords: ChangeRecord[] = [
     automatedChecks: ['entry bundle budget', 'v051 legacy-request browser check', 'full legacy v05 browser suite'],
     humanReview: 'passed',
     rollbackCommit: '48d34db'
+  },
+  {
+    id: 'wp-costa-rica-focused-route',
+    playerProblem: 'The optional chapter introduced unexplained people, specialist terms, side systems, and archive labels before the player understood the situation.',
+    changedFiles: ['src/v05/butterflyScholarPack.ts', 'src/v05/web/V05ButterflyScholarRoute.jsx', 'src/v05/costaRicaAttention.ts'],
+    stateEffect: 'Twelve traceable decisions create one chapter-specific Work and save; people enter through scenes and player-chosen feedback changes later text.',
+    automatedChecks: ['generic attention and redundancy gate on every scene', 'dynamic-copy vocabulary regression', 'separate save and public Work browser path', 'desktop and mobile browser'],
+    humanReview: 'passed',
+    rollbackCommit: 'dcef346'
   }
 ];

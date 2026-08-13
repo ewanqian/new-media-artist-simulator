@@ -132,7 +132,7 @@ export function loadRunState(raw: string | null, fallback: RunState): RunState {
     return migrateV1(parsed) || fallback;
   } catch { return fallback; }
 }
-export function saveRunState(storage: Pick<Storage, 'setItem'>, state: RunState) { storage.setItem(V051_RUN_SAVE_KEY, JSON.stringify(state)); }
+export function saveRunState(storage: Pick<Storage, 'setItem'>, state: RunState, key = V051_RUN_SAVE_KEY) { storage.setItem(key, JSON.stringify(state)); }
 export function applyAction(state: RunState, node: NarrativeNode, actionId: string, now = new Date().toISOString()): RunState {
   if (node.type !== 'decision') return state;
   if (state.history.some((entry) => entry.nodeId === node.id && entry.actionId === actionId)) return state;

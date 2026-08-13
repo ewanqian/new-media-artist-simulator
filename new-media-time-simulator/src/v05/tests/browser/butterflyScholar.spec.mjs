@@ -11,7 +11,7 @@ async function clearRoute(page) {
       'nmas-blueprint-editor-autosave-v2',
       'nmas-butterfly-training-complete-v1', 'nmas-butterfly-training-complete-v2',
       'nmas-butterfly-training-complete-v3', 'nmas-butterfly-training-complete-v4',
-      'nmas-costarica-training-complete-v1'
+      'nmas-costarica-training-complete-v1', 'nmas-v05.1-run:costa-rica'
     ]) localStorage.removeItem(key);
   });
 }
@@ -55,89 +55,79 @@ async function seedNode(page, currentNodeId, flags = []) {
   await page.reload({ waitUntil: 'networkidle' });
 }
 
-test('Costa Rica chapter covers invitation, route state, knowledge, assets, consequences and work-graph handoff', async ({ page, isMobile }) => {
-  test.setTimeout(45000);
-  await page.goto('/?core=v05', { waitUntil: 'networkidle' });
+test('Costa Rica stays inside one understandable situation from invitation through public test', async ({ page }) => {
+  test.setTimeout(70000);
+  await page.goto('/?core=v05&mode=costarica', { waitUntil: 'networkidle' });
   await clearRoute(page);
+  await page.evaluate(() => localStorage.setItem('nmas-v05.1-run', JSON.stringify({ untouched: true })));
   await page.reload({ waitUntil: 'networkidle' });
 
-  await page.getByRole('link', { name: /生涯 \/ 章节/ }).click();
-  await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
-  const costaRicaChapter = page.getByRole('link', { name: /哥斯达黎加/ });
-  await expect(costaRicaChapter).toContainText('知识 → 节点 → Assets');
-  await costaRicaChapter.click();
-  await page.waitForURL(/core=v05.*mode=costarica|mode=costarica/);
-
-  await expect(page.locator('.bs-topbar')).toContainText('SPECIAL 01 · COSTA RICA');
-  await expect(page.locator('.bs-topbar')).toContainText('哥斯达黎加');
-  await expect(page.getByLabel('哥斯达黎加任务进度')).toContainText('等待确认是否出发');
-  await expect(page.getByRole('button', { name: '进入场景' })).toBeVisible();
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('蝴蝶一直在动');
-  const firstChoice = page.getByRole('button', { name: /接。先写下一个问题再出发/ });
+  await expect(page.locator('.bs-topbar')).toContainText('哥斯达黎加 · 一周驻地');
+  await expect(page.getByLabel('哥斯达黎加任务进度')).toHaveCount(0);
+  await expect(page.getByLabel('临时记忆与已知信息')).toHaveCount(0);
+  await expect(page.locator('.narrative-minor-actions')).toHaveCount(0);
+  await expect(page.locator('.gf-layer')).toHaveCount(0);
+  const firstChoice = page.getByRole('button', { name: /去。先写下自己想弄明白什么/ });
   await advanceUntil(page, firstChoice);
-  await expect(firstChoice).toContainText('项目方向');
+  const opening = await page.locator('body').innerText();
+  expect(opening).toContain('看过你去年做的植物网页');
+  expect(opening).toContain('住宿和机票他们出');
+  expect(opening).not.toContain('Inés');
+  expect(opening).not.toContain('Rojas');
   await firstChoice.click();
-  await dismissFeedback(page);
-  await expect(page.getByLabel('哥斯达黎加任务进度')).toContainText('哥斯达黎加驻地行程已建立');
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('哥斯达黎加往返电子行程单');
 
-  const inesIntro = page.getByText(/我是 Inés。这周交通、样地、植物档案和数据许可都找我/);
+  const inesIntro = page.getByText(/我叫 Inés，负责这周的交通、场地和资料许可/);
   await advanceUntil(page, inesIntro);
   await expect(inesIntro).toBeVisible();
+  const arrivalChoice = page.getByRole('button', { name: /先把明天的工作说清楚/ });
+  await advanceUntil(page, arrivalChoice);
+  await arrivalChoice.click();
 
-  await seedNode(page, 'bs-03-field');
-  const fieldNote = page.getByRole('button', { name: /小操作：记下这 1.8 秒/ });
-  await advanceUntil(page, fieldNote);
-  await fieldNote.click();
-  await dismissFeedback(page);
-  await expect(page.getByRole('button', { name: /小操作：记下这 1.8 秒/ })).toHaveCount(0);
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('CR-FIELD-1.8S');
-
-  const researchButterfly = page.getByRole('button', { name: /研究：活蝴蝶怎么采集/ });
-  await researchButterfly.click();
-  const researchDialog = page.getByRole('dialog', { name: /研究：活蝴蝶怎么采集/ });
-  await expect(researchDialog).toContainText('活体运动不适合硬做成静态摄影测量对象');
-  await expect(researchDialog).toContainText('理解以后可进入工作台');
-  await expect(researchDialog).toContainText('节点 · 活体运动记录');
-  await researchDialog.getByRole('button', { name: '理解并写入知识库' }).click();
-  await dismissFeedback(page);
-  await expect(page.getByLabel('临时记忆与已知信息')).toContainText('活蝴蝶怎么采集');
-
-  await seedNode(page, 'bs-04-process', ['field-recapture']);
-  await advanceUntil(page, page.getByText('76 / 80 张照片已定位', { exact: true }));
-  await expect(page.getByText('CR-SOLVE-01 / 相机求解', { exact: true })).toBeVisible();
-  await expect(page.getByText('76 / 80 张照片已定位', { exact: true })).toBeVisible();
-  await expect(page.getByText(/补拍起作用了/)).toBeVisible();
-
-  await seedNode(page, 'bs-04-process', ['capture-gap-debt']);
-  await advanceUntil(page, page.getByText('61 / 80 张照片已定位', { exact: true }));
-  await expect(page.getByText('61 / 80 张照片已定位', { exact: true })).toBeVisible();
-  await expect(page.getByText(/白天没补的缺口晚上回来了/)).toBeVisible();
-
-  await seedNode(page, 'bs-04x-failure', ['capture-gap-debt', 'forced-reconstruct-bad-solve']);
-  const repairChoice = page.getByRole('button', { name: /保留失败版本，然后回去修相机求解/ });
-  await advanceUntil(page, repairChoice);
-  await expect(page.getByText('FAIL_01', { exact: true })).toBeVisible();
-  await expect(repairChoice).toContainText('失败版本留作 Evidence');
-  await expect(page.getByRole('button', { name: /不修干净，把断裂本身带进作品/ })).toContainText('技术脆弱性不会被自动消除');
-
-  await page.goto('/?core=v05&lab=blueprint&preset=costarica', { waitUntil: 'networkidle' });
-  await expect(page.locator('input[value="哥斯达黎加 / 三步采集工作图"]')).toBeVisible();
-  const hud = page.getByLabel('哥斯达黎加工作图训练');
-  await expect(hud).toContainText('任务 1 / 3');
-  await expect(hud).toContainText('数据线传递：采集对象');
-  await expect(hud).toContainText('步骤线 = 制作顺序');
-
-  if (isMobile) {
-    const tabs = page.getByRole('navigation', { name: '手机编辑视图' });
-    await tabs.getByRole('button', { name: '节点' }).click();
-    const library = page.getByLabel('节点库');
-    await expect(library.getByRole('button', { name: /Gaussian Splatting/ })).toBeVisible();
-    await expect(library.getByRole('button', { name: /LED 屏/ })).toBeHidden();
-  } else {
-    await expect(page.getByText('现场调查', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('摄影测量采集', { exact: true }).first()).toBeVisible();
+  const route = [
+    [/运动和空间分开采/, 'bs-capture-relation'],
+    [/先回去，接受这个风险/, 'bs-audit-leave'],
+    [/让软件继续算出一个坏版本/, 'bs-align-force'],
+    [/把坏版本存下来，再回去修/, 'bs-failure-repair'],
+    [/把缺口也给观众看/, 'bs-represent-pointcloud'],
+    [/观众靠近时，让它逃开/, 'bs-compose-interactive']
+  ];
+  for (const [label] of route) {
+    const action = page.getByRole('button', { name: label });
+    await advanceUntil(page, action);
+    await action.click();
   }
+
+  const feedbackChoice = page.getByRole('button', { name: /发十秒录屏到社交平台/ });
+  await advanceUntil(page, feedbackChoice);
+  await expect(page.getByRole('button', { name: /先不发，直接带去现场试/ })).toBeVisible();
+  await feedbackChoice.click();
+
+  const sourceChoice = page.getByRole('button', { name: /把来源和差异写清楚/ });
+  await advanceUntil(page, sourceChoice);
+  await expect(page.getByText(/几个点赞很快到了/)).toBeVisible();
+  await sourceChoice.click();
+
+  const separateRoles = page.getByRole('button', { name: /要求把“协作”和“评估”两个角色拆开/ });
+  await advanceUntil(page, separateRoles);
+  await expect(page.getByText(/我除了帮你协调，也要替资助方判断/)).toBeVisible();
+  await separateRoles.click();
+
+  const finish = page.getByRole('button', { name: /关掉投影。收工/ });
+  await advanceUntil(page, finish);
+  await finish.click();
+  await expect(page.getByText('你带回去的东西')).toBeVisible();
+  await expect(page.getByText('现场的人怎么说')).toBeVisible();
+  await expect(page.getByText(/节点|Assets|Evidence|Blueprint|KNOWLEDGE|点云|Gaussian|Noise|系统/)).toHaveCount(0);
+
+  const stores = await page.evaluate(() => ({
+    main: localStorage.getItem('nmas-v05.1-run'),
+    costa: JSON.parse(localStorage.getItem('nmas-v05.1-run:costa-rica') || '{}')
+  }));
+  expect(stores.main).toBe(JSON.stringify({ untouched: true }));
+  expect(stores.costa.chapterId).toBe('costa-rica');
+  expect(stores.costa.works[0].status).toBe('public');
+  expect(stores.costa.works[0].decisionIds).toHaveLength(12);
+  expect(stores.costa.works[0].versions).toHaveLength(1);
 });
 
 test('desktop Costa Rica work graph uses checkable field state and four readable relationship lines', async ({ page, isMobile }) => {

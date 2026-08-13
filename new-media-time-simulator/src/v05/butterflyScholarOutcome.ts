@@ -35,30 +35,33 @@ export type ButterflyOutcome = {
 };
 
 export const butterflyChoiceOutcomeHints: Record<string, string> = {
-  'bs-go-question': '项目方向：先建立创作问题；不会锁定最终媒介',
-  'bs-go-open': '项目方向：保持媒介开放；现场之后再决定',
-  'bs-arrival-work': '合作：先确认样地、材料和数据边界',
-  'bs-arrival-prior': '信息：留下一个关于 Inés 信息来源的未解线索',
+  'bs-go-question': '带着一个明确问题出发',
+  'bs-go-open': '到现场以后再定作品',
+  'bs-arrival-work': '明天少一点误会',
+  'bs-arrival-prior': '公开前少一次返工',
   'bs-capture-relation': '方法：双轨采集；解锁观察 / 视频 / 摄影测量相关节点',
   'bs-capture-site': '方法：空间优先；蝴蝶行为留到制作阶段再进入',
   'bs-capture-trace': '方法：非侵入式采集；材料伦理进入项目记录',
   'bs-audit-recapture': '现场：改善覆盖；离场检查会在晚上的求解里直接起作用',
   'bs-audit-leave': '现场：留下真实覆盖缺口；晚上会承担这个决定的后果',
-  'bs-align-diagnose': '技术：先确认相机关系；可靠时再进入重建',
-  'bs-align-force': '技术：先生成一个失败版本；下一步再决定修还是保留断裂',
-  'bs-failure-repair': '失败处理：失败版本留作 Evidence；修回一套可用的相机关系',
-  'bs-failure-use': '失败处理：断裂进入作品形式；技术脆弱性不会被自动消除',
-  'bs-represent-pointcloud': '作品方向：保留采样点、孔洞和扫描痕迹',
-  'bs-represent-gaussian': '作品方向：强调连续视角和空间外观',
-  'bs-compose-noise': '作品能力：解锁程序化形变方法',
-  'bs-compose-physics': '作品能力：解锁物理运动方法',
-  'bs-compose-interactive': '作品能力：把现场观察转成观众驱动行为；可能触发组合成就',
+  'bs-align-diagnose': '先知道哪里坏了',
+  'bs-align-force': '先得到一个能看的坏版本',
+  'bs-failure-repair': '坏版本保留；另修一个能用的版本',
+  'bs-failure-use': '断裂会继续留在作品里',
+  'bs-represent-pointcloud': '观众会直接看见缺口',
+  'bs-represent-gaussian': '观众先进入空间，失败留在记录里',
+  'bs-compose-noise': '画面会一直缓慢走样',
+  'bs-compose-physics': '风和碰撞继续改变画面',
+  'bs-compose-interactive': '观众靠近时，画面会逃开',
+  'bs-test-friend': '得到熟悉你作品的人的反应',
+  'bs-test-social': '得到滑动信息流里的第一反应',
+  'bs-test-private': '把第一次反应留给现场观众',
   'bs-authorship-source': '作者性：来源说明进入档案；讨论回到你的具体方法',
   'bs-authorship-system': '作者性：把“蝴蝶图像”继续退后，行为关系成为主结构',
   'bs-authorship-defend': '作者性：问题保持开放；公开反馈会继续追问“为什么是蝴蝶”',
   'bs-reveal-listen': '机构关系：先写清数据许可与公开范围',
   'bs-reveal-distance': '机构关系：要求协作与评估角色分开',
-  'bs-archive-open': '全局：归档 Blueprint / Evidence / 方法 / 关系，并保留真正未解决的问题'
+  'bs-archive-open': '把照片、坏版本和公开说明带回去'
 };
 
 const threadNames: Record<string, string> = {
@@ -137,9 +140,9 @@ export function deriveButterflyOutcome(state: NarrativeState, world: ButterflyWo
           : '“我能看出这是扫描来的，但它一直在变，不像普通的 3D 展示。”'
     },
     {
-      speaker: 'Rojas / 技术',
+      speaker: 'Rojas',
       text: disciplinedRoute
-        ? '“白天那十分钟补拍值了。关键轨迹是接上的，所以你后面做什么表示都知道底层哪里可信。”'
+        ? '“白天那十分钟补拍值了。照片现在能连起来，后面的版本没有偷偷猜那一段。”'
         : repairedFailure
           ? '“这个失败版本值得留。你没有把它包装成艺术决定，而是先承认失败，再修出可用版本。”'
           : fragile
@@ -147,7 +150,7 @@ export function deriveButterflyOutcome(state: NarrativeState, world: ButterflyWo
             : '“数据不是完美的，但你至少知道问题发生在哪一步。”'
     },
     {
-      speaker: '同行 / 策展',
+      speaker: '一个同行',
       text: authorshipOpen
         ? '“空间和技术都成立了，但我还是会问：为什么一定是蝴蝶？这个问题现在比软件问题更大。”'
         : has(flags, 'authorship-system-shift')
@@ -155,7 +158,7 @@ export function deriveButterflyOutcome(state: NarrativeState, world: ButterflyWo
           : '“来源写清楚以后，讨论终于可以回到你的采集方法和作品结构，而不是只剩一句‘像不像别人’。”'
     },
     {
-      speaker: 'Inés / 机构',
+      speaker: 'Inés',
       text: has(flags, 'role-conflict-separated')
         ? '“后续评估会换人。我继续负责现场协作，这样至少不会让我一边帮你、一边给你打分。”'
         : '“公开版没有把未授权资料顺手塞进去。许可边界已经写进记录，之后可以继续谈合作。”'
@@ -175,14 +178,14 @@ export function deriveButterflyOutcome(state: NarrativeState, world: ButterflyWo
   const unresolved = unresolvedThreads(flags, world);
   const learned = [capture, solve, motion, authorship, institution].filter(Boolean);
   const headline = fragile
-    ? '断裂进入了作品，但技术事实没有被洗成美学借口。'
+    ? '你没修那个断口。也没假装它是故意的。'
     : repairedFailure
-      ? '失败版本留下了，你也真的把它修回来了。'
+      ? '坏版本留着。能用的也修好了。'
       : authorshipOpen
-        ? '作品可以公开，作者性问题还没有结束。'
+        ? '作品开门了。“为什么非得是蝴蝶”还在门口。'
         : has(flags, 'motion-interactive-butterfly')
-          ? '蝴蝶终于从图像变成了系统。'
-          : '你完成的不是一次扫描，而是一套方法。';
+          ? '你没把蝴蝶画回来，只留下了它逃开的方式。'
+          : '你没带回一片森林。带回了下次怎么做。';
 
   const summary = `${capture} ${representation} ${motion}`;
   const journal = `这一周在 Bosque Field Lab，我先处理现场：${capture}${field} 回到工作台以后，${solve}${representation} 真正开始做作品以后，${motion} ${authorship} ${institution}`;

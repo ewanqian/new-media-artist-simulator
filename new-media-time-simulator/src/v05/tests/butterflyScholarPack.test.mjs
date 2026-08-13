@@ -43,7 +43,7 @@ test('Butterfly Scholar makes the player a new-media artist with butterfly and s
   assert.ok(!butterflyScholarIdentity.practice.includes('跟随一位'));
 });
 
-test('research cards explain the hard terms before asking the player to decide', () => {
+test('advanced reference cards remain complete outside the focused player route', () => {
   const ids = new Set(butterflyResearchCards.map((item) => item.id));
   for (const required of ['research-live-butterfly', 'research-overlap', 'research-camera-solve', 'research-representation', 'research-blender-motion', 'research-butterfly-authorship', 'research-specimen-ethics']) {
     assert.ok(ids.has(required), `missing research card ${required}`);
@@ -84,6 +84,7 @@ test('narrative route connects capture, reconstruction, making, authorship, inst
 
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-represent-gaussian');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-compose-noise');
+  state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-test-friend');
   state = applyNarrativeChoice(butterflyScholarNarrativePack, state, 'bs-authorship-source');
   assert.equal(state.currentNodeId, 'bs-04b-reveal');
   assert.ok(narrativeKnownFacts(state).some((fact) => fact.id === 'fact-butterfly-authorship' && fact.state === 'verified'));
@@ -111,14 +112,14 @@ test('forcing reconstruction creates a visible failure state before representati
 test('a failed build can be preserved then repaired without erasing the evidence', () => {
   const route = playRoute([
     'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force', 'bs-failure-repair',
-    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-authorship-source', 'bs-reveal-listen', 'bs-archive-open'
+    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-test-friend', 'bs-authorship-source', 'bs-reveal-listen', 'bs-archive-open'
   ]);
   assert.ok(route.state.flags.includes('failure-kept'));
   assert.ok(route.state.flags.includes('solve-repaired'));
   assert.ok(route.world.evidenceIds.includes('ev-failed-reconstruction-kept'));
   assert.ok(route.world.achievementIds.includes('ach-keep-the-failure'));
   const outcome = deriveButterflyOutcome(route.state, route.world);
-  assert.ok(outcome.headline.includes('修回'));
+  assert.ok(outcome.headline.includes('修好'));
   assert.ok(!outcome.unresolved.some((item) => item.includes('相机求解')));
   assert.ok(outcome.unresolved.some((item) => item.includes('覆盖缺口')));
 });
@@ -135,11 +136,11 @@ test('world effects connect choices to reusable nodes, methods, contextual achie
   assert.ok(deriveButterflyWorldEffect(['capture-relation-route'], 'bs-compose-interactive').achievementIds.includes('ach-observation-to-system'));
 });
 
-test('every visible Butterfly decision has a readable non-spoiler consequence hint', () => {
+test('advanced decision metadata remains complete even when hidden from focused play', () => {
   const choiceIds = butterflyScholarNarrativePack.nodes.flatMap((node) => node.choices.map((choice) => choice.id));
   for (const choiceId of choiceIds) assert.ok(butterflyChoiceOutcomeHints[choiceId], `missing outcome hint for ${choiceId}`);
   assert.ok(butterflyChoiceOutcomeHints['bs-audit-leave'].includes('缺口'));
-  assert.ok(butterflyChoiceOutcomeHints['bs-failure-use'].includes('脆弱'));
+  assert.ok(butterflyChoiceOutcomeHints['bs-failure-use'].includes('断裂'));
   assert.ok(!butterflyChoiceOutcomeHints['bs-audit-leave'].includes('失败结局'));
 });
 
@@ -155,20 +156,20 @@ test('field decisions change later technical text rather than only adding flags'
 test('the same special chapter produces materially different public feedback, archive and public draft', () => {
   const disciplined = playRoute([
     'bs-go-question', 'bs-arrival-work', 'bs-capture-relation', 'bs-audit-recapture', 'bs-align-diagnose',
-    'bs-represent-gaussian', 'bs-compose-interactive', 'bs-authorship-system', 'bs-reveal-listen', 'bs-archive-open'
+    'bs-represent-gaussian', 'bs-compose-interactive', 'bs-test-friend', 'bs-authorship-system', 'bs-reveal-listen', 'bs-archive-open'
   ]);
   const fragile = playRoute([
     'bs-go-open', 'bs-arrival-prior', 'bs-capture-site', 'bs-audit-leave', 'bs-align-force', 'bs-failure-use',
-    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-authorship-defend', 'bs-reveal-distance', 'bs-archive-open'
+    'bs-represent-pointcloud', 'bs-compose-noise', 'bs-test-social', 'bs-authorship-defend', 'bs-reveal-distance', 'bs-archive-open'
   ]);
 
   const cleanOutcome = deriveButterflyOutcome(disciplined.state, disciplined.world);
   const fragileOutcome = deriveButterflyOutcome(fragile.state, fragile.world);
 
-  assert.ok(cleanOutcome.headline.includes('系统'));
-  assert.ok(fragileOutcome.headline.includes('断裂'));
+  assert.ok(cleanOutcome.headline.includes('逃开'));
+  assert.ok(fragileOutcome.headline.includes('没修'));
   assert.notEqual(cleanOutcome.headline, fragileOutcome.headline);
-  assert.ok(cleanOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('可信')));
+  assert.ok(cleanOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('没有偷偷猜')));
   assert.ok(fragileOutcome.publicNotes.some((note) => note.speaker.includes('Rojas') && note.text.includes('采集缺口')));
   assert.ok(fragileOutcome.unresolved.some((item) => item.includes('覆盖缺口')));
   assert.ok(fragileOutcome.unresolved.some((item) => item.includes('相机求解')));

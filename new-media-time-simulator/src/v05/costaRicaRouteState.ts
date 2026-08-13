@@ -61,15 +61,15 @@ export function deriveCostaRicaAssets(state: NarrativeState, world: CostaRicaWor
   const flags = new Set(state.flags || []);
   const evidence = new Set(world.evidenceIds || []);
   const assets: RouteAsset[] = [];
-  if (flags.has('accepted-field-trip')) assets.push({ id: 'CR-BRIEF-01', kind: 'brief', title: 'CR-BRIEF-01 / 驻地 Brief', detail: '一周驻地、住宿、样地权限、数据公开边界。', use: '以后判断合作范围、来源与公开许可。' });
-  if (evidence.has('ev-butterfly-two-second')) assets.push({ id: 'CR-FIELD-1.8S', kind: 'field-note', title: 'CR-FIELD-1.8S / 1.8 秒观察', detail: '蓝色个体停留、离开方向与寄主位置。', use: '可继续进入行为系统、动画规则和项目档案。' });
-  if (flags.has('capture-relation-route') || flags.has('capture-space-route') || flags.has('capture-ethical-trace')) assets.push({ id: 'CR-PHOTOSET-01', kind: 'dataset', title: 'CR-PHOTOSET-01 / 现场采集包', detail: flags.has('field-recapture') ? '80 张主照片 + 缺口补拍；关键转角已补齐。' : flags.has('capture-gap-debt') ? '80 张照片；已知存在叶片背面与转角覆盖缺口。' : '照片、观察记录与现场条件正在形成。', use: '摄影测量、相机求解、点云/Gaussian、失败分析。' });
-  if (flags.has('diagnosed-camera-solve') || flags.has('forced-reconstruct-bad-solve') || flags.has('solve-repaired')) assets.push({ id: 'CR-SOLVE-01', kind: 'solve-report', title: 'CR-SOLVE-01 / Camera Solve 报告', detail: flags.has('solve-repaired') ? '失败证据保留；可用相机关系已经修复。' : flags.has('diagnosed-camera-solve') ? '相机关系已检查，可以继续重建。' : '相机轨迹断裂，问题已经显形。', use: '决定是否继续重建、返工或把脆弱性纳入作品。' });
-  if (flags.has('forced-reconstruct-bad-solve')) assets.push({ id: 'FAIL_01', kind: 'failed-build', title: 'FAIL_01 / 错误重建', detail: '叶片双层、转角断裂、错位相机。', use: '可作为 Evidence、修复依据，或在承认来源的前提下继续转化。' });
-  if (flags.has('representation-pointcloud')) assets.push({ id: 'CR-SPACE-PC01', kind: 'spatial-data', title: 'CR-SPACE-PC01 / 点云版本', detail: '保留点、密度、孔洞与采样痕迹。', use: '可进入清理、Blender、实时系统和后续空间作品。' });
-  if (flags.has('representation-gaussian')) assets.push({ id: 'CR-SPACE-GS01', kind: 'spatial-data', title: 'CR-SPACE-GS01 / Gaussian 版本', detail: '连续视角空间外观。', use: '可进入自由视角预览、实时展示和后续空间作品。' });
-  if (flags.has('motion-interactive-butterfly') || flags.has('motion-physics') || flags.has('motion-procedural')) assets.push({ id: 'CR-RULE-01', kind: 'behavior-rule', title: 'CR-RULE-01 / 运动规则', detail: flags.has('motion-interactive-butterfly') ? '停留 / 逃离 / 聚集由观众与现场触发。' : flags.has('motion-physics') ? '风、碰撞与物理条件驱动。' : 'Noise / Geometry Nodes 程序化形变。', use: '可复用到日常任务、Blueprint 和其他作品。' });
-  if (flags.has('butterfly-route-complete')) assets.push({ id: 'CR-PUBLIC-01', kind: 'public-record', title: 'CR-PUBLIC-01 / 公开测试档案', detail: '包含作品版本、来源说明、失败记录、机构边界与反馈。', use: '进入长期 RECORDS；以后申请、复盘、Remix 或引用这次方法。' });
+  if (flags.has('accepted-field-trip')) assets.push({ id: 'CR-BRIEF-01', kind: 'brief', title: '一周驻地邀请', detail: '机票、住宿、能进哪片样地、哪些资料不能公开。', use: '以后再合作，不用重新猜一次边界。' });
+  if (evidence.has('ev-butterfly-two-second')) assets.push({ id: 'CR-FIELD-1.8S', kind: 'field-note', title: '那只停了 1.8 秒的蝴蝶', detail: '它从哪来、停在哪、往哪飞。', use: '以后还能把这段运动放进别的作品。' });
+  if (flags.has('capture-relation-route') || flags.has('capture-space-route') || flags.has('capture-ethical-trace')) assets.push({ id: 'CR-PHOTOSET-01', kind: 'dataset', title: '现场照片和观察记录', detail: flags.has('field-recapture') ? '80 张照片；小径转角后来补拍完整了。' : flags.has('capture-gap-debt') ? '80 张照片；叶片背面和小径转角没有拍全。' : '照片、观察记录和当天的现场情况。', use: '下次继续做，不必假装这次什么都没漏。' });
+  if (flags.has('diagnosed-camera-solve') || flags.has('forced-reconstruct-bad-solve') || flags.has('solve-repaired')) assets.push({ id: 'CR-SOLVE-01', kind: 'solve-report', title: '哪些照片没对上的记录', detail: flags.has('solve-repaired') ? '坏版本留着；能用的版本已经修好。' : flags.has('diagnosed-camera-solve') ? '问题找到了，可以继续做。' : '照片在小径转角断开了。', use: '下次先检查这里，少熬一个晚上。' });
+  if (flags.has('forced-reconstruct-bad-solve')) assets.push({ id: 'FAIL_01', kind: 'failed-build', title: '那个坏版本', detail: '叶片变成两层，转角断了，几张照片飘错了位置。', use: '可以拿来复盘，也可以在说清来由以后继续改。' });
+  if (flags.has('representation-pointcloud')) assets.push({ id: 'CR-SPACE-PC01', kind: 'spatial-data', title: '保留断裂的空间版本', detail: '观众会直接看到孔洞和没有拍全的地方。', use: '以后还能清理、修改或放进另一件作品。' });
+  if (flags.has('representation-gaussian')) assets.push({ id: 'CR-SPACE-GS01', kind: 'spatial-data', title: '更容易走进去的空间版本', detail: '观看比较连续；漏拍的地方仍然写在记录里。', use: '以后还能继续修改或拿去现场测试。' });
+  if (flags.has('motion-interactive-butterfly') || flags.has('motion-physics') || flags.has('motion-procedural')) assets.push({ id: 'CR-RULE-01', kind: 'behavior-rule', title: '画面怎么动的规则', detail: flags.has('motion-interactive-butterfly') ? '观众靠近时，画面会停下、逃开或聚在一起。' : flags.has('motion-physics') ? '风和碰撞继续改变画面。' : '空间会一直轻微走样。', use: '以后可以换材料，继续试这套运动。' });
+  if (flags.has('butterfly-route-complete')) assets.push({ id: 'CR-PUBLIC-01', kind: 'public-record', title: '第一次公开测试记录', detail: '谁看了、哪里没看懂、哪些材料能公开。', use: '下次修改时，从真实反应开始。' });
   return assets;
 }
 
@@ -81,7 +81,7 @@ export function deriveCostaRicaMementos(state: NarrativeState, world: CostaRicaW
   if (flags.has('accepted-field-trip')) items.push({ id: 'M-CR-TICKET', kind: 'travel', title: '哥斯达黎加往返电子行程单', detail: '第一次把一个半开玩笑的“蝴蝶学者”身份真的写进行程。' });
   if (state.currentNodeId !== 'bs-01-invite') items.push({ id: 'M-CR-BADGE', kind: 'object', title: 'Bosque Field Lab 门禁卡', detail: '卡背面有样地编号和一个已经蹭花的日期。' });
   if (evidence.has('ev-butterfly-two-second')) items.push({ id: 'M-CR-18S', kind: 'memory', title: '1.8 秒', detail: '一只蝴蝶停得不够久，反而让你第一次把“运动”和“空间”拆开。' });
-  if (flags.has('forced-reconstruct-bad-solve')) items.push({ id: 'M-CR-FAIL01', kind: 'failure', title: 'FAIL_01 截图', detail: '一张不漂亮但以后很可能比“成功版”更有用的错误图。' });
+  if (flags.has('forced-reconstruct-bad-solve')) items.push({ id: 'M-CR-FAIL01', kind: 'failure', title: '坏版本截图', detail: '一张不漂亮但以后很可能比“成功版”更有用的错误图。' });
   if (flags.has('role-conflict-separated') || flags.has('institutional-boundary-written')) items.push({ id: 'M-CR-INSTITUTION', kind: 'people', title: '被划过两次的数据许可表', detail: '一次合作里，谁提供材料、谁评估你、谁决定公开，并不是同一件事。' });
   if (achievements.has('ach-special-butterfly-complete') || flags.has('butterfly-route-complete')) items.push({ id: 'M-CR-STICKER', kind: 'object', title: '临时展厅撤场贴纸', detail: '作品已经拆掉，贴纸还留着。章节结束，材料没有消失。' });
   return items;
