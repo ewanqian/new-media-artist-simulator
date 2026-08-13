@@ -49,7 +49,7 @@ const metaByNode = {
   'bs-03b-audit': { kicker: 'FIELD / CHECK', time: 'DAY 02 · 16:50', objective: '离场前检查 CR-PHOTOSET-01，决定要不要补拍', pacing: ['short', 'hold'], holdChoices: true },
   'bs-04-process': { kicker: 'WORKBENCH / CAMERA SOLVE', time: 'DAY 02 · 22:35', objective: '让现场数据真正进入工作室状态', pacing: ['short', 'hold'], holdChoices: true },
   'bs-04x-failure': { kicker: 'WORKBENCH / FAILED BUILD', time: 'DAY 02 · 23:20', objective: 'FAIL_01 已生成：决定修、留，还是继续转化', pacing: ['short', 'hold'], holdChoices: true },
-  'bs-04a-represent': { kicker: 'WORKBENCH / REPRESENTATION', time: 'DAY 03 · 00:10', objective: '决定观众看到的是采样，还是连续空间外观', pacing: ['short', 'hold'], holdChoices: true },
+  'bs-04a-represent': { kicker: 'WORKBENCH / FIRST VERSION', time: 'DAY 03 · 00:10', objective: '决定要不要把这次失败直接给观众看', pacing: ['short', 'hold'], holdChoices: true },
   'bs-04e-compose': { kicker: 'WORKBENCH / MAKE THE WORK', time: 'DAY 03 · 01:20', objective: '重建只是 Asset：现在决定它怎么进入作品', pacing: ['short', 'hold'], holdChoices: true },
   'bs-04f-authorship': { kicker: 'NETWORK / PEER FEEDBACK', time: 'DAY 03 · 01:55', objective: '这次选择会进入作者性、来源与公开记录', pacing: ['short', 'long', 'hold'], holdChoices: true },
   'bs-04b-reveal': { kicker: 'INSTITUTION / ROLE CONFLICT', time: 'DAY 03 · 02:30', objective: '处理协作者同时也是评估者的角色冲突', pacing: ['short', 'long', 'hold'], holdChoices: true },
@@ -129,8 +129,8 @@ function TrainingInstrument({ nodeId, flags = [] }) {
     return <div className="bs-instrument solve"><header><small>CR-SOLVE-01 / 相机求解</small><strong>{repairedByField ? '76 / 80 张照片已定位' : '61 / 80 张照片已定位'}</strong></header><div className={`bs-track ${repairedByField ? 'healthy' : ''}`}><i/><i/><i className={repairedByField ? '' : 'broken'}/><i/><i/></div><p>{repairedByField ? '白天补拍的转角已经接上。还有少量未注册照片，但不在关键区域。' : '白天留下的缺口现在变成了断开的相机轨迹。它不是抽象扣分，而是空间关系真的没算出来。'}</p></div>;
   }
   if (nodeId === 'bs-04x-failure') return <div className="bs-instrument failure"><header><small>FAILED BUILD / ASSET 已保存</small><strong>叶片双层 · 转角断裂 · 错位相机</strong></header><div className="bs-readout"><span><b>版本</b><i>FAIL_01</i></span><span><b>原因</b><i>覆盖不足</i></span><span><b>可修</b><i>是</i></span><span><b>可留作 Evidence</b><i>是</i></span></div><p>失败不会被系统自动清空。以后它既能用于诊断，也可能成为别的作品、教学或复盘材料。</p></div>;
-  if (nodeId === 'bs-04a-represent') return <div className="bs-instrument representation"><div><small>点云</small><strong>直接看到点、密度和孔洞</strong><p>得到可继续使用的空间 Asset。</p></div><div><small>Gaussian</small><strong>移动视角时更连续</strong><p>得到另一种空间 Asset；它不会自动修复底层缺口。</p></div></div>;
-  if (nodeId === 'bs-04e-compose') return <div className="bs-instrument representation"><div><small>程序化</small><strong>Noise / Geometry Nodes</strong><p>把空间 Asset 接进规则。</p></div><div><small>物理 / 实时</small><strong>风、碰撞、观众位置</strong><p>让环境或观众真的参与运动。</p></div></div>;
+  if (nodeId === 'bs-04a-represent') return <div className="bs-instrument representation"><div><small>版本 A</small><strong>把断裂留在画面里</strong><p>观众会看见这次采集没拍全的地方。</p></div><div><small>版本 B</small><strong>先让画面好走进去</strong><p>把失败留在作品记录里，不让它抢走第一次观看。</p></div></div>;
+  if (nodeId === 'bs-04e-compose') return <div className="bs-instrument representation"><div><small>让它自己慢慢变</small><strong>画面会按一套规则持续变化</strong><p>适合把现场变成不安静的记忆。</p></div><div><small>让观众靠近才发生</small><strong>人的位置会改变画面</strong><p>适合把“观察”变成一件真的发生的事。</p></div></div>;
   if (nodeId === 'bs-04b-reveal') return <div className="bs-instrument identity"><small>角色冲突</small><strong>Inés 同时负责现场协作和长期合作评估。</strong><p>这是会影响合作、数据和后续机会的认真选择，不是对白口味选择。</p></div>;
   return null;
 }
