@@ -165,7 +165,7 @@ WP0 -> WP1 -> WP2 -> WP3 -> minimum WP4 -> WP5. This P0 chain is complete. The n
 | player-led feedback with use/retest/ignore | complete | `48d34db` | `aabf268` |
 | legacy route and bundle isolation | complete | `dcef346` | `48d34db` |
 | focused optional Costa Rica route | complete | `96abdda` | `dcef346` |
-| same-Work continuity through first public run | complete | `CURRENT_PACKAGE` | `07eb513` |
+| same-Work continuity through first public run | complete | `d635ae0` | `07eb513` |
 
 P0 is complete for the accepted `/v051/` first session and the optional Costa Rica pack. It is not a claim that the entire legacy career is rewritten.
 
