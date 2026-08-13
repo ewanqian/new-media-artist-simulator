@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('v051 serves the full v05 home, reaches Costa Rica, and resumes after refresh', async ({ page }) => {
-  await page.goto('/v051/', { waitUntil: 'networkidle' });
+  // Relative navigation works for both local preview roots and the repository
+  // subpath used by GitHub Pages.
+  await page.goto('v051/', { waitUntil: 'networkidle' });
   await page.evaluate(() => {
     for (const key of ['nmas-special-costarica-narrative-v1', 'nmas-special-costarica-world-v1', 'nmas-v05.1-run']) localStorage.removeItem(key);
   });

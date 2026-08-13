@@ -14,7 +14,7 @@ export default defineConfig({
       ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
       : undefined
   },
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_EXTERNAL_BASE_URL ? undefined : {
     command: process.env.PLAYWRIGHT_STATIC_SERVER
       ? `python3 -m http.server ${port} --bind 127.0.0.1 -d dist`
       : `npm run preview -- --host 127.0.0.1 --port ${port}`,
