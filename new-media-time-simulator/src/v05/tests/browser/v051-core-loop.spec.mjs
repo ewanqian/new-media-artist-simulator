@@ -22,15 +22,16 @@ test('first-week loop changes the visible work, records feedback, and resumes af
   await expect(page.getByRole('heading', { name: '画面回来了。先别急着感动。' })).toBeVisible();
   await page.getByRole('button', { name: /发给一个还没睡的朋友/ }).click();
   await expect(page.getByText(/所以我要干嘛/)).toBeVisible();
-  await page.getByRole('button', { name: /只做电脑版，写清楚/ }).click();
+  await page.getByRole('button', { name: /加一句“拖动这些圆”/ }).click();
+  await expect(page.getByRole('heading', { name: '上午十点要链接。' })).toBeVisible();
+  await page.getByRole('button', { name: /现在发链接/ }).click();
   await expect(page.getByRole('heading', { name: '链接发出去了。' })).toBeVisible();
-  await expect(page.getByText('保存：写清设备要求的版本')).toBeVisible();
   await expect.poll(() => page.evaluate(() => {
     const run = JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}');
-    return [run.schemaVersion, run.works?.[0]?.versions?.length, run.feedback?.length, run.history?.length];
-  })).toEqual([2, 2, 1, 3]);
+    return [run.schemaVersion, run.works?.[0]?.versions?.length, run.feedback?.[0]?.status, run.history?.length];
+  })).toEqual([2, 3, 'used', 4]);
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByText('场地方回：“收到。现场会准备电脑。”')).toBeVisible();
+  await expect(page.getByText('场地方回：“收到。拖动提示看见了。”')).toBeVisible();
 });
 
 for (const width of [1024, 1440]) {

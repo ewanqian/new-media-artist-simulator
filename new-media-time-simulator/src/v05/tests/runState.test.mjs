@@ -29,6 +29,12 @@ test('work updates and feedback stay attached to the version and source action',
   assert.equal(next.works[0].versions[0].id, 'version-phone');
   assert.equal(next.feedback[0].versionId, 'version-phone');
   assert.ok(next.eventIds.includes('phone-test-failed'));
+  const responseNode = { id: 'revise', type: 'decision', text: '处理反馈', actions: [{ id: 'use-feedback', label: '改', nextNodeId: 'done', result: { summary: '改了', delta: {
+    updateFeedback: { feedbackId: 'feedback-phone', status: 'used', responseActionId: 'use-feedback' }
+  } } }] };
+  const responded = applyAction(next, responseNode, 'use-feedback');
+  assert.equal(responded.feedback[0].status, 'used');
+  assert.equal(responded.feedback[0].responseActionId, 'use-feedback');
 });
 test('bad saves reset and v1 saves migrate safely', () => {
   const fresh = state();

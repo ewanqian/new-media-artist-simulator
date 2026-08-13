@@ -13,6 +13,7 @@ function WorkPreview({ state }) {
     fragile: '小屏幕：黑',
     touch: '小屏幕：能用',
     desktop: '小屏幕：不支持',
+    guided: '操作：有提示',
     video: '交付：只有录屏',
     minimal: '小屏幕：待试',
     responsive: '小屏幕：待试'
@@ -24,6 +25,7 @@ function WorkPreview({ state }) {
       <div className="v051-shape"><b/><b/><b/></div>
       {state === 'broken' && <p>37 errors</p>}
       {state === 'desktop' && <p>请用电脑打开</p>}
+      {state === 'guided' && <p>拖动这些圆</p>}
       {state === 'video' && <p>00:10 / 00:10</p>}
       {state === 'touch' && <button type="button" aria-label="预览里的互动按钮">点一下</button>}
     </div>
@@ -34,7 +36,6 @@ function WorkPreview({ state }) {
 export default function V051VerticalSlice() {
   const [run, setRun] = useState(() => loadRunState(localStorage.getItem(V051_RUN_SAVE_KEY), makeFreshRun()));
   const scene = useMemo(() => firstWeekScene(run), [run]);
-  const work = run.works[0];
 
   useEffect(() => { saveRunState(localStorage, run); }, [run]);
   useEffect(() => { document.title = `${scene.title} · 新媒体艺术家模拟器`; }, [scene.title]);
@@ -77,7 +78,6 @@ export default function V051VerticalSlice() {
             <h2>今晚</h2>
             <ol>{run.history.map((entry) => <li key={entry.id}>{entry.summary}</li>)}</ol>
           </section>
-          {work && <p className="v051-version">保存：{work.versions?.at(-1)?.label}</p>}
           <button className="v051-again" onClick={restart}>再熬一遍</button>
         </>}
       </article>

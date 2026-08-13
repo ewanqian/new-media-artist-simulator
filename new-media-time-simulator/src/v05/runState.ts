@@ -25,12 +25,15 @@ export type WorkUpdate = {
 };
 export type FeedbackEntry = {
   id: string;
-  source: 'self-test' | 'friend' | 'group' | 'venue';
+  source: 'self-test' | 'friend' | 'group' | 'social' | 'venue';
   workId: string;
   versionId: string;
   text: string;
   createdByActionId: string;
+  status?: 'new' | 'used' | 'ignored';
+  responseActionId?: string;
 };
+export type FeedbackUpdate = { feedbackId: string; status: 'used' | 'ignored'; responseActionId: string };
 export type RunHistoryEntry = { id: string; actionId: string; nodeId: string; summary: string; at: string };
 export type RunState = {
   schemaVersion: typeof RUN_STATE_SCHEMA_VERSION; runId: string; identity: { id: string; label: string };
@@ -46,6 +49,7 @@ export type StateDelta = {
   addWork?: Work;
   updateWork?: WorkUpdate;
   addFeedback?: FeedbackEntry;
+  updateFeedback?: FeedbackUpdate;
 };
 export type NarrativeNode =
   | { id: string; type: 'observation' | 'transition'; text: string; nextNodeId: string }
@@ -87,8 +91,10 @@ function isHistoryEntry(value: unknown): value is RunHistoryEntry {
 function isFeedbackEntry(value: unknown): value is FeedbackEntry {
   if (!isRecord(value)) return false;
   return typeof value.id === 'string'
-    && ['self-test', 'friend', 'group', 'venue'].includes(String(value.source))
-    && ['workId', 'versionId', 'text', 'createdByActionId'].every((key) => typeof value[key] === 'string');
+    && ['self-test', 'friend', 'group', 'social', 'venue'].includes(String(value.source))
+    && ['workId', 'versionId', 'text', 'createdByActionId'].every((key) => typeof value[key] === 'string')
+    && (value.status === undefined || ['new', 'used', 'ignored'].includes(String(value.status)))
+    && (value.responseActionId === undefined || typeof value.responseActionId === 'string');
 }
 
 export function isRunState(value: unknown): value is RunState {
@@ -148,7 +154,13 @@ export function applyAction(state: RunState, node: NarrativeNode, actionId: stri
         : work.versions
     });
   }
-  const feedback = delta.addFeedback && !state.feedback.some((entry) => entry.id === delta.addFeedback?.id) ? [...state.feedback, delta.addFeedback] : state.feedback;
+  let feedback = delta.addFeedback && !state.feedback.some((entry) => entry.id === delta.addFeedback?.id) ? [...state.feedback, delta.addFeedback] : state.feedback;
+  if (delta.updateFeedback) {
+    const update = delta.updateFeedback;
+    feedback = feedback.map((entry) => entry.id === update.feedbackId
+      ? { ...entry, status: update.status, responseActionId: update.responseActionId }
+      : entry);
+  }
   return {
     ...state,
     currentNodeId: action.nextNodeId,

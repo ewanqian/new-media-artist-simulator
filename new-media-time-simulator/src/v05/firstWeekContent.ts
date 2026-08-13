@@ -10,14 +10,15 @@ export type FirstWeekScene = {
   title: string;
   lines: string[];
   problemId?: string;
-  preview: 'broken' | 'minimal' | 'responsive' | 'fragile' | 'touch' | 'desktop' | 'video';
+  preview: 'broken' | 'minimal' | 'responsive' | 'fragile' | 'touch' | 'desktop' | 'guided' | 'video';
   choices: FirstWeekChoice[];
 };
 
 export const firstWeekProblems: PlayerProblem[] = [
   { id: 'fix-black-screen', objectId: 'work-web-01', goal: '让网页离开当前窗口也能打开' },
   { id: 'test-outside-laptop', objectId: 'work-web-01', goal: '确认作品在别的设备上会发生什么' },
-  { id: 'choose-delivery', objectId: 'work-web-01', goal: '根据测试结果决定明早交哪个版本' }
+  { id: 'respond-to-feedback', objectId: 'work-web-01', goal: '决定是否根据刚收到的反应修改作品' },
+  { id: 'deliver-by-ten', objectId: 'work-web-01', goal: '上午十点前给场地方一个能查看的版本' }
 ];
 
 const work = (actionId: string, label: string, state: 'rough' | 'testable'): Work => ({
@@ -51,7 +52,7 @@ const firstChoices: FirstWeekChoice[] = [
   }
 ];
 
-function outsideResult(run: RunState, source: 'phone' | 'friend' | 'group') {
+function outsideResult(run: RunState, source: 'phone' | 'friend' | 'social') {
   const minimal = run.flags.includes('version-minimal');
   const responsive = run.flags.includes('version-responsive');
   if (source === 'phone') {
@@ -65,62 +66,154 @@ function outsideResult(run: RunState, source: 'phone' | 'friend' | 'group') {
     return '朋友回了一张黑屏截图，没有配文字。信息很完整。';
   }
   if (minimal) return '有人说像故障，有人说像极简。你暂时分不出哪句更危险。';
-  if (responsive) return '三个人点赞，一个人问链接，十九个人没说话。';
+  if (responsive) return '几个点赞，一个人问链接。其余人继续刷走。';
   return '录屏很好看。有人要链接。问题重新回来了。';
 }
 
 function outsideChoices(run: RunState): FirstWeekChoice[] {
   return [
     {
-      id: 'open-on-phone', label: '用自己手机打开', note: '先换一块屏幕。', nextNodeId: 'choose-delivery',
+      id: 'open-on-phone', label: '用自己手机打开', note: '先换一块屏幕。', nextNodeId: 'respond-to-feedback',
       result: { summary: outsideResult(run, 'phone'), delta: {
         addFlags: ['checked-on-phone'], addEventIds: ['outside-check-complete'],
         updateWork: { workId: 'work-web-01', decisionId: 'open-on-phone' },
-        addFeedback: { id: 'feedback-phone', source: 'self-test', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'phone'), createdByActionId: 'open-on-phone' }
+        addFeedback: { id: 'feedback-phone', source: 'self-test', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'phone'), createdByActionId: 'open-on-phone', status: 'new' }
       } }
     },
     {
-      id: 'send-to-awake-friend', label: '发给一个还没睡的朋友', note: '请对方直接点链接。别先解释作品。', nextNodeId: 'choose-delivery',
+      id: 'send-to-awake-friend', label: '发给一个还没睡的朋友', note: '请对方直接点链接。别先解释作品。', nextNodeId: 'respond-to-feedback',
       result: { summary: outsideResult(run, 'friend'), delta: {
         addFlags: ['checked-by-friend'], addEventIds: ['outside-check-complete'],
         updateWork: { workId: 'work-web-01', decisionId: 'send-to-awake-friend' },
-        addFeedback: { id: 'feedback-friend', source: 'friend', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'friend'), createdByActionId: 'send-to-awake-friend' }
+        addFeedback: { id: 'feedback-friend', source: 'friend', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'friend'), createdByActionId: 'send-to-awake-friend', status: 'new' }
       } }
     },
     {
-      id: 'post-ten-second-clip', label: '发十秒录屏到 23 人群', note: '看谁停下来。也看谁只点赞。', nextNodeId: 'choose-delivery',
-      result: { summary: outsideResult(run, 'group'), delta: {
-        addFlags: ['checked-by-group'], addEventIds: ['outside-check-complete'],
+      id: 'post-ten-second-clip', label: '发十秒录屏到社交平台', note: '看谁真的停下来，不只看点赞。', nextNodeId: 'respond-to-feedback',
+      result: { summary: outsideResult(run, 'social'), delta: {
+        addFlags: ['checked-by-social'], addEventIds: ['outside-check-complete'],
         updateWork: { workId: 'work-web-01', decisionId: 'post-ten-second-clip' },
-        addFeedback: { id: 'feedback-group', source: 'group', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'group'), createdByActionId: 'post-ten-second-clip' }
+        addFeedback: { id: 'feedback-social', source: 'social', workId: 'work-web-01', versionId: 'version-01', text: outsideResult(run, 'social'), createdByActionId: 'post-ten-second-clip', status: 'new' }
       } }
     }
   ];
 }
 
-const deliveryChoices: FirstWeekChoice[] = [
-  {
-    id: 'make-touch-version', label: '修到手机也能用', note: '把鼠标操作换成点击和触摸。', nextNodeId: 'morning-touch',
-    result: { summary: '上午 9:41。手机和电脑都能打开。你没睡，但链接活着。', delta: {
-      addFlags: ['delivered-touch'], addEventIds: ['first-link-delivered'],
-      updateWork: { workId: 'work-web-01', status: 'testable', decisionId: 'make-touch-version', addVersion: { id: 'version-02-touch', label: '手机和电脑都能打开', state: 'shared', createdByActionId: 'make-touch-version' } }
+function respondTo(feedbackId: string, actionId: string, status: 'used' | 'ignored') {
+  return { feedbackId, responseActionId: actionId, status };
+}
+
+function responseChoices(run: RunState): FirstWeekChoice[] {
+  const feedback = run.feedback.at(-1);
+  const feedbackId = feedback?.id || 'feedback-phone';
+  const ignore: FirstWeekChoice = {
+    id: 'ignore-feedback', label: '先不管这条反馈', note: '作品不改。风险也不改。', nextNodeId: 'deliver-link',
+    result: { summary: '你把这条反馈留在聊天框里。它没有消失，只是安静了。', delta: {
+      addFlags: ['response-ignored'], updateWork: { workId: 'work-web-01', decisionId: 'ignore-feedback' }, updateFeedback: respondTo(feedbackId, 'ignore-feedback', 'ignored')
     } }
-  },
-  {
-    id: 'declare-desktop-only', label: '只做电脑版，写清楚', note: '别假装全平台。把观看条件放在链接前。', nextNodeId: 'morning-desktop',
-    result: { summary: '上午 9:18。你写明“请用电脑打开”。范围变小，坑也变小。', delta: {
-      addFlags: ['delivered-desktop'], addEventIds: ['first-link-delivered'],
-      updateWork: { workId: 'work-web-01', status: 'testable', decisionId: 'declare-desktop-only', addVersion: { id: 'version-02-desktop', label: '写清设备要求的版本', state: 'shared', createdByActionId: 'declare-desktop-only' } }
-    } }
-  },
-  {
-    id: 'send-video-first', label: '先发录屏，链接下午补', note: '换几个小时。债也会活到下午。', nextNodeId: 'morning-video',
-    result: { summary: '上午 9:57。视频发出去了。“链接稍后”是今天最危险的四个字。', delta: {
-      addFlags: ['delivered-video'], addEventIds: ['first-video-delivered'],
-      updateWork: { workId: 'work-web-01', status: 'draft', decisionId: 'send-video-first', addVersion: { id: 'version-02-video', label: '先交录屏的版本', state: 'shared', createdByActionId: 'send-video-first' } }
-    } }
-  }
-];
+  };
+
+  if (feedback?.source === 'friend') return [
+    {
+      id: 'add-one-line-instruction', label: '加一句“拖动这些圆”', note: '不写概念。只告诉对方怎么动手。', nextNodeId: 'deliver-link',
+      result: { summary: '页面多了一句话。它不像艺术宣言，胜在真的有用。', delta: {
+        addFlags: ['response-guided'], updateFeedback: respondTo(feedbackId, 'add-one-line-instruction', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'add-one-line-instruction', addVersion: { id: 'version-02-guided', label: '写清怎么操作的版本', state: 'testable', createdByActionId: 'add-one-line-instruction' } }
+      } }
+    },
+    {
+      id: 'ask-friend-retry', label: '让朋友别问，随便点', note: '再测一次。不解释。', nextNodeId: 'deliver-link',
+      result: { summary: '朋友乱点一通，终于拖动了圆。然后回：“哦，原来能动。”', delta: {
+        addFlags: ['response-retested'], updateFeedback: respondTo(feedbackId, 'ask-friend-retry', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'ask-friend-retry' },
+        addFeedback: { id: 'feedback-friend-retry', source: 'friend', workId: 'work-web-01', versionId: 'version-01', text: '哦，原来能动。', createdByActionId: 'ask-friend-retry', status: 'new' }
+      } }
+    },
+    ignore
+  ];
+
+  if (feedback?.source === 'social' || feedback?.source === 'group') return [
+    {
+      id: 'send-real-link', label: '把真实链接发给问的人', note: '录屏能骗人。链接比较诚实。', nextNodeId: 'deliver-link',
+      result: { summary: '对方点开了。回：“电脑能看，手机不好点。”比一个赞有用。', delta: {
+        addFlags: ['response-real-link'], updateFeedback: respondTo(feedbackId, 'send-real-link', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'send-real-link' },
+        addFeedback: { id: 'feedback-social-link', source: 'social', workId: 'work-web-01', versionId: 'version-01', text: '电脑能看，手机不好点。', createdByActionId: 'send-real-link', status: 'new' }
+      } }
+    },
+    {
+      id: 'recut-opening', label: '把录屏开头剪短', note: '先让画面动。别让人等你铺垫。', nextNodeId: 'deliver-link',
+      result: { summary: '你剪掉前六秒黑场。作品没变，别人终于来得及看见它。', delta: {
+        addFlags: ['response-recut'], updateFeedback: respondTo(feedbackId, 'recut-opening', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'recut-opening', addVersion: { id: 'version-02-clip', label: '开头直接动起来的录屏', state: 'testable', createdByActionId: 'recut-opening' } }
+      } }
+    },
+    ignore
+  ];
+
+  return [
+    {
+      id: 'make-touch-version', label: '把鼠标操作换成触摸', note: '让手指也能拖动。', nextNodeId: 'deliver-link',
+      result: { summary: '手机上终于能拖。你用一根手指修了一个只在鼠标里存在的世界。', delta: {
+        addFlags: ['response-touch'], updateFeedback: respondTo(feedbackId, 'make-touch-version', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'make-touch-version', addVersion: { id: 'version-02-touch', label: '手机也能拖动的版本', state: 'testable', createdByActionId: 'make-touch-version' } }
+      } }
+    },
+    {
+      id: 'declare-desktop-only', label: '只做电脑版，写清楚', note: '不假装全平台。', nextNodeId: 'deliver-link',
+      result: { summary: '你写明“请用电脑打开”。范围变小，坑也变小。', delta: {
+        addFlags: ['response-desktop'], updateFeedback: respondTo(feedbackId, 'declare-desktop-only', 'used'),
+        updateWork: { workId: 'work-web-01', decisionId: 'declare-desktop-only', addVersion: { id: 'version-02-desktop', label: '写清设备要求的版本', state: 'testable', createdByActionId: 'declare-desktop-only' } }
+      } }
+    },
+    ignore
+  ];
+}
+
+function previewAfterResponse(run: RunState): FirstWeekScene['preview'] {
+  if (run.flags.includes('response-touch')) return 'touch';
+  if (run.flags.includes('response-desktop')) return 'desktop';
+  if (run.flags.includes('response-guided')) return 'guided';
+  if (run.flags.includes('response-recut')) return 'video';
+  return previewAfterFirst(run);
+}
+
+function linkReply(run: RunState) {
+  if (run.flags.includes('response-touch')) return '场地方回：“收到，手机也能打开。”';
+  if (run.flags.includes('response-desktop')) return '场地方回：“收到。现场会准备电脑。”';
+  if (run.flags.includes('response-guided')) return '场地方回：“收到。拖动提示看见了。”';
+  if (run.flags.includes('response-retested')) return '场地方回：“收到。现场试了一遍，能动。”';
+  if (run.flags.includes('response-real-link')) return '场地方回：“收到。刚才已经有人帮你点过了。”';
+  if (run.flags.includes('response-recut')) return '场地方回：“录屏很清楚。链接也能打开。”';
+  if (run.flags.includes('version-fragile')) return '场地方回：“这里是黑的。你发错链接了吗？”';
+  if (run.flags.includes('version-minimal')) return '场地方回：“收到。这个点是在加载吗？”';
+  return '场地方回：“收到。所以现场要怎么操作？”';
+}
+
+function deliveryChoices(): FirstWeekChoice[] {
+  return [
+    {
+      id: 'send-link-now', label: '现在发链接', note: '关电脑。赌现场和刚才一样。', nextNodeId: 'morning-link',
+      result: { summary: '上午 9:54。链接发出去了。', delta: {
+        addFlags: ['delivered-link'], addEventIds: ['first-link-delivered'],
+        updateWork: { workId: 'work-web-01', status: 'testable', decisionId: 'send-link-now', addVersion: { id: 'version-03-link', label: '交给场地方的链接', state: 'shared', createdByActionId: 'send-link-now' } }
+      } }
+    },
+    {
+      id: 'send-video-first', label: '先发录屏，链接下午补', note: '换几个小时。债也会活到下午。', nextNodeId: 'morning-video',
+      result: { summary: '上午 9:57。视频发出去了。“链接稍后”是今天最危险的四个字。', delta: {
+        addFlags: ['delivered-video'], addEventIds: ['first-video-delivered'],
+        updateWork: { workId: 'work-web-01', status: 'draft', decisionId: 'send-video-first', addVersion: { id: 'version-03-video', label: '先交录屏的版本', state: 'shared', createdByActionId: 'send-video-first' } }
+      } }
+    },
+    {
+      id: 'ask-one-more-hour', label: '跟场地方说晚一小时', note: '多一小时。先欠一句“抱歉”。', nextNodeId: 'morning-late',
+      result: { summary: '上午 9:38。你承认还没好。对方给到十一点。', delta: {
+        addFlags: ['delivery-delayed'], addEventIds: ['first-deadline-moved'], updateWork: { workId: 'work-web-01', decisionId: 'ask-one-more-hour' }
+      } }
+    }
+  ];
+}
 
 function previewAfterFirst(run: RunState): FirstWeekScene['preview'] {
   if (run.flags.includes('version-responsive')) return 'responsive';
@@ -139,22 +232,28 @@ export function firstWeekScene(run: RunState): FirstWeekScene {
     lines: [run.history.at(-1)?.summary || '', '场地方明早会用什么打开，你不知道。现在可以换一块屏幕试试。'],
     problemId: 'test-outside-laptop', preview: previewAfterFirst(run), choices: outsideChoices(run)
   };
-  if (run.currentNodeId === 'choose-delivery') return {
-    id: 'choose-delivery', moment: 'problem', time: '凌晨 2:39', title: '问题找到了。',
-    lines: [run.feedback.at(-1)?.text || '另一个设备给出了答案。', '明早交哪个版本？'],
-    problemId: 'choose-delivery', preview: previewAfterFirst(run), choices: deliveryChoices
+  if (run.currentNodeId === 'respond-to-feedback') return {
+    id: 'respond-to-feedback', moment: 'problem', time: '凌晨 2:39',
+    title: run.feedback.at(-1)?.source === 'friend' ? '朋友回消息了。' : run.feedback.at(-1)?.source === 'social' ? '有人停下来看了。' : '手机给你看了答案。',
+    lines: [run.feedback.at(-1)?.text || '另一个设备给出了答案。', '这条反馈，改不改？'],
+    problemId: 'respond-to-feedback', preview: previewAfterFirst(run), choices: responseChoices(run)
+  };
+  if (run.currentNodeId === 'deliver-link') return {
+    id: 'deliver-link', moment: 'problem', time: '凌晨 3:14', title: '上午十点要链接。',
+    lines: [run.history.at(-1)?.summary || '', '现在怎么交？'],
+    problemId: 'deliver-by-ten', preview: previewAfterResponse(run), choices: deliveryChoices()
   };
   if (run.currentNodeId === 'morning-video') return {
     id: 'morning-video', moment: 'ending', time: '上午 9:57', title: '视频发出去了。链接没有。',
     lines: ['场地方回：“收到。链接呢？”'], preview: 'video', choices: []
   };
-  if (run.currentNodeId === 'morning-desktop') return {
-    id: 'morning-desktop', moment: 'ending', time: '上午 9:18', title: '链接发出去了。',
-    lines: ['场地方回：“收到。现场会准备电脑。”'], preview: 'desktop', choices: []
+  if (run.currentNodeId === 'morning-late') return {
+    id: 'morning-late', moment: 'ending', time: '上午 9:38', title: '你开口要了一个小时。',
+    lines: ['场地方回：“可以。十一点前给我。”'], preview: previewAfterResponse(run), choices: []
   };
   return {
-    id: 'morning-touch', moment: 'ending', time: '上午 9:41', title: '链接发出去了。',
-    lines: ['场地方回：“收到，手机也能打开。”'], preview: 'touch', choices: []
+    id: 'morning-link', moment: 'ending', time: '上午 9:54', title: '链接发出去了。',
+    lines: [linkReply(run)], preview: previewAfterResponse(run), choices: []
   };
 }
 

@@ -15,6 +15,7 @@ test('AI is not required by any first-week action', async ({ page }) => {
   await page.reload({ waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /删掉最后加的效果/ }).click();
   await page.getByRole('button', { name: /用自己手机打开/ }).click();
-  await page.getByRole('button', { name: /修到手机也能用/ }).click();
+  await page.getByRole('button', { name: /把鼠标操作换成触摸/ }).click();
+  await page.getByRole('button', { name: /现在发链接/ }).click();
   await expect(page.getByText('场地方回：“收到，手机也能打开。”')).toBeVisible();
 });
