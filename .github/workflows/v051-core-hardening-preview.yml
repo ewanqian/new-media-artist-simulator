@@ -1,9 +1,8 @@
-name: v0.5.1 Core Hardening Preview
+name: v0.5.1 Playable Preview
 
 on:
   push:
-    branches:
-      - v05.1/core-hardening
+    branches: [v05.1/core-hardening]
   workflow_dispatch:
 
 permissions:
@@ -14,35 +13,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-publish-and-check:
+  verify-and-publish:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: new-media-time-simulator
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: new-media-time-simulator/package-lock.json
-
-      - name: Install locked dependencies
-        run: npm ci
-
-      - name: Build playable preview
-        run: npm run build
-
-      - name: Verify relative GitHub Pages artifact
+      - run: npm ci
+      - name: Strict content, state, and build verification
+        run: npm run verify:v05
+      - name: Verify relative Pages artifact
         run: |
           test -f dist/index.html
           grep -Eq '(src|href)="\./assets/' dist/index.html
           test -s dist/index.html
-
-      - name: Publish v0.5.1 preview under /v051/
+      - name: Publish the verified preview under /v051/
         env:
           GH_TOKEN: ${{ github.token }}
         working-directory: .
@@ -57,13 +48,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add v051 .nojekyll
-          if git diff --cached --quiet; then
-            echo "Preview already current."
-          else
-            git commit -m "deploy: update v0.5.1 core hardening preview"
+          if ! git diff --cached --quiet; then
+            git commit -m "deploy: update verified v0.5.1 playable preview"
             git push origin gh-pages
           fi
-
-      - name: Strict v0.5.1 verification (non-blocking for preview)
-        continue-on-error: true
-        run: npm run verify:v05

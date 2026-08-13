@@ -25,6 +25,7 @@ import {
   emphasizeChoiceHint
 } from '../costaRicaRouteState.ts';
 import { buildCostaRicaCarryover, persistSpecialCarryover } from '../specialCarryover.ts';
+import { applyAction, createRunState, loadRunState, saveRunState, V051_RUN_SAVE_KEY } from '../runState.ts';
 import V05NarrativeStage from './V05NarrativeStage.jsx';
 import { emitGlobalFeedback } from './V05GlobalFeedback.jsx';
 import './v05-butterfly-scholar.css';
@@ -81,7 +82,7 @@ const achievementNames = {
 
 function v05Href(query = '') {
   const params = new URLSearchParams(window.location.search);
-  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/');
+  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/') && !window.location.pathname.includes('/v051/');
   if (!query) return rootPreview ? './?core=v05' : './';
   return rootPreview ? `./?core=v05&${query}` : `./?${query}`;
 }
@@ -209,6 +210,18 @@ export default function V05ButterflyScholarRoute() {
   const chaptersHref = v05Href('mode=career');
   const researchCards = (butterflyResearchByNode[node?.id] || []).map((id) => researchById.get(id)).filter(Boolean);
 
+  // The established Costa Rica save remains canonical for this existing route.
+  // v05.1 mirrors each decision into a versioned, deterministic audit trail,
+  // without guessing at or overwriting any older save format.
+  function recordV051Action(choice) {
+    if (!node) return;
+    const fallback = createRunState({ runId: 'costa-rica-butterfly', identity: { id: 'butterfly-scholar', label: butterflyScholarIdentity.title }, chapterId: 'costa-rica', currentNodeId: node.id, objective: '把现场观察转化为可继续使用的作品方法' });
+    const prior = loadRunState(localStorage.getItem(V051_RUN_SAVE_KEY), fallback);
+    const isFinal = choice.id === 'bs-archive-open';
+    const actionNode = { id: node.id, type: 'decision', text: node.text.join(' '), actions: [{ id: choice.id, label: choice.label, nextNodeId: choice.nextNodeId, result: { summary: `已选择：${choice.label}`, delta: { resources: { energy: -1 }, addFlags: [choice.id], ...(isFinal ? { addWork: { id: 'work-costa-rica-butterfly', workingTitle: '哥斯达黎加 / 蝴蝶与现场关系', projectId: 'project-costa-rica', status: 'public', originEventId: node.id, decisionIds: [choice.id] } } : {}) } } }] };
+    saveRunState(localStorage, applyAction(prior, actionNode, choice.id));
+  }
+
   function persistWorld(next) { localStorage.setItem(WORLD_KEY, JSON.stringify(next)); setWorld(next); }
   function rememberResearch(card) {
     if ((world.researchIds || []).includes(card.id)) { setActiveResearch(null); return; }
@@ -237,6 +250,7 @@ export default function V05ButterflyScholarRoute() {
     const baseEffect = butterflyWorldEffectsByChoice[choice.id] || {};
     const contextualEffect = deriveButterflyWorldEffect(state.flags, choice.id);
     const nextWorld = mergeWorld(mergeWorld(world, baseEffect), contextualEffect);
+    recordV051Action(choice);
     localStorage.setItem(STATE_KEY, JSON.stringify(nextState));
     persistWorld(nextWorld);
     notifyWorldChanges(world, nextWorld, choice.id);
@@ -250,7 +264,7 @@ export default function V05ButterflyScholarRoute() {
   }
   function reset() {
     const nextState = createNarrativeState(butterflyScholarNarrativePack); const nextWorld = emptyWorld();
-    for (const key of [STATE_KEY, WORLD_KEY, LEGACY_STATE_KEY, LEGACY_WORLD_KEY]) localStorage.removeItem(key);
+    for (const key of [STATE_KEY, WORLD_KEY, LEGACY_STATE_KEY, LEGACY_WORLD_KEY, V051_RUN_SAVE_KEY]) localStorage.removeItem(key);
     localStorage.setItem(STATE_KEY, JSON.stringify(nextState)); localStorage.setItem(WORLD_KEY, JSON.stringify(nextWorld)); setState(nextState); setWorld(nextWorld); setActiveResearch(null);
   }
 

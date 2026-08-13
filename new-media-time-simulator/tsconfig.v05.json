@@ -1,17 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true
+    "target": "ES2022", "useDefineForClassFields": true, "module": "ESNext", "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"], "allowImportingTsExtensions": true, "noEmit": true,
+    "strict": true, "skipLibCheck": true, "forceConsistentCasingInFileNames": true, "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/v05/**/*.ts"],
-  "exclude": ["src/v05/tests/**"]
+  "include": ["src/v05/**/*.ts"], "exclude": ["src/v05/tests/**"]
 }

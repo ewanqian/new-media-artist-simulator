@@ -37,7 +37,11 @@ function V05Frame({ children }) {
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const corePreview = params.get('core');
-  const pathPreview = window.location.pathname.includes('/v05/') ? 'v05' : window.location.pathname.includes('/v03/') ? 'v03' : null;
+  // v051 is a full v05 content build with a newer persistence contract, not a
+  // separate (or empty) simulator. Keep /v05/ untouched and route /v051/ here.
+  const pathPreview = (window.location.pathname.includes('/v05/') || window.location.pathname.includes('/v051/'))
+    ? 'v05'
+    : window.location.pathname.includes('/v03/') ? 'v03' : null;
   const preview = corePreview || pathPreview;
   const lab = params.get('lab');
   const mode = params.get('mode');

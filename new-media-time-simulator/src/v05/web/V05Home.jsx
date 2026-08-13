@@ -5,7 +5,7 @@ import './v05-home.css';
 
 function v05Href(query = '') {
   const params = new URLSearchParams(window.location.search);
-  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/');
+  const rootPreview = params.get('core') === 'v05' && !window.location.pathname.includes('/v05/') && !window.location.pathname.includes('/v051/');
   if (!query) return rootPreview ? './?core=v05' : './';
   return rootPreview ? `./?core=v05&${query}` : `./?${query}`;
 }
