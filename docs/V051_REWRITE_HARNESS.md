@@ -25,11 +25,9 @@ If the screen cannot answer all four, it is blocked.
 
 ### Banned from default play
 
-- Technical names before a concrete problem makes them useful.
+- Any concept whose provenance chain is missing: it was not introduced by a reached event, does not solve the current player problem, or enables no available action.
 - Explanation of why a system, person, chapter, counter, or UI exists.
-- Unintroduced named people, places, chapters, credentials, or jargon.
-- Decorative counters, progress terms, achievement language, and internal labels.
-- “Research”, “small operation”, “asset”, “evidence”, “current version”, “impact”, or similar system UI as a compulsory interruption.
+- Decorative counters, progress terms, achievement language, and internal labels that change nothing.
 - A choice whose consequence is only a statement of taste or a hidden system change.
 - Text that pre-defends, apologizes for, or explains the game.
 
