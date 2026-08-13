@@ -1,26 +1,20 @@
 import { test, expect } from '@playwright/test';
 
-test('v051 serves the full v05 home, reaches Costa Rica, and resumes after refresh', async ({ page }) => {
-  // Relative navigation works for both local preview roots and the repository
-  // subpath used by GitHub Pages.
-  await page.goto('v051/', { waitUntil: 'networkidle' });
-  await page.evaluate(() => {
-    for (const key of ['nmas-special-costarica-narrative-v1', 'nmas-special-costarica-world-v1', 'nmas-v05.1-run']) localStorage.removeItem(key);
-  });
+test('malformed v05.1 save recovers into the first concrete problem', async ({ page }) => {
+  await page.goto('/v051/', { waitUntil: 'networkidle' });
+  await page.evaluate(() => localStorage.setItem('nmas-v05.1-run', '{broken'));
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
-  await page.getByRole('link', { name: /生涯 \/ 章节/ }).click();
-  await expect(page.getByRole('heading', { name: '选择游玩内容' })).toBeVisible();
-  await page.getByRole('link', { name: /哥斯达黎加/ }).click();
-  await expect(page.locator('.bs-topbar')).toContainText('COSTA RICA');
-  await page.getByRole('button', { name: '进入场景', exact: true }).click();
-  const firstChoice = page.getByRole('button', { name: /接。先写下一个问题再出发/ });
-  for (let step = 0; step < 4 && !(await firstChoice.isVisible().catch(() => false)); step += 1) {
-    const next = page.getByRole('button', { name: /继续|提前看选择/, exact: true });
-    await next.click();
-  }
-  await firstChoice.click();
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}').currentNodeId)).toBe('bs-02-arrival');
+  await expect(page.getByRole('heading', { name: '你做的网页黑屏了。' })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}').schemaVersion)).toBe(2);
+});
+
+test('AI is not required by any first-week action', async ({ page }) => {
+  await page.route(/openai|anthropic|api\//, (route) => route.abort());
+  await page.goto('/v051/', { waitUntil: 'networkidle' });
+  await page.evaluate(() => localStorage.removeItem('nmas-v05.1-run'));
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByText(/Inés 在研究站门口接你/)).toBeVisible();
+  await page.getByRole('button', { name: /删掉最后加的效果/ }).click();
+  await page.getByRole('button', { name: /用自己手机打开/ }).click();
+  await page.getByRole('button', { name: /修到手机也能用/ }).click();
+  await expect(page.getByText('场地方回：“收到，手机也能打开。”')).toBeVisible();
 });

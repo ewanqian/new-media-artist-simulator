@@ -6,6 +6,8 @@ node_modules/
 # 只忽略源码目录下的构建中间产物
 new-media-time-simulator/node_modules/
 new-media-time-simulator/dist/
+new-media-time-simulator/test-results/
+new-media-time-simulator/playwright-report/
 
 # OS
 .DS_Store

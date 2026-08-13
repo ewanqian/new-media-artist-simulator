@@ -1,14 +1,44 @@
 import { test, expect } from '@playwright/test';
 
-test('v051 core loop saves a work and resumes after refresh', async ({ page }) => {
-  await page.goto('/v051/?mode=core', { waitUntil: 'networkidle' });
+test.beforeEach(async ({ page }) => {
+  await page.goto('/v051/', { waitUntil: 'networkidle' });
   await page.evaluate(() => localStorage.removeItem('nmas-v05.1-run'));
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByRole('heading', { name: '一个真实委托来了。' })).toBeVisible();
-  await page.getByRole('button', { name: /先做一个可靠的版本/ }).click();
-  await expect(page.getByRole('heading', { name: '第一版已经有了结果。' })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}').works?.[0]?.id)).toBe('work-first');
-  await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByText('第一件作品')).toBeVisible();
-  await expect(page.getByText('未完成系统')).toBeVisible();
 });
+
+test('default entry starts inside one concrete problem with no menu or premature system UI', async ({ page }) => {
+  await expect(page.getByRole('heading', { name: '你做的网页黑屏了。' })).toBeVisible();
+  await expect(page.getByLabel('作品预览')).toContainText('37 errors');
+  await expect(page.getByLabel('现在能做的事').getByRole('button')).toHaveCount(3);
+  await expect(page.getByRole('link')).toHaveCount(0);
+  const copy = await page.locator('body').innerText();
+  for (const premature of ['哥斯达黎加', 'Inés', 'Rojas', '点云', 'Gaussian', 'Asset', 'Evidence', 'Blueprint', '选择游玩内容', '内容管理']) {
+    expect(copy).not.toContain(premature);
+  }
+});
+
+test('first-week loop changes the visible work, records feedback, and resumes after refresh', async ({ page }) => {
+  await page.getByRole('button', { name: /看第一条红色报错/ }).click();
+  await expect(page.getByRole('heading', { name: '画面回来了。先别急着感动。' })).toBeVisible();
+  await page.getByRole('button', { name: /发给一个还没睡的朋友/ }).click();
+  await expect(page.getByText(/所以我要干嘛/)).toBeVisible();
+  await page.getByRole('button', { name: /只做电脑版，写清楚/ }).click();
+  await expect(page.getByRole('heading', { name: '链接发出去了。' })).toBeVisible();
+  await expect(page.getByText('保存：写清设备要求的版本')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => {
+    const run = JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}');
+    return [run.schemaVersion, run.works?.[0]?.versions?.length, run.feedback?.length, run.history?.length];
+  })).toEqual([2, 2, 1, 3]);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByText('场地方回：“收到。现场会准备电脑。”')).toBeVisible();
+});
+
+for (const width of [1024, 1440]) {
+  test(`first problem stays usable at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.getByLabel('作品预览')).toBeVisible();
+    await expect(page.getByLabel('现在能做的事')).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+    expect(overflow).toBe(false);
+  });
+}
