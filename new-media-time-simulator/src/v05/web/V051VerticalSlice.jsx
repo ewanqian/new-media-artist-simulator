@@ -2,21 +2,36 @@ import { useEffect, useMemo, useState } from 'react';
 import { applyAction, createRunState, loadRunState, saveRunState, V051_RUN_SAVE_KEY } from '../runState.ts';
 import './v051-vertical-slice.css';
 
-const nodes = { brief: { id: 'brief', type: 'decision', text: '周二晚上，陈乔发来一个小委托：七天后在一个临时展厅做一件会响应观众移动的影像。预算 ¥8,000。你需要决定第一版怎么做。', actions: [
-  { id: 'fast-version', label: '先做一个可靠的版本', nextNodeId: 'result-fast', result: { summary: '你用更小的范围换来一个可以稳定运行的原型。', delta: { resources: { cash: -600, energy: -1, reputation: 1 }, addFlags: ['scope-small'], addWork: { id: 'work-first', workingTitle: '未完成系统', projectId: 'project-first', status: 'in-progress', originEventId: 'brief', decisionIds: ['fast-version'] } } } },
-  { id: 'experimental-version', label: '坚持实验：先测试陌生输入', nextNodeId: 'result-experimental', result: { summary: '你保住了实验问题，但第一版还不稳定。', delta: { resources: { cash: -300, energy: -2 }, addFlags: ['scope-experimental'], addWork: { id: 'work-first', workingTitle: '未完成系统', projectId: 'project-first', status: 'draft', originEventId: 'brief', decisionIds: ['experimental-version'] } } } },
-  { id: 'ask-collaborator', label: '找一位合作伙伴', nextNodeId: 'result-collaborator', result: { summary: '你获得了技术支持，也欠下了一次协作承诺。', delta: { resources: { cash: -900, energy: -1, reputation: 2 }, addFlags: ['asked-collaborator'], addWork: { id: 'work-first', workingTitle: '未完成系统', projectId: 'project-first', status: 'in-progress', originEventId: 'brief', decisionIds: ['ask-collaborator'] } } } }
-] } };
-const resultText = { 'result-fast': '测试通过。投影比你想象得暗，但交互逻辑能被观众理解。陈乔回复：可以继续，把现场尺寸写进下一版。', 'result-experimental': '测试没有完全成功。陌生输入让画面出现了意外的断裂，但也让作品第一次有了自己的问题。陈乔回复：先给我看一个能解释的版本。', 'result-collaborator': '测试通过。合作伙伴补上了信号链，你们也约定下一次由你来解决展厅的安装细节。陈乔回复：这版可以继续。' };
-function freshRun() { return createRunState({ runId: crypto.randomUUID?.() || 'run-first', identity: { id: 'new-media-artist', label: '刚开始独立工作的艺术家' }, chapterId: 'first-commission', currentNodeId: 'brief', objective: '在七天内完成第一件可展示的作品' }); }
+const firstDecision = { id: 'broken-page', type: 'decision', text: '你花了三天做一个会跟着鼠标动的网页。刚才把窗口缩小以后，它只剩一块黑屏。不是艺术效果，是真的坏了。七天后你要给别人看它。今晚先做什么？', actions: [
+  { id: 'make-it-run', label: '先让它能跑', nextNodeId: 'made-run', result: { summary: '你关掉了最花哨的效果。现在它没那么酷，但至少不会当场去世。', delta: { resources: { cash: -100, energy: -1, reputation: 1 }, addFlags: ['stable-first-version'], addWork: { id: 'work-first', workingTitle: '会动，但还不太好看的网页', projectId: 'project-first', status: 'in-progress', originEventId: 'broken-page', decisionIds: ['make-it-run'] } } } },
+  { id: 'find-the-bug', label: '查清楚到底哪里坏了', nextNodeId: 'found-bug', result: { summary: '你找到问题：一段代码只在你自己的屏幕尺寸下成立。它很具体，也很不浪漫。', delta: { resources: { energy: -2 }, addFlags: ['understood-the-bug'], addWork: { id: 'work-first', workingTitle: '会动，但还不太好看的网页', projectId: 'project-first', status: 'draft', originEventId: 'broken-page', decisionIds: ['find-the-bug'] } } } },
+  { id: 'keep-a-record', label: '录下这个失败，先留个版本', nextNodeId: 'recorded-failure', result: { summary: '你没有假装一切正常。你录下黑屏、报错和之前能跑的版本；以后它们能帮你解释这件作品怎么长出来。', delta: { resources: { energy: -1 }, addFlags: ['saved-failure'], addWork: { id: 'work-first', workingTitle: '会动，但还不太好看的网页', projectId: 'project-first', status: 'draft', originEventId: 'broken-page', decisionIds: ['keep-a-record'] } } } }
+] };
+
+const feedbackDecision = { id: 'share-first-version', type: 'decision', text: '现在你手上有一个版本。你不用莫名其妙发给任何人，但如果想知道它在别人那里会不会成立，可以主动把它交出去。', actions: [
+  { id: 'send-to-friend', label: '发给一个朋友看', nextNodeId: 'friend-feedback', result: { summary: '朋友回：我知道它坏了，但我第一次真的想把鼠标移过去看看会发生什么。', delta: { resources: { reputation: 1 }, addFlags: ['friend-feedback'] } } },
+  { id: 'post-a-clip', label: '发一段短视频到模拟社交媒体', nextNodeId: 'social-feedback', result: { summary: '有人说“这像我电脑卡死时的内心戏”，也有人问链接。你不确定这是夸奖，但至少有人停下来了。', delta: { resources: { reputation: 2 }, addFlags: ['social-feedback'] } } },
+  { id: 'keep-working', label: '先不发，自己再改一晚', nextNodeId: 'private-feedback', result: { summary: '你决定暂时不接受反馈。这个选择没错，只是明天你还得自己判断它到底好不好。', delta: { resources: { energy: -1 }, addFlags: ['kept-private'] } } }
+] };
+
+const resultText = {
+  'made-run': '第一步完成：它现在能在别人的电脑上打开。',
+  'found-bug': '第一步完成：你知道它为什么坏了，下一步才能决定要不要修。',
+  'recorded-failure': '第一步完成：你留下了失败的证据，而不是让它像从没发生过一样消失。',
+  'friend-feedback': '你得到第一条来自真人的反馈。',
+  'social-feedback': '你得到第一批陌生人的反馈。',
+  'private-feedback': '你决定先把这件事留在自己的桌面上。'
+};
+
+function freshRun() { return createRunState({ runId: crypto.randomUUID?.() || 'run-first', identity: { id: 'artist', label: '一个刚开始做作品的人' }, chapterId: 'first-commission', currentNodeId: 'broken-page', objective: '把桌上这个坏掉的东西，变成一件能给别人看的作品' }); }
 
 export default function V051VerticalSlice() {
   const [run, setRun] = useState(() => loadRunState(localStorage.getItem(V051_RUN_SAVE_KEY), freshRun()));
   useEffect(() => saveRunState(localStorage, run), [run]);
-  const isBrief = run.currentNodeId === 'brief';
-  const result = useMemo(() => resultText[run.currentNodeId], [run.currentNodeId]);
-  function choose(actionId) { setRun((current) => applyAction(current, nodes.brief, actionId)); }
-  function restart() { const next = freshRun(); saveRunState(localStorage, next); setRun(next); }
+  const phase = run.currentNodeId === 'broken-page' ? 'problem' : run.history.length === 1 ? 'share' : 'complete';
   const work = run.works[0];
-  return <main className="v051-shell"><header><a href="./">← 返回桌面</a><small>WEEK 01 · FIRST COMMISSION</small><button onClick={restart}>重新开始</button></header><section className="v051-layout"><article><p className="v051-kicker">现在要做什么</p><h1>{isBrief ? '一个真实委托来了。' : '第一版已经有了结果。'}</h1><p className="v051-objective">{run.objective}</p>{isBrief ? <><p>{nodes.brief.text}</p><div className="v051-actions">{nodes.brief.actions.map((action) => <button key={action.id} onClick={() => choose(action.id)}><strong>{action.label}</strong><span>{action.result.summary}</span></button>)}</div></> : <><p>{result}</p><section className="v051-result"><small>RESULT</small><strong>{run.history[0]?.summary}</strong><p>下一步：根据这次测试继续制作；作品与这次决定已经写入生涯记录。</p></section></>}</article><aside><section><small>你是谁</small><strong>{run.identity.label}</strong></section><section><small>资源</small><p>现金 ¥{run.resources.cash}</p><p>精力 {run.resources.energy}</p><p>信誉 {run.resources.reputation}</p></section><section><small>第一件作品</small><strong>{work?.workingTitle || '尚未开始'}</strong><p>{work ? work.status + ' · 由这次委托与决定形成' : '做出决定后，它会成为生涯的一部分。'}</p></section><section><small>History</small>{run.history.length ? run.history.map((item) => <p key={item.id}>{item.summary}</p>) : <p>还没有行动记录。</p>}</section></aside></section></main>;
+  const text = useMemo(() => resultText[run.currentNodeId], [run.currentNodeId]);
+  function choose(node, actionId) { setRun((current) => applyAction(current, node, actionId)); }
+  function restart() { const next = freshRun(); saveRunState(localStorage, next); setRun(next); }
+  return <main className="v051-shell"><header><a href="./">← 返回桌面</a><small>第一周 · 你的桌面</small><button onClick={restart}>重新开始</button></header><section className="v051-layout"><article><p className="v051-kicker">{phase === 'problem' ? '发生了什么' : phase === 'share' ? '下一步可以做什么' : '这件作品已经开始有了自己的生活'}</p><h1>{phase === 'problem' ? '你的作品坏了。' : phase === 'share' ? '现在要不要让别人看？' : '你完成了第一轮。'}</h1><p className="v051-objective">{run.objective}</p>{phase === 'problem' && <><p>{firstDecision.text}</p><div className="v051-actions">{firstDecision.actions.map((action) => <button key={action.id} onClick={() => choose(firstDecision, action.id)}><strong>{action.label}</strong><span>{action.result.summary}</span></button>)}</div></>}{phase === 'share' && <><p>{text}</p><p>{feedbackDecision.text}</p><div className="v051-actions">{feedbackDecision.actions.map((action) => <button key={action.id} onClick={() => choose(feedbackDecision, action.id)}><strong>{action.label}</strong><span>{action.result.summary}</span></button>)}</div></>}{phase === 'complete' && <section className="v051-result"><small>你做了什么</small><strong>{text}</strong><p>这不是结局。下一次你可以根据反馈修改，也可以无视反馈继续做。重要的是：这件作品、你的选择和它留下的后果都已经被保存。</p></section>}</article><aside><section><small>你是谁</small><strong>{run.identity.label}</strong><p>没有预设人脉，也没有陌生人等着考验你。</p></section><section><small>你现在有多少余地</small><p>钱 ¥{run.resources.cash}：还能买材料或找人帮忙。</p><p>精力 {run.resources.energy}：今晚还能再折腾几次。</p><p>反馈 {run.resources.reputation}：别人愿不愿意停下来看看。</p></section><section><small>第一件作品</small><strong>{work?.workingTitle || '还在坏着'}</strong><p>{work ? '它不是成就图标；它会带着这次选择进入之后的项目。' : '先做一个决定，它才会开始存在。'}</p></section><section><small>你已经做过的事</small>{run.history.length ? run.history.map((item) => <p key={item.id}>{item.summary}</p>) : <p>还没有。黑屏正在等你。</p>}</section></aside></section></main>;
 }
