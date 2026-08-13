@@ -125,9 +125,9 @@ export const butterflyScholarNarrativePack: NarrativePack = {
       { id: 'bs-failure-repair', label: '保留失败版本，然后回去修相机求解', subtext: '把失败当 Evidence，不把失败当成必须隐藏的废料。', effects: { setFlags: ['failure-kept', 'solve-repaired'], factUpdates: [{ factId: 'fact-bad-solve', state: 'verified', sourceId: 'failed-reconstruction' }] }, nextNodeId: 'bs-04a-represent' },
       { id: 'bs-failure-use', label: '不修干净，把断裂本身带进作品', subtext: '接受技术问题成为形式，但必须承认它来自采集缺口。', effects: { setFlags: ['failure-used-as-form', 'solve-still-fragile'] }, nextNodeId: 'bs-04a-represent' }
     ] },
-    { id: 'bs-04a-represent', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['现在才轮到选空间表示。', '点云会把采样点、密度和孔洞直接露出来；Gaussian 更适合让观众在照片形成的空间外观里连续移动。'], choices: [
-      { id: 'bs-represent-pointcloud', label: '做点云版本', subtext: '点、密度、孔洞都会被看见，采集过程不容易被藏起来。', effects: { setFlags: ['representation-pointcloud'] }, nextNodeId: 'bs-04e-compose' },
-      { id: 'bs-represent-gaussian', label: '做 Gaussian 版本', subtext: '移动视角更连续，但仍然要对底层采集缺口负责。', effects: { setFlags: ['representation-gaussian'] }, nextNodeId: 'bs-04e-compose' }
+    { id: 'bs-04a-represent', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['你终于把昨晚那堆坏数据弄成了一个能看的版本。问题来了：要不要把它最狼狈的地方给观众看？', '如果保留孔洞和断裂，观众会看到这次采集的不完整；如果把画面尽量做顺，观众更容易走进去，但未必知道你经历过什么。'], choices: [
+      { id: 'bs-represent-pointcloud', label: '把缺口也给观众看', subtext: '让不完整成为作品的一部分：别把现场装成从没出过错。', effects: { setFlags: ['representation-pointcloud'] }, nextNodeId: 'bs-04e-compose' },
+      { id: 'bs-represent-gaussian', label: '先让观众能舒服地走进去', subtext: '先把观看做顺；采集的麻烦留在作品记录里。', effects: { setFlags: ['representation-gaussian'] }, nextNodeId: 'bs-04e-compose' }
     ] },
     { id: 'bs-04e-compose', sceneId: 'scene-night', speakerId: 'player-butterfly-scholar', channel: 'record', text: ['重建完成以后，你才真正开始做作品。', '空间进 Blender / 实时系统。白天记录的蝴蝶运动现在可以回来：不一定变成一只写实蝴蝶，也可以变成形变、风、密度，或者观众靠近时才发生的行为。'], choices: [
       { id: 'bs-compose-noise', label: '用 Noise / 程序化形变做动画', subtext: '让空间持续发生规则化形变，不假装是真实物理。', effects: { setFlags: ['motion-procedural'] }, nextNodeId: 'bs-04f-authorship' },
@@ -200,10 +200,10 @@ export function resolveButterflyNodeText(nodeId: string, flags: string[], fallba
     return ['白天没补的缺口晚上回来了。80 张照片里只有 61 张成功定位，叶片背面附近的相机轨迹直接断掉。', '现在你能看到那个决定的实际代价：不是扣一个抽象分数，而是这部分空间没有可靠的相机关系。'];
   }
   if (nodeId === 'bs-04a-represent' && has.has('failure-kept')) {
-    return ['失败版本已经单独保存。你修回了一套可用的相机关系，现在才轮到决定空间用什么方式呈现。', '点云更直接地暴露采样和孔洞；Gaussian 更适合连续浏览照片形成的空间外观。'];
+    return ['失败版本已经单独保存。现在不是选一个听起来厉害的技术，而是决定要不要让观众看见这个失败。', '你可以让孔洞和断裂留在画面里；也可以先做一个更容易进入的版本，再把失败留在记录中。'];
   }
   if (nodeId === 'bs-04a-represent' && has.has('failure-used-as-form')) {
-    return ['你决定不把断裂伪装成“修好了”。接下来选的不是哪个技术替你补洞，而是哪种表示更适合让观众看见这次不完整。', '点云会直接露出破碎采样；Gaussian 会让连续外观和断裂区域之间的落差更明显。'];
+    return ['你决定不把断裂伪装成“修好了”。接下来只需要决定：观众第一眼是看见断裂，还是先走进这个空间。', '两种做法都会留下这次失败；区别只在于你把它放在画面里，还是放在作品记录里。'];
   }
   if (nodeId === 'bs-05-public') {
     const capture = has.has('capture-relation-route') ? '蝴蝶的运动和空间被分开采集再重新组合' : has.has('capture-ethical-trace') ? '作品没有捕捉活体，而是留下寄主、出现时间和痕迹' : '样地空间成为作品的主要底层';
