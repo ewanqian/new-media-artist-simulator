@@ -29,11 +29,11 @@ export default function V05Home() {
         </header>
 
         <div className="vh-modes two">
-          <a className="primary" href={v05Href('mode=career')}>
+          <a className="primary" href={v05Href('mode=core')}>
             <small>PLAY</small>
-            <strong>生涯 / 章节</strong>
-            <span>{career.profile ? `已有档案：${career.profile.title} · 第 ${career.save?.week || 1} 周` : '主线生涯、教学章节与特殊章节都从这里进入。'}</span>
-            <em>选择游玩内容 →</em>
+            <strong>开始第一件作品</strong>
+            <span>{career.profile ? `继续：${career.profile.title} · 第 ${career.save?.week || 1} 周` : '七天后的首次委托：做一个选择、看到结果、留下第一件作品。'}</span>
+            <em>开始生涯 →</em>
           </a>
           <div className="vh-free-card">
             <small>FREE CREATE</small><strong>自由创作</strong><span>从空白开始搭节点，或者继续最近一次工作图。</span>
