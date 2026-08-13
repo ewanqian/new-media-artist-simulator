@@ -8,7 +8,7 @@ This is the operating contract for the v05.1 rewrite. It replaces ad-hoc copy ed
 - Canonical source: `new-media-time-simulator/src/v05/`.
 - Generated `gh-pages` assets are never edited.
 - Each work package is one focused commit. A failed gate is reverted or corrected before the next package starts.
-- The current deployed v05 preview remains intact while `/v051/` is the rewrite preview.
+- The current deployed `/v05/` artifact remains the rollback preview. CI publishes this branch only under `/v051/`.
 
 ## Non-negotiable player contract
 
@@ -50,6 +50,8 @@ Every player-facing sentence must be one of:
 - a short human reaction.
 
 Anything else is deleted by default. “Good writing” does not exempt a sentence.
+
+This test is not a word blacklist. A term is allowed when its concept has provenance, current relevance, and action value. Route-specific blocked-word assertions exist only to catch previously observed leaks.
 
 ## Content grammar
 
@@ -132,8 +134,10 @@ The following must block a merge:
 - no Decision has fewer than 2 or more than 3 actions;
 - no Decision action lacks a structured consequence;
 - content budget lint;
-- forbidden-default-copy scan for system labels and premature technical terms;
+- route-specific regression assertions for previously observed system-label and technical-term leaks;
 - browser smoke at 1024px and 1440px.
+- desktop and mobile playthrough of every accepted player route.
+- entry-bundle checks proving legacy engines, overlays, and CSS are absent from default play.
 
 ## Human review ritual
 
@@ -149,12 +153,38 @@ For every work package:
 
 ## Execution order
 
-WP0 -> WP1 -> WP2 -> WP3 -> WP4 -> WP5. No package may be advanced because another part of the UI looks polished.
+WP0 -> WP1 -> WP2 -> WP3 -> minimum WP4 -> WP5. This P0 chain is complete. The next chain begins with continuity after the first delivery, then legacy-screen migration. No content expansion comes before those two problems.
 
 ## Current status
 
-- Gate 0 source provenance: complete.
-- RunState/save/action/work contracts: partially complete; the new contract must become the only default-play persistence route during WP1.
-- First-session slice: present, but under active rewrite and not accepted until the attention scrub passes.
-- Costa Rica: not accepted; it is a later content-pack rewrite, not a reference for default play.
-- Full P0 is not complete.
+| Package | Status | Accepted commit | Roll back to |
+|---|---|---:|---:|
+| Gate 0: canonical source and Pages pipeline | complete | `9f83b44` | previous branch state |
+| generic attention/redundancy/change contracts | complete | `356dfd5` | `9f83b44` |
+| RunState v2, migration/reset, Work, direct first session | complete | `aabf268` | `356dfd5` |
+| player-led feedback with use/retest/ignore | complete | `48d34db` | `aabf268` |
+| legacy route and bundle isolation | complete | `dcef346` | `48d34db` |
+| focused optional Costa Rica route | complete | `96abdda` | `dcef346` |
+
+P0 is complete for the accepted `/v051/` first session and the optional Costa Rica pack. It is not a claim that the entire legacy career is rewritten.
+
+## Known remaining work
+
+1. `/v051/` stops after the first delivery. It needs a second playable day that starts from the Work and consequence just created, not a menu.
+2. Original `/v05/` career/story screens still contain dense internal language. They are isolated, not repaired.
+3. Costa Rica retains legacy narrative/world persistence beside the separate v05.1 RunState mirror. Migrate consumers before deleting it.
+4. The advanced work graph and research cards intentionally retain specialist language. They must remain opt-in and lazy-loaded.
+5. Full Prep Loop, new NPCs, factions, locations, and chapters remain frozen.
+
+## First-principles admission test for future content
+
+For every proposed visible item, stop at the first “no”:
+
+1. Does the player currently have a concrete problem?
+2. Did a reached event introduce this item?
+3. Does it change an action, a visible result, a Work, or an already chosen feedback relationship?
+4. Is it needed now rather than later?
+5. Does it fit one primary focus, 2–3 actions, at most one new concept, and the text budget?
+6. Can its effect be expressed as a deterministic state delta and history line?
+
+No: delete, defer, or move behind voluntary help. Do not add an explanation to justify its presence.

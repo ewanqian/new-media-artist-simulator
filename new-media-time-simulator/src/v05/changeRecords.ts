@@ -45,5 +45,14 @@ export const v051ChangeRecords: ChangeRecord[] = [
     automatedChecks: ['generic attention and redundancy gate on every scene', 'dynamic-copy vocabulary regression', 'separate save and public Work browser path', 'desktop and mobile browser'],
     humanReview: 'passed',
     rollbackCommit: 'dcef346'
+  },
+  {
+    id: 'wp-full-harness',
+    playerProblem: 'Accepted routes could regress because status documents were stale and CI exercised only the first-session browser specs.',
+    changedFiles: ['docs/V051_REWRITE_HARNESS.md', '.github/workflows/v051-core-hardening-preview.yml'],
+    stateEffect: 'None. The harness records exact accepted boundaries and blocks preview publication unless every v05 browser route passes on desktop and mobile.',
+    automatedChecks: ['all v05 and v05.1 unit tests', 'all browser specs in both projects', 'entry build budgets'],
+    humanReview: 'passed',
+    rollbackCommit: '96abdda'
   }
 ];

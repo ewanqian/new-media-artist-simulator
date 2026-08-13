@@ -1,14 +1,27 @@
 # WP0 — Default-play attention inventory
 
-Audited: `/v051/`, `/v051/?mode=core`, and reachable legacy entry routes on 2026-08-14.
+Audited: `/v051/`, the optional Costa Rica route, and reachable legacy entry routes on 2026-08-14.
 
-This is an execution list, not a design memo. No new player-facing copy may be added until every row marked DELETE or REWRITE is resolved and reviewed.
+This is an execution list, not a design memo. The default route and Costa Rica rows are resolved. Legacy rows remain quarantined work, not accepted copy.
+
+## Resolution snapshot
+
+| Area | Result | Evidence |
+|---|---|---|
+| `/v051/` home/menu | removed | route opens directly inside the black-screen problem |
+| first problem | resolved | concrete preview, one deadline, three actions; no named person or optional chapter |
+| first Work | resolved | created by the first decision; versions and history are stored without exposing internal labels |
+| feedback | resolved | phone, friend, or social test is player-chosen; use/retest/ignore changes later play |
+| save/resume | resolved | schema v2, v1 migration, malformed reset, refresh resume, stale-action protection |
+| Costa Rica | resolved as optional pack | invitation explains why/pay; Inés and Rojas enter in scenes; technical choices use player stakes; feedback is chosen |
+| legacy career/story | not resolved | isolated from default bundle and storage; remains available under original v05 routes |
+| advanced work graph/research | not resolved as general play | opt-in tool only; not loaded by `/v051/` |
 
 ## Scope rule
 
 **Default play** means the route a first-time player reaches through the primary button. It must not require a player to understand any of the other systems. Advanced career setup, free creation, content tools, and Costa Rica are outside default play and must be visually secondary and explicitly labelled advanced/optional.
 
-## /v051/ home
+## Historical `/v051/` home findings — resolved by direct entry
 
 | Visible item | Decision | Reason | Required action |
 |---|---|---|---|
@@ -20,7 +33,7 @@ This is an execution list, not a design memo. No new player-facing copy may be a
 | “内容管理” and settings cards | HIDE | Breaks the magic circle. | Remove from first screen; settings only behind icon. |
 | Footer with version, READ/DECIDE, Blueprint language | DELETE | Internal/product language. | Delete. |
 
-## /v051/?mode=core first loop
+## `/v051/` first loop findings — resolved
 
 | Visible item | Decision | Reason | Required action |
 |---|---|---|---|
@@ -47,7 +60,7 @@ This is an execution list, not a design memo. No new player-facing copy may be a
 | Known people | DELETE | A relationship list has no meaning without meetings. | Introduce people only through a current event. |
 | Costa Rica card | HIDE | Optional chapter is crowding the beginning. | Remove from new-player UI; bring back after main loop acceptance. |
 
-## Costa Rica route (not default; blocked until WP5)
+## Costa Rica route — optional WP5 accepted
 
 | Visible item | Decision | Reason | Required action |
 |---|---|---|---|
@@ -57,9 +70,9 @@ This is an execution list, not a design memo. No new player-facing copy may be a
 | Asset/Evidence/Knowledge labels | REWRITE/HIDE | Internal nouns break attention. | Replace with ordinary nouns in player view; retain IDs only in data. |
 | Inés/Rojas | REWRITE | Names need a current role and first interaction. | Introduce one at a time, only at the moment they act. |
 
-## Regressions to prevent
+## Route-specific regressions to prevent
 
-The following strings or concepts are blocked from first-session UI unless a reviewed exception documents the immediate player problem:
+The following strings or concepts are smoke assertions based on failures already seen in the first-session UI. They are not the reusable attention algorithm. A new concept is governed by provenance, current relevance, action value, and screen budget:
 
 - Asset, Evidence, Knowledge, Work Graph, Blueprint, Node, phase, stage, content, system, archive, current version, impact.
 - Costa Rica, Inés, Rojas, Lin, Chen, or any named NPC.
@@ -68,8 +81,8 @@ The following strings or concepts are blocked from first-session UI unless a rev
 
 ## WP0 exit criteria
 
-- The default route has one clear CTA and no tool/management/chapter cards.
-- The first screen has one concrete object, one visible failure, and 2–3 actions.
-- Every word in default play has a row above with a reviewed status.
-- All DELETE rows are gone; all REWRITE rows have a new screenshot and a human attention review.
-- The original v05 route remains available as rollback; no deletion is irreversible.
+- [x] The default route opens directly in play and has no tool/management/chapter cards.
+- [x] The first screen has one concrete object, one visible failure, and three actions.
+- [x] Default-play surfaces pass the generic attention and redundancy contract.
+- [x] DELETE/REWRITE findings are absent from accepted routes and were checked on desktop/mobile.
+- [x] The original v05 artifact remains available as rollback; no generated hashed asset was hand-edited.
