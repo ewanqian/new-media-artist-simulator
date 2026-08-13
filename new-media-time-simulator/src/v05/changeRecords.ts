@@ -54,5 +54,14 @@ export const v051ChangeRecords: ChangeRecord[] = [
     automatedChecks: ['all v05 and v05.1 unit tests', 'all browser specs in both projects', 'entry build budgets'],
     humanReview: 'passed',
     rollbackCommit: '96abdda'
+  },
+  {
+    id: 'wp-second-day-continuity',
+    playerProblem: 'The first Work stopped immediately after delivery, so consequences never reached a real venue and play collapsed into restart.',
+    changedFiles: ['src/v05/firstWeekContent.ts', 'src/v05/web/V051VerticalSlice.jsx', 'src/v05/runState.ts'],
+    stateEffect: 'The same Work advances through a result transition, venue setup, final revision, and first public run with six decisions and traceable versions and feedback.',
+    automatedChecks: ['729 deterministic two-day paths', 'transition idempotency', 'desktop and mobile public-run browser path', 'reviewed 24 KB slice budget'],
+    humanReview: 'passed',
+    rollbackCommit: '07eb513'
   }
 ];

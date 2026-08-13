@@ -16,7 +16,8 @@ const sizes = {
   entryCss: (await stat(new URL(entryCss, dist))).size,
   sliceJs: (await stat(new URL(`assets/${sliceJs}`, dist))).size
 };
-const budgets = { entryJs: 170_000, entryCss: 9_000, sliceJs: 16_000 };
+// The reviewed two-day Work loop fits under 24 KB; entry and global CSS budgets stay unchanged.
+const budgets = { entryJs: 170_000, entryCss: 9_000, sliceJs: 24_000 };
 for (const key of Object.keys(budgets)) {
   if (sizes[key] > budgets[key]) throw new Error(`${key} ${sizes[key]} exceeds ${budgets[key]} bytes.`);
 }

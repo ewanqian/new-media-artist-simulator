@@ -133,6 +133,14 @@ export function loadRunState(raw: string | null, fallback: RunState): RunState {
   } catch { return fallback; }
 }
 export function saveRunState(storage: Pick<Storage, 'setItem'>, state: RunState, key = V051_RUN_SAVE_KEY) { storage.setItem(key, JSON.stringify(state)); }
+export function advanceTransition(state: RunState, node: NarrativeNode): RunState {
+  if (node.type !== 'transition' || node.id !== state.currentNodeId) return state;
+  return {
+    ...state,
+    currentNodeId: node.nextNodeId,
+    eventIds: [...new Set([...state.eventIds, node.id])]
+  };
+}
 export function applyAction(state: RunState, node: NarrativeNode, actionId: string, now = new Date().toISOString()): RunState {
   if (node.type !== 'decision') return state;
   if (state.history.some((entry) => entry.nodeId === node.id && entry.actionId === actionId)) return state;

@@ -10,8 +10,8 @@ This is an execution list, not a design memo. The default route and Costa Rica r
 |---|---|---|
 | `/v051/` home/menu | removed | route opens directly inside the black-screen problem |
 | first problem | resolved | concrete preview, one deadline, three actions; no named person or optional chapter |
-| first Work | resolved | created by the first decision; versions and history are stored without exposing internal labels |
-| feedback | resolved | phone, friend, or social test is player-chosen; use/retest/ignore changes later play |
+| first Work | resolved | created by the first decision; the same Work reaches venue testing and a public version without exposing internal labels |
+| feedback | resolved | phone, friend, or social test is player-chosen; use/retest/ignore changes delivery, then venue feedback changes the public version |
 | save/resume | resolved | schema v2, v1 migration, malformed reset, refresh resume, stale-action protection |
 | Costa Rica | resolved as optional pack | invitation explains why/pay; Inés and Rojas enter in scenes; technical choices use player stakes; feedback is chosen |
 | legacy career/story | not resolved | isolated from default bundle and storage; remains available under original v05 routes |

@@ -165,12 +165,13 @@ WP0 -> WP1 -> WP2 -> WP3 -> minimum WP4 -> WP5. This P0 chain is complete. The n
 | player-led feedback with use/retest/ignore | complete | `48d34db` | `aabf268` |
 | legacy route and bundle isolation | complete | `dcef346` | `48d34db` |
 | focused optional Costa Rica route | complete | `96abdda` | `dcef346` |
+| same-Work continuity through first public run | complete | `CURRENT_PACKAGE` | `07eb513` |
 
 P0 is complete for the accepted `/v051/` first session and the optional Costa Rica pack. It is not a claim that the entire legacy career is rewritten.
 
 ## Known remaining work
 
-1. `/v051/` stops after the first delivery. It needs a second playable day that starts from the Work and consequence just created, not a menu.
+1. `/v051/` now reaches the first public run, then offers replay. It still needs a direct bridge from that public Work into later career play.
 2. Original `/v05/` career/story screens still contain dense internal language. They are isolated, not repaired.
 3. Costa Rica retains legacy narrative/world persistence beside the separate v05.1 RunState mirror. Migrate consumers before deleting it.
 4. The advanced work graph and research cards intentionally retain specialist language. They must remain opt-in and lazy-loaded.

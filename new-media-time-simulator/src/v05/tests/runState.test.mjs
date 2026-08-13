@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { RUN_STATE_SCHEMA_VERSION, applyAction, createRunState, loadRunState } from '../runState.ts';
+import { RUN_STATE_SCHEMA_VERSION, advanceTransition, applyAction, createRunState, loadRunState } from '../runState.ts';
 
 function state() { return createRunState({ runId: 'run-test', identity: { id: 'artist', label: '新媒体艺术家' }, chapterId: 'career', currentNodeId: 'first-brief', objective: '完成第一件作品' }); }
 
@@ -53,5 +53,14 @@ test('the same node action is idempotent and stale nodes cannot write state', ()
   const once = applyAction(start, node, 'go', '2026-08-13T00:00:00.000Z');
   assert.equal(applyAction(once, node, 'go'), once);
   assert.equal(applyAction(once, { ...node, id: 'stale-node' }, 'go'), once);
+});
+test('a transition advances once without inventing a player decision', () => {
+  const initial = { ...state(), currentNodeId: 'delivery-result' };
+  const node = { id: 'delivery-result', type: 'transition', text: '链接发出去了。', nextNodeId: 'venue-photo' };
+  const next = advanceTransition(initial, node);
+  assert.equal(next.currentNodeId, 'venue-photo');
+  assert.ok(next.eventIds.includes('delivery-result'));
+  assert.equal(next.history.length, 0);
+  assert.equal(advanceTransition(next, node), next);
 });
 test('valid versioned saves resume unchanged', () => { const fresh = state(); const resumed = loadRunState(JSON.stringify(fresh), state()); assert.equal(resumed.schemaVersion, RUN_STATE_SCHEMA_VERSION); assert.equal(resumed.runId, fresh.runId); });

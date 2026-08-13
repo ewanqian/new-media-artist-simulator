@@ -133,7 +133,7 @@ The build is not accepted because it is sophisticated, expressive, or technicall
 
 | Surface | State | Enforcement |
 |---|---|---|
-| `/v051/` first session | accepted P0 | generic surface gate, 81 path test, save tests, desktop/mobile browser, build isolation |
+| `/v051/` two-day opening | accepted P0 | generic surface gate, 729 path test, save tests, desktop/mobile browser, build isolation |
 | optional Costa Rica route | accepted focused pack | same generic surface gate, introduction contracts, dynamic-copy regression, separate Work/save, desktop/mobile browser |
 | original `/v05/` home/career/story | rollback and advanced reference | isolated from default; not yet copy-clean |
 | work graph / research cards | advanced reference | lazy-loaded; specialist language allowed only because the player explicitly opens the tool |

@@ -5,20 +5,22 @@ import type { PlayerProblem, SurfaceContract, SurfaceItem } from './controlSyste
 export type FirstWeekChoice = NarrativeAction & { note: string };
 export type FirstWeekScene = {
   id: string;
-  moment: 'problem' | 'ending';
+  moment: 'problem' | 'result' | 'ending';
   time: string;
   title: string;
   lines: string[];
   problemId?: string;
-  preview: 'broken' | 'minimal' | 'responsive' | 'fragile' | 'touch' | 'desktop' | 'guided' | 'video';
+  preview: 'broken' | 'minimal' | 'responsive' | 'fragile' | 'touch' | 'desktop' | 'guided' | 'video' | 'venue-wide' | 'venue-test' | 'venue-idle';
   choices: FirstWeekChoice[];
+  advance?: { id: string; label: string; nextNodeId: string };
 };
 
 export const firstWeekProblems: PlayerProblem[] = [
   { id: 'fix-black-screen', objectId: 'work-web-01', goal: '让网页离开当前窗口也能打开' },
   { id: 'test-outside-laptop', objectId: 'work-web-01', goal: '确认作品在别的设备上会发生什么' },
   { id: 'respond-to-feedback', objectId: 'work-web-01', goal: '决定是否根据刚收到的反应修改作品' },
-  { id: 'deliver-by-ten', objectId: 'work-web-01', goal: '上午十点前给场地方一个能查看的版本' }
+  { id: 'deliver-by-ten', objectId: 'work-web-01', goal: '上午十点前给场地方一个能查看的版本' },
+  { id: 'adapt-to-venue', objectId: 'work-web-01', goal: '让同一个网页在现场投影和普通鼠标上能工作' }
 ];
 
 const work = (actionId: string, label: string, state: 'rough' | 'testable'): Work => ({
@@ -215,6 +217,67 @@ function deliveryChoices(): FirstWeekChoice[] {
   ];
 }
 
+function latestVersionId(run: RunState) {
+  return run.works[0]?.versions?.at(-1)?.id || 'version-01';
+}
+
+function venueSetupChoices(): FirstWeekChoice[] {
+  return [
+    {
+      id: 'fit-wide-projector', label: '按现场照片重排画面', note: '先适配那面宽墙。别等墙自己长成你的浏览器。', nextNodeId: 'venue-last-check',
+      result: { summary: '场地方刷新。圆终于铺开了，鼠标还孤零零躺在角落。', delta: {
+        addFlags: ['venue-layout-fixed'],
+        updateWork: { workId: 'work-web-01', decisionId: 'fit-wide-projector', addVersion: { id: 'version-04-layout', label: '按现场投影重排的版本', state: 'testable', createdByActionId: 'fit-wide-projector' } }
+      } }
+    },
+    {
+      id: 'send-minimum-venue-test', label: '先发一个只有圆和鼠标的测试页', note: '先测投影能开、鼠标能动。作品晚点再塞回去。', nextNodeId: 'venue-last-check',
+      result: { summary: '测试页能开，鼠标也能动。场地方回：“不看你消息的人，不知道要动它。”', delta: {
+        addFlags: ['venue-minimum-tested'],
+        updateWork: { workId: 'work-web-01', decisionId: 'send-minimum-venue-test', addVersion: { id: 'version-04-test', label: '现场最小测试页', state: 'testable', createdByActionId: 'send-minimum-venue-test' } },
+        addFeedback: { id: 'feedback-venue-test', source: 'venue', workId: 'work-web-01', versionId: 'version-04-test', text: '测试页能开，鼠标能动。但没人知道要动它。', createdByActionId: 'send-minimum-venue-test', status: 'new' }
+      } }
+    },
+    {
+      id: 'venue-loop-video', label: '直接让录屏循环播放', note: '最稳。互动当场死亡。', nextNodeId: 'venue-last-check',
+      result: { summary: '录屏铺满了墙，每十秒准时重来。它再也不会黑屏，也不再需要观众。', delta: {
+        addFlags: ['venue-video-loop'],
+        updateWork: { workId: 'work-web-01', decisionId: 'venue-loop-video', addVersion: { id: 'version-04-loop', label: '现场循环录屏', state: 'shared', createdByActionId: 'venue-loop-video' } }
+      } }
+    }
+  ];
+}
+
+function finalVenueChoices(run: RunState): FirstWeekChoice[] {
+  const reactedVersionId = latestVersionId(run);
+  return [
+    {
+      id: 'make-controls-obvious', label: '把能拖的东西做大，再写“动一下”', note: '不写宣言。先救那只角落里的鼠标。', nextNodeId: 'venue-opened',
+      result: { summary: '第一个观众看见了那句话，找到鼠标，拖了一下。画面真的躲开了。', delta: {
+        addFlags: ['venue-guided-control'], addEventIds: ['first-public-run'],
+        updateWork: { workId: 'work-web-01', status: 'public', decisionId: 'make-controls-obvious', addVersion: { id: 'version-05-guided', label: '现场能看懂怎么操作的版本', state: 'shared', createdByActionId: 'make-controls-obvious' } },
+        addFeedback: { id: 'feedback-venue-guided', source: 'venue', workId: 'work-web-01', versionId: reactedVersionId, text: '有人找到鼠标，画面第一次被现场观众改变。', createdByActionId: 'make-controls-obvious', status: 'new' }
+      } }
+    },
+    {
+      id: 'add-idle-motion', label: '没人碰时，也让画面自己慢慢动', note: '互动还在。冷场时，作品先自救。', nextNodeId: 'venue-opened',
+      result: { summary: '没人碰鼠标。画面还是慢慢散开，又自己聚回来。至少没有装死。', delta: {
+        addFlags: ['venue-idle-motion'], addEventIds: ['first-public-run'],
+        updateWork: { workId: 'work-web-01', status: 'public', decisionId: 'add-idle-motion', addVersion: { id: 'version-05-idle', label: '没人操作也会继续的版本', state: 'shared', createdByActionId: 'add-idle-motion' } },
+        addFeedback: { id: 'feedback-venue-idle', source: 'venue', workId: 'work-web-01', versionId: reactedVersionId, text: '没人碰鼠标，但画面没有停。', createdByActionId: 'add-idle-motion', status: 'new' }
+      } }
+    },
+    {
+      id: 'keep-video-final', label: '认了：今晚就播录屏', note: '删掉互动。换一个不会现场死掉的版本。', nextNodeId: 'venue-opened',
+      result: { summary: '录屏每十秒准时重来。没有人弄坏它，因为没有人能碰它。非常稳。', delta: {
+        addFlags: ['venue-video-final'], addEventIds: ['first-public-run'],
+        updateWork: { workId: 'work-web-01', status: 'public', decisionId: 'keep-video-final', addVersion: { id: 'version-05-video', label: '第一次现场播放的录屏版', state: 'shared', createdByActionId: 'keep-video-final' } },
+        addFeedback: { id: 'feedback-venue-video', source: 'venue', workId: 'work-web-01', versionId: reactedVersionId, text: '播放很稳定。互动没有进入现场。', createdByActionId: 'keep-video-final', status: 'new' }
+      } }
+    }
+  ];
+}
+
 function previewAfterFirst(run: RunState): FirstWeekScene['preview'] {
   if (run.flags.includes('version-responsive')) return 'responsive';
   if (run.flags.includes('version-fragile')) return 'fragile';
@@ -244,16 +307,40 @@ export function firstWeekScene(run: RunState): FirstWeekScene {
     problemId: 'deliver-by-ten', preview: previewAfterResponse(run), choices: deliveryChoices()
   };
   if (run.currentNodeId === 'morning-video') return {
-    id: 'morning-video', moment: 'ending', time: '上午 9:57', title: '视频发出去了。链接没有。',
-    lines: ['场地方回：“收到。链接呢？”'], preview: 'video', choices: []
+    id: 'morning-video', moment: 'result', time: '上午 9:57', title: '视频发出去了。链接没有。',
+    lines: ['场地方回：“收到。链接呢？”'], problemId: 'deliver-by-ten', preview: 'video', choices: [],
+    advance: { id: 'continue-after-video', label: '看下午发来的现场照片', nextNodeId: 'venue-photo' }
   };
   if (run.currentNodeId === 'morning-late') return {
-    id: 'morning-late', moment: 'ending', time: '上午 9:38', title: '你开口要了一个小时。',
-    lines: ['场地方回：“可以。十一点前给我。”'], preview: previewAfterResponse(run), choices: []
+    id: 'morning-late', moment: 'result', time: '上午 9:38', title: '你开口要了一个小时。',
+    lines: ['场地方回：“可以。十一点前给我。”'], problemId: 'deliver-by-ten', preview: previewAfterResponse(run), choices: [],
+    advance: { id: 'continue-after-delay', label: '补上链接，再看现场照片', nextNodeId: 'venue-photo' }
   };
+  if (run.currentNodeId === 'morning-link') return {
+    id: 'morning-link', moment: 'result', time: '上午 9:54', title: '链接发出去了。',
+    lines: [linkReply(run)], problemId: 'deliver-by-ten', preview: previewAfterResponse(run), choices: [],
+    advance: { id: 'continue-after-link', label: '看下午发来的现场照片', nextNodeId: 'venue-photo' }
+  };
+  if (run.currentNodeId === 'venue-photo') {
+    const line = run.flags.includes('delivered-video')
+      ? '下午两点，场地方发来一张投影照片。录屏铺满了墙。消息里还跟着一句：“链接呢？”'
+      : run.flags.includes('delivery-delayed')
+        ? '十一点零六分，你补上链接。下午两点，现场照片到了：宽投影把画面挤在了左边。'
+        : '下午两点，场地方发来一张投影照片：墙比你的屏幕宽得多，三个圆全挤在左边，鼠标放在角落。';
+    return { id: 'venue-photo', moment: 'problem', time: '第二天 · 下午 2:18', title: '现场和你的电脑不是一回事。', lines: [line], problemId: 'adapt-to-venue', preview: 'venue-wide', choices: venueSetupChoices() };
+  }
+  if (run.currentNodeId === 'venue-last-check') {
+    const title = run.flags.includes('venue-video-loop') ? '录屏很稳。也完全不用观众。' : run.flags.includes('venue-minimum-tested') ? '测试页能开。人不一定会动它。' : '画面铺满了。鼠标还躺在角落。';
+    return { id: 'venue-last-check', moment: 'problem', time: '第二天 · 下午 4:42', title, lines: [run.history.at(-1)?.summary || '现场回消息了。', '晚上七点开门。最后改一次。'], problemId: 'adapt-to-venue', preview: run.flags.includes('venue-video-loop') ? 'video' : 'venue-test', choices: finalVenueChoices(run) };
+  }
+  if (run.currentNodeId === 'venue-opened') {
+    if (run.flags.includes('venue-guided-control')) return { id: 'venue-opened', moment: 'ending', time: '第二天 · 晚上 7:08', title: '第一个观众找到鼠标了。', lines: ['他拖了一下。画面躲开了。然后又拖了一下。'], preview: 'guided', choices: [] };
+    if (run.flags.includes('venue-idle-motion')) return { id: 'venue-opened', moment: 'ending', time: '第二天 · 晚上 7:08', title: '没人碰鼠标。画面还是活着。', lines: ['它慢慢散开，又自己聚回来。现场没有掌声，也没有黑屏。'], preview: 'venue-idle', choices: [] };
+    return { id: 'venue-opened', moment: 'ending', time: '第二天 · 晚上 7:08', title: '它每十秒准时重来。', lines: ['没有人弄坏它，因为没有人能碰它。非常稳。'], preview: 'video', choices: [] };
+  }
   return {
-    id: 'morning-link', moment: 'ending', time: '上午 9:54', title: '链接发出去了。',
-    lines: [linkReply(run)], preview: previewAfterResponse(run), choices: []
+    id: 'unknown-first-week-state', moment: 'ending', time: '时间不详', title: '这段记录断了。',
+    lines: ['重新开始，或者保留这份坏存档。'], preview: 'broken', choices: []
   };
 }
 
@@ -261,14 +348,16 @@ const budget = { maxPrimaryItems: 1, maxActions: 3, maxNewConcepts: 1, maxCharac
 
 export function firstWeekSurface(scene: FirstWeekScene): SurfaceContract {
   const items: SurfaceItem[] = [
-    { id: `${scene.id}-title`, role: scene.moment === 'ending' ? 'result' : 'problem', text: scene.title, priority: 'primary', problemId: scene.problemId, effectRefs: scene.moment === 'ending' ? ['work.versions'] : undefined, factId: `${scene.id}-headline` },
+    { id: `${scene.id}-title`, role: scene.moment === 'problem' ? 'problem' : 'result', text: scene.title, priority: 'primary', problemId: scene.problemId, effectRefs: scene.moment === 'problem' ? undefined : ['work.versions'], factId: `${scene.id}-headline` },
     ...scene.lines.filter(Boolean).map((line, index) => ({ id: `${scene.id}-line-${index}`, role: scene.moment === 'ending' ? 'result' as const : 'context' as const, text: line, priority: 'secondary' as const, problemId: scene.problemId, effectRefs: scene.moment === 'ending' ? ['work.status'] : undefined, factId: `${scene.id}-line-${index}` })),
-    ...scene.choices.map((choice) => ({ id: `${scene.id}-${choice.id}`, role: 'action' as const, text: `${choice.label}${choice.note}`, priority: 'secondary' as const, problemId: scene.problemId, enablesActionIds: [choice.id], effectRefs: Object.keys(choice.result.delta), factId: `${scene.id}-action-${choice.id}` }))
+    ...scene.choices.map((choice) => ({ id: `${scene.id}-${choice.id}`, role: 'action' as const, text: `${choice.label}${choice.note}`, priority: 'secondary' as const, problemId: scene.problemId, enablesActionIds: [choice.id], effectRefs: Object.keys(choice.result.delta), factId: `${scene.id}-action-${choice.id}` })),
+    ...(scene.advance ? [{ id: `${scene.id}-${scene.advance.id}`, role: 'action' as const, text: scene.advance.label, priority: 'secondary' as const, problemId: scene.problemId, enablesActionIds: [scene.advance.id], effectRefs: ['currentNodeId'], factId: `${scene.id}-advance` }] : [])
   ];
   return { id: scene.id, moment: scene.moment, currentProblemId: scene.problemId, items, budget };
 }
 
 export function sceneAsNarrativeNode(scene: FirstWeekScene): NarrativeNode {
+  if (scene.advance) return { id: scene.id, type: 'transition', text: scene.lines.join(' '), nextNodeId: scene.advance.nextNodeId };
   return { id: scene.id, type: 'decision', text: scene.lines.join(' '), actions: scene.choices };
 }
 

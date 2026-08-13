@@ -18,4 +18,8 @@ test('AI is not required by any first-week action', async ({ page }) => {
   await page.getByRole('button', { name: /把鼠标操作换成触摸/ }).click();
   await page.getByRole('button', { name: /现在发链接/ }).click();
   await expect(page.getByText('场地方回：“收到，手机也能打开。”')).toBeVisible();
+  await page.getByRole('button', { name: '看下午发来的现场照片' }).click();
+  await page.getByRole('button', { name: /按现场照片重排画面/ }).click();
+  await page.getByRole('button', { name: /认了：今晚就播录屏/ }).click();
+  await expect(page.getByRole('heading', { name: '它每十秒准时重来。' })).toBeVisible();
 });

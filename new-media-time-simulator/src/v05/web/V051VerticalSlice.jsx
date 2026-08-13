@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { applyAction, loadRunState, saveRunState, V051_RUN_SAVE_KEY } from '../runState.ts';
+import { advanceTransition, applyAction, loadRunState, saveRunState, V051_RUN_SAVE_KEY } from '../runState.ts';
 import { firstWeekScene, freshFirstWeekRun, sceneAsNarrativeNode } from '../firstWeekContent.ts';
 import './v051-vertical-slice.css';
 
@@ -15,6 +15,9 @@ function WorkPreview({ state }) {
     desktop: '小屏幕：不支持',
     guided: '操作：有提示',
     video: '交付：只有录屏',
+    'venue-wide': '现场：挤在左边',
+    'venue-test': '现场：等人操作',
+    'venue-idle': '现场：自己会动',
     minimal: '小屏幕：待试',
     responsive: '小屏幕：待试'
   }[state];
@@ -27,6 +30,8 @@ function WorkPreview({ state }) {
       {state === 'desktop' && <p>请用电脑打开</p>}
       {state === 'guided' && <p>拖动这些圆</p>}
       {state === 'video' && <p>00:10 / 00:10</p>}
+      {state === 'venue-wide' && <p>现场照片：画面挤在左边</p>}
+      {state === 'venue-test' && <p>动一下</p>}
       {state === 'touch' && <button type="button" aria-label="预览里的互动按钮">点一下</button>}
     </div>
     <footer><span>{state === 'broken' ? '画面：无' : '画面：有'}</span><span>{smallScreenState}</span></footer>
@@ -45,6 +50,10 @@ export default function V051VerticalSlice() {
       const currentScene = firstWeekScene(current);
       return applyAction(current, sceneAsNarrativeNode(currentScene), actionId);
     });
+  }
+
+  function advance() {
+    setRun((current) => advanceTransition(current, sceneAsNarrativeNode(firstWeekScene(current))));
   }
 
   function restart() {
@@ -73,9 +82,11 @@ export default function V051VerticalSlice() {
           </button>)}
         </div>}
 
+        {scene.advance && <button className="v051-continue" onClick={advance}>{scene.advance.label}</button>}
+
         {scene.moment === 'ending' && <>
-          <section className="v051-night" aria-label="今晚发生的事">
-            <h2>今晚</h2>
+          <section className="v051-night" aria-label="这两天发生的事">
+            <h2>这两天</h2>
             <ol>{run.history.map((entry) => <li key={entry.id}>{entry.summary}</li>)}</ol>
           </section>
           <button className="v051-again" onClick={restart}>再熬一遍</button>

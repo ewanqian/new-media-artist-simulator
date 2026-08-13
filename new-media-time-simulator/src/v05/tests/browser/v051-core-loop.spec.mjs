@@ -25,7 +25,7 @@ test('default entry does not load legacy overlays, engines, or their storage', a
   await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(['nmas-v05.1-run']);
 });
 
-test('first-week loop changes the visible work, records feedback, and resumes after refresh', async ({ page }) => {
+test('two-day loop carries one Work from black screen through feedback into its first public run', async ({ page }) => {
   await page.getByRole('button', { name: /看第一条红色报错/ }).click();
   await expect(page.getByRole('heading', { name: '画面回来了。先别急着感动。' })).toBeVisible();
   await page.getByRole('button', { name: /发给一个还没睡的朋友/ }).click();
@@ -40,6 +40,21 @@ test('first-week loop changes the visible work, records feedback, and resumes af
   })).toEqual([2, 3, 'used', 4]);
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.getByText('场地方回：“收到。拖动提示看见了。”')).toBeVisible();
+  await page.getByRole('button', { name: '看下午发来的现场照片' }).click();
+  await expect(page.getByRole('heading', { name: '现场和你的电脑不是一回事。' })).toBeVisible();
+  await expect(page.getByLabel('作品预览')).toContainText('现场：挤在左边');
+  await page.getByRole('button', { name: /先发一个只有圆和鼠标的测试页/ }).click();
+  await expect(page.getByText(/不看你消息的人，不知道要动它/)).toBeVisible();
+  await page.getByRole('button', { name: /没人碰时，也让画面自己慢慢动/ }).click();
+  await expect(page.getByRole('heading', { name: '没人碰鼠标。画面还是活着。' })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => {
+    const run = JSON.parse(localStorage.getItem('nmas-v05.1-run') || '{}');
+    return [run.works?.[0]?.status, run.works?.[0]?.versions?.length, run.feedback?.length, run.history?.length, run.currentNodeId];
+  })).toEqual(['public', 5, 3, 6, 'venue-opened']);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  expect(overflow).toBe(false);
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByText('现场没有掌声，也没有黑屏。')).toBeVisible();
 });
 
 for (const width of [1024, 1440]) {
