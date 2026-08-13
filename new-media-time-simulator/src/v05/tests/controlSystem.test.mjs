@@ -33,6 +33,6 @@ test('surface rejects early irrelevant concepts, dead UI, duplicate facts, and m
 
 test('change record cannot pass without problem, state effect, checks, and rollback', () => {
   assert.deepEqual(validateChangeRecord({ id: 'wp', playerProblem: '', changedFiles: [], stateEffect: '', automatedChecks: [], humanReview: 'pending', rollbackCommit: '' }), [
-    'playerProblem', 'changedFiles', 'stateEffect', 'automatedChecks', 'rollbackCommit'
+    'playerProblem', 'changedFiles', 'stateEffect', 'automatedChecks', 'humanReview', 'rollbackCommit'
   ]);
 });

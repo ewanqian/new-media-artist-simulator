@@ -12,7 +12,9 @@
     "verify:v03": "npm run typecheck:v03 && npm run test:v03 && npm run build",
     "typecheck:v05": "npx --yes -p typescript@5.9.3 tsc -p tsconfig.v05.json",
     "test:v05": "node --experimental-strip-types --test src/v05/tests/*.test.mjs",
+    "audit:v051": "node scripts/audit-v051-build.mjs",
     "verify:v05": "npm run typecheck:v03 && npm run test:v03 && npm run typecheck:v05 && npm run test:v05 && npm run build",
+    "verify:v051": "npm run verify:v05 && npm run audit:v051",
     "deploy:docs": "npm run build && node scripts/sync-docs.mjs",
     "deploy:gh-pages": "npm run build && gh-pages -d dist"
   },

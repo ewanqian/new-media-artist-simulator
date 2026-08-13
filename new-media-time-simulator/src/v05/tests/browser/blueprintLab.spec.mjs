@@ -22,10 +22,11 @@ async function openPalette(page, isMobile) {
   await expect(page.locator('.be-palette')).toBeVisible();
 }
 
-test('v05 home exposes career chapters and free-create modes while tools stay secondary', async ({ page }) => {
+test('legacy v05 home keeps one direct play entry while free-create tools stay secondary', async ({ page }) => {
   await page.goto('/?core=v05&mode=home', { waitUntil: 'networkidle' });
   await expect(page.getByRole('heading', { name: '新媒体艺术家模拟器' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /生涯 \/ 章节/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /开始第一件作品/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /生涯 \/ 章节/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /新建空白/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /打开最近工作图/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /内容管理/ })).toBeVisible();

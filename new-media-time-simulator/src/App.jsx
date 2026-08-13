@@ -1,24 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import Assessment from './components/Assessment.jsx';
-import ArchetypePicker from './components/ArchetypePicker.jsx';
-import Dashboard from './components/Dashboard.jsx';
-import './v05/onboardingPolicy.ts';
-import './v05/web/v05-mobile-fix.css';
-import './v05/web/v05-blueprint-editor-fixes.css';
-import V05GlobalFeedback from './v05/web/V05GlobalFeedback.jsx';
-import {
-  createInitialState,
-  equipSkill,
-  getAvailableRegions,
-  getComputedStats,
-  getCurrentSubmap,
-  getRecommendedArchetype,
-  getRegionById,
-  moveToRegion,
-  performAction,
-  startGameWithArchetype,
-  startProject
-} from './engine/gameEngine.js';
+import { lazy, Suspense } from 'react';
 
 const V03CorePreview = lazy(() => import('./v03/web/V03CorePreview.jsx'));
 const V05Experience = lazy(() => import('./v05/web/V05CareerExperienceShell.jsx'));
@@ -29,10 +9,11 @@ const V05ContentManager = lazy(() => import('./v05/web/V05ContentManager.jsx'));
 const V05CostaRicaRoute = lazy(() => import('./v05/web/V05ButterflyScholarRoute.jsx'));
 const V05Ep00Route = lazy(() => import('./v05/web/V05Ep00Route.jsx'));
 const V051VerticalSlice = lazy(() => import('./v05/web/V051VerticalSlice.jsx'));
-const STORAGE_KEY = 'new-media-time-simulator-save';
+const V05LegacyFrame = lazy(() => import('./v05/web/V05LegacyFrame.jsx'));
+const LegacySimulator = lazy(() => import('./legacy/LegacySimulator.jsx'));
 
 function V05Frame({ children }) {
-  return <>{children}<V05GlobalFeedback /></>;
+  return <Suspense fallback={<main className="app-shell"><section className="panel">正在载入…</section></main>}><V05LegacyFrame>{children}</V05LegacyFrame></Suspense>;
 }
 
 export default function App() {
@@ -95,91 +76,5 @@ export default function App() {
       </Suspense>
     );
   }
-  return <LegacySimulator />;
-}
-
-function LegacySimulator() {
-  const [state, setState] = useState(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : createInitialState();
-    } catch (error) {
-      return createInitialState();
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
-
-  const computedStats = useMemo(() => getComputedStats(state), [state]);
-  const currentRegion = getRegionById(state.currentRegionId);
-  const currentSubmap = getCurrentSubmap(state);
-  const availableRegions = getAvailableRegions(state.phase);
-
-  const handleAnswer = (index, option) => {
-    setState((current) => {
-      const answers = [...current.answers];
-      answers[index] = option;
-      return { ...current, answers };
-    });
-  };
-
-  const handleFinishAssessment = (recommendedArchetypeId) => {
-    setState((current) => ({
-      ...current,
-      recommendedArchetypeId,
-      stage: 'pick',
-      log: [...current.log, `测评完成。系统建议你尝试：${recommendedArchetypeId}`]
-    }));
-  };
-
-  const handleSelectArchetype = (archetypeId) => {
-    setState((current) => startGameWithArchetype(current, archetypeId));
-  };
-
-  const handleStartProject = (projectId) => {
-    setState((current) => startProject(current, projectId));
-  };
-
-  const handleMove = (regionId) => {
-    setState((current) => moveToRegion(current, regionId));
-  };
-
-  const handlePerformAction = (actionId) => {
-    setState((current) => performAction(current, actionId));
-  };
-
-  const handleEquipSkill = (slot, skillId) => {
-    setState((current) => equipSkill(current, slot, skillId));
-  };
-
-  if (state.stage === 'assessment') {
-    return (
-      <Assessment
-        answers={state.answers}
-        onAnswer={handleAnswer}
-        onFinish={handleFinishAssessment}
-        getRecommendation={getRecommendedArchetype}
-      />
-    );
-  }
-
-  if (state.stage === 'pick') {
-    return <ArchetypePicker recommendedId={state.recommendedArchetypeId} onSelect={handleSelectArchetype} />;
-  }
-
-  return (
-    <Dashboard
-      state={state}
-      computedStats={computedStats}
-      currentRegion={currentRegion}
-      currentSubmap={currentSubmap}
-      availableRegions={availableRegions}
-      onStartProject={handleStartProject}
-      onMove={handleMove}
-      onPerformAction={handlePerformAction}
-      onEquipSkill={handleEquipSkill}
-    />
-  );
+  return <Suspense fallback={<main className="app-shell"><section className="panel">正在载入…</section></main>}><LegacySimulator/></Suspense>;
 }

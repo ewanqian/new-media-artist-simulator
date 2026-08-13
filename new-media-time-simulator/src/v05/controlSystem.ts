@@ -163,6 +163,7 @@ export function validateChangeRecord(record: ChangeRecord): string[] {
   if (!record.changedFiles.length) missing.push('changedFiles');
   if (!record.stateEffect.trim()) missing.push('stateEffect');
   if (!record.automatedChecks.length) missing.push('automatedChecks');
+  if (record.humanReview !== 'passed') missing.push('humanReview');
   if (!record.rollbackCommit.trim()) missing.push('rollbackCommit');
   return missing;
 }

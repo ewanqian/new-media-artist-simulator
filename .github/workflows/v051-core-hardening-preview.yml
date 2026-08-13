@@ -27,7 +27,13 @@ jobs:
           cache-dependency-path: new-media-time-simulator/package-lock.json
       - run: npm ci
       - name: Strict content, state, and build verification
-        run: npm run verify:v05
+        run: npm run verify:v051
+      - name: Install pinned browser test harness
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.60.0
+          npx playwright install --with-deps chromium
+      - name: Verify first-session behavior on desktop and mobile
+        run: npx playwright test -c playwright.v05.config.mjs src/v05/tests/browser/v051-core-loop.spec.mjs src/v05/tests/browser/v051-smoke.spec.mjs
       - name: Verify relative Pages artifact
         run: |
           test -f dist/index.html

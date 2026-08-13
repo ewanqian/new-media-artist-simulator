@@ -17,6 +17,14 @@ test('default entry starts inside one concrete problem with no menu or premature
   }
 });
 
+test('default entry does not load legacy overlays, engines, or their storage', async ({ page }) => {
+  const resources = await page.evaluate(() => performance.getEntriesByType('resource').map((entry) => entry.name));
+  for (const legacyChunk of ['V05LegacyFrame', 'V05GlobalFeedback', 'LegacySimulator']) {
+    expect(resources.some((url) => url.includes(legacyChunk))).toBe(false);
+  }
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(['nmas-v05.1-run']);
+});
+
 test('first-week loop changes the visible work, records feedback, and resumes after refresh', async ({ page }) => {
   await page.getByRole('button', { name: /看第一条红色报错/ }).click();
   await expect(page.getByRole('heading', { name: '画面回来了。先别急着感动。' })).toBeVisible();
