@@ -1,0 +1,1 @@
+import{R as t}from"./index-CMwsZ5Ma.js";import{s as a}from"./legacyDeck-BpfZZxmT.js";import{V as r}from"./V05GlobalFeedback-6eQ7_cCw.js";for(const e of a)e.unlockAt=Math.max(4,e.unlockAt);function m({children:e}){return t.createElement(t.Fragment,null,e,t.createElement(r,null))}export{m as default};
